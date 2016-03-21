@@ -1,17 +1,17 @@
 module Pages.GamePage where
-
+import String
 import Html exposing (..)
 import Html.Attributes exposing (..)
 import Html.Events exposing (..)
 import Model exposing (..)
 import Actions exposing (..)
 import Util.Events exposing (onInput)
+import Util.List exposing (find, last)
 
 gamePage : Model -> Html
-gamePage model =
+gamePage {location, games, taskForm} =
   let
-    game' = List.head model.games
-    taskForm = model.taskForm
+    game' = Debug.log "game" <| getSelectedGame location games
   in
     case game' of
       Just game ->
@@ -32,3 +32,25 @@ gamePage model =
 gameTask : GameTask -> Html
 gameTask task =
   li [class "list-group-item"] [text task.title]
+
+getSelectedGame : String -> List Game -> Maybe Game
+getSelectedGame location games =
+  let
+    gameId = chain toInt (last (String.split "/" location))
+  in
+    case gameId of
+      Just selected -> find (\{id} -> id == selected) games
+      _ -> Nothing
+
+
+chain : (a -> Maybe b) -> Maybe a -> Maybe b
+chain f a =
+  case a of
+    Just v -> f v
+    Nothing -> Nothing
+
+toInt : String -> Maybe Int
+toInt str =
+  case String.toInt str of
+    Ok v -> Just v
+    _ -> Nothing

@@ -11,5 +11,5 @@ games action model =
 updateGames : Action -> List Game -> List Game
 updateGames action games =
   case action of
-    CreateGame game -> game :: games
+    CreateGame game -> {game | id = List.length games} :: games
     _ -> games

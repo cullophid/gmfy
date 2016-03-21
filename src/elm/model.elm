@@ -3,6 +3,7 @@ module Model where
 
 
 type alias Game = {
+  id : Int,
   title : String,
   tasks : List GameTask
 }
@@ -45,6 +46,7 @@ emptyModel =
 
 emptyGame =
   {
+    id = 0,
     title = "",
     tasks = []
   }

@@ -11,6 +11,7 @@ updateForm : Action -> TaskForm -> TaskForm
 updateForm action taskForm =
   case action of
     Actions.ShowTaskForm bool -> { taskForm | showTaskForm = bool }
+    Actions.AddTask _ -> {taskForm | showTaskForm = False, task = emptyTask}
     _ -> {taskForm | task = updateTask action taskForm.task}
 
 updateTask : Action -> GameTask -> GameTask
@@ -19,5 +20,4 @@ updateTask action task =
     Actions.SetTaskTitle title -> {task | title = title}
     Actions.SetTaskDescription description -> {task | description = description}
     Actions.SetTaskValue value -> {task | value = value}
-    Actions.AddTask task -> emptyTask
     _ -> task

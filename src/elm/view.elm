@@ -3,7 +3,7 @@ module View where
 import Html exposing (Html, div)
 import Html.Attributes exposing (..)
 import Html.Events exposing (..)
-import Components.Route exposing (route)
+import Components.Router exposing (router, route)
 import Components.Header exposing (header)
 import Actions exposing (actions)
 import Pages.NewGamePage exposing (newGamePage)
@@ -20,10 +20,12 @@ view model =
       div [class "col-xs-8 col-xs-offset-2"] [
         header,
         div [class ""] [
-          route "#home" (homePage) location,
-          route "#new-game" (newGamePage model) location,
-          route "#games/game" (gamePage model) location,
-          route "#games" (gamesListPage games) location
+          router [
+            route "#home" (homePage),
+            route "#new-game" (newGamePage model),
+            route "#games/[0-9]*" (gamePage model),
+            route "#games" (gamesListPage games)
+          ] location
         ]
       ]
     ]
