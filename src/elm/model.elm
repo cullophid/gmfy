@@ -1,36 +1,45 @@
 module Model where
 
 
-type alias GameTask = {
-  title : String,
-  description : String,
-  value : Int
-}
 
 type alias Game = {
   title : String,
   tasks : List GameTask
 }
 
+type alias GameForm = {
+  game : Game
+}
+
+type alias GameTask = {
+  title : String,
+  description : String,
+  value : Int
+}
+
+type alias TaskForm = {
+  showTaskForm : Bool,
+  task : GameTask
+}
+
 type alias Model = {
-  newGame : {
-    showNewTask: Bool,
-    game : Game
-  },
-  newTask : GameTask,
+  gameForm : GameForm,
+  taskForm : TaskForm,
   games : List Game,
   location : String
 }
 
-initialModel : Model
-initialModel =
+emptyModel : Model
+emptyModel =
   {
     location  = "#home",
-    newGame = {
-      showNewTask = False,
+    gameForm = {
       game = emptyGame
     },
-    newTask = emptyTask,
+    taskForm = {
+      showTaskForm = False,
+      task = emptyTask
+    },
     games = []
   }
 

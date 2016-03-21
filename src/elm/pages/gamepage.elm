@@ -11,7 +11,7 @@ gamePage : Model -> Html
 gamePage model =
   let
     game' = List.head model.games
-    newTask = model.newTask
+    taskForm = model.taskForm
   in
     case game' of
       Just game ->

@@ -6,6 +6,13 @@
     <script src="/elm.js" charset="utf-8"></script>
   </head>
   <body>
-    <script> Elm.fullscreen(Elm.Main, {}) </script>
+    <script>
+      var storedState = localStorage.getItem('gmfy-state');
+      var startingState = storedState ? JSON.parse(storedState) : null;
+      var gmfy = Elm.fullscreen(Elm.Main, { getStorage: startingState });
+      gmfy.ports.setStorage.subscribe(function(state) {
+        localStorage.setItem('gmfy-state', JSON.stringify(state));
+      });
+    </script>
   </body>
 </html>

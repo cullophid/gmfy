@@ -14,14 +14,14 @@ import Model exposing (Model)
 
 view : Model -> Html
 view model =
-  let {newGame, games, location} = model
+  let {gameForm, games, location} = model
   in
     div [class "container-fluid full-screen bg-gray-ligthest"] [
       div [class "col-xs-8 col-xs-offset-2"] [
         header,
         div [class ""] [
           route "#home" (homePage) location,
-          route "#new-game" (newGamePage newGame) location,
+          route "#new-game" (newGamePage model) location,
           route "#games/game" (gamePage model) location,
           route "#games" (gamesListPage games) location
         ]

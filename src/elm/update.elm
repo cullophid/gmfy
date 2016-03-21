@@ -1,7 +1,8 @@
 module Update where
-import Update.NewGame exposing (newGame)
+import Update.GameForm exposing (gameForm)
 import Update.Games exposing (games)
 import Update.Location exposing (location)
+import Update.TaskForm exposing (taskForm)
 
 import Actions exposing (Action)
 import Model exposing (Model)
@@ -14,7 +15,8 @@ composeAll action = (List.foldl (<<) (\a -> a)) << List.map (\r -> r action)
 update action model =
   let
     updateAll = composeAll (Debug.watch "action" action) [
-      newGame,
+      gameForm,
+      taskForm,
       games,
       location
     ]
