@@ -1,22 +1,15 @@
-# TodoMVC in Elm - [Try It!](http://evancz.github.io/elm-todomvc)
+# gmfy
+project for gmfy.life
 
-[![Deploy](https://www.herokucdn.com/deploy/button.png)](https://heroku.com/deploy)
+## install
 
-## Project Structure
-
-All of the Elm code lives in `Todo.elm` and relies on the [elm-html][] library. 
-
-[elm-html]: http://package.elm-lang.org/packages/evancz/elm-html/latest 
-
-There also is a port handler set up in `index.html` to set the focus on
-particular text fields when necessary.
-
-## Build Instructions
-
-Run the following command from the root of this project:
-
-```bash
-elm-make Todo.elm --output elm.js
+```
+elm package install
+npm i
 ```
 
-Then open `index.html` in your browser!
+## build
+```
+npm run build
+
+```

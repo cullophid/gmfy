@@ -1,0 +1,32 @@
+{
+  "name": "gmfy",
+  "version": "1.0.0",
+  "main": "index.js",
+  "scripts": {
+    "build:elm": "elm make src/elm/main.elm --output public/elm.js",
+    "build:sass": "node-sass src/sass/main.scss public/bundle.css",
+    "build": "npm run build:elm && npm run build:sass",
+    "watch:elm": "watch 'npm run build:elm' src/elm",
+    "watch:sass": "watch 'npm run build:sass' src/sass",
+    "watch": "parallelshell 'npm run watch:elm' 'npm run watch:sass'",
+    "livereload": "parallelshell 'livereload public/' 'npm run watch'",
+    "dev": "parallelshell 'npm start' 'npm run livereload'",
+    "start": "serve public"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/cullophid/gmfy.git"
+  },
+  "author": "",
+  "license": "ISC",
+  "bugs": {},
+  "devDependencies": {
+    "elm": "^0.16.0",
+    "node-sass": "^3.4.2",
+    "watchify": "^3.7.0"
+  },
+  "dependencies": {
+    "serve": "^1.4.0"
+  }
+}
+git@github.com:cullophid/gmfy.git

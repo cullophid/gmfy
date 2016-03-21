@@ -1,2 +1,7 @@
+# dependencies
 elm-stuff
-elm.js
+node_modules/
+
+#build
+public/elm.js
+public/bundle.css

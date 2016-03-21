@@ -1,0 +1,18 @@
+@import "variables";
+@import "bootstrap/bootstrap";
+
+.bg-gray-ligth { background: $gray-light; }
+.bg-gray-ligther { background: $gray-lighter; }
+.bg-gray-ligthest { background: $gray-lightest; }
+
+.full-screen {
+  height: 100vh;
+}
+
+body {
+  color: rgba(0, 0, 0, 0.6);
+}
+
+a {
+  cursor: pointer;
+}
