@@ -35,13 +35,13 @@ newGamePage model =
           div [class "pull-xs-right"] [
             button [
               type' "button",
-              class "btn btn-danger",
+              class "btn btn-danger-outline",
               linkTo "#games"
             ] [text "Cancel"],
             text " ",
             button [
               type' "button",
-              class "btn btn-success",
+              class "btn btn-success-outline",
               onClick (Actions.CreateGame game)
             ] [text "Create Game"]
           ]

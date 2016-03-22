@@ -14,7 +14,7 @@ newTaskForm taskForm =
       True -> content task
       _ ->
         button [
-          class "btn btn-success",
+          class "btn btn-success-outline",
           onClick (Actions.ShowTaskForm True)
         ] [text "Add Task"]
 
@@ -48,12 +48,12 @@ content task =
       div [class "clearfix"] [
         div [class "pull-xs-right"] [
           button [
-            class "btn btn-danger",
+            class "btn btn-danger-outline",
             onClick (Actions.ShowTaskForm False)
           ] [text "cancel"],
           text " ",
           button [
-            class "btn btn-success",
+            class "btn btn-success-outline",
             onClick (Actions.AddTask task)
           ] [text "add"]
         ]
