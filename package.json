@@ -1,6 +1,6 @@
 {
   "name": "gmfy",
-  "version": "1.0.0",
+  "version": "1.1.0",
   "main": "index.js",
   "scripts": {
     "build:elm": "elm make src/elm/main.elm --output public/elm.js",
