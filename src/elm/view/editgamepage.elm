@@ -1,4 +1,4 @@
-module Pages.GamePage where
+module View.GamePage where
 
 import Html exposing (..)
 import Html.Attributes exposing (..)

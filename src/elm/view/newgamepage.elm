@@ -1,10 +1,11 @@
-module Pages.NewGamePage where
+module View.NewGamePage where
+
 import Html exposing (..)
 import Html.Attributes exposing (class, value, type')
 import Util.Events exposing (onClick, onInput, onSubmit, linkTo)
 import Model exposing (..)
 import Actions exposing (..)
-import Pages.NewTaskForm exposing (newTaskForm)
+import View.NewTaskForm exposing (newTaskForm)
 
 newGamePage : Model -> Html
 newGamePage model =
@@ -30,17 +31,20 @@ newGamePage model =
           div [class "list-group list-group-flush"] <| List.map gameTask game.tasks,
           newTaskForm taskForm
         ],
-        div [ class "card-block"] [
-          button [
-            type' "button",
-            class "btn btn-danger",
-            linkTo "#games"
-          ] [text "Cancel"],
-          button [
-            type' "button",
-            class "btn btn-success",
-            onClick (Actions.CreateGame game)
-          ] [text "Create Game"]
+        div [ class "card-block clearfix"] [
+          div [class "pull-xs-right"] [
+            button [
+              type' "button",
+              class "btn btn-danger",
+              linkTo "#games"
+            ] [text "Cancel"],
+            text " ",
+            button [
+              type' "button",
+              class "btn btn-success",
+              onClick (Actions.CreateGame game)
+            ] [text "Create Game"]
+          ]
         ]
       ]
     ]

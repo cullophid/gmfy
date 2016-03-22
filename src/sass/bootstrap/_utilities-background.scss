@@ -9,9 +9,17 @@
   background-color: $gray-dark;
 }
 
-.bg-faded {
-  background-color: $gray-lightest;
-}
+.bg-faded { background-color: $gray-lightest; }
+
+.bg-gray-dark { background: $gray-dark; }
+
+.bg-gray { background: $gray; }
+
+.bg-gray-light { background: $gray-light; }
+
+.bg-gray-lighter { background: $gray-lighter; }
+
+.bg-gray-lightest { background: $gray-lightest; }
 
 @include bg-variant('.bg-primary', $brand-primary);
 

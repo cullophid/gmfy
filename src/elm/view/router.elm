@@ -1,4 +1,5 @@
-module Components.Router where
+module View.Router where
+
 import Html exposing (Html, text)
 import Regex exposing (regex, contains)
 import Util.List exposing (find)

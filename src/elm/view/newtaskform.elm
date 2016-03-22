@@ -1,4 +1,5 @@
-module Pages.NewTaskForm where
+module View.NewTaskForm where
+
 import Html exposing (..)
 import Html.Attributes exposing (class, type')
 import Model exposing (TaskForm, GameTask)
@@ -44,13 +45,18 @@ content task =
           onNumberInput Actions.SetTaskValue
         ] []
       ],
-      button [
-        class "btn btn-danger",
-        onClick (Actions.ShowTaskForm False)
-      ] [text "cancel"],
-      button [
-        class "btn btn-success",
-        onClick (Actions.AddTask task)
-      ] [text "add"]
+      div [class "clearfix"] [
+        div [class "pull-xs-right"] [
+          button [
+            class "btn btn-danger",
+            onClick (Actions.ShowTaskForm False)
+          ] [text "cancel"],
+          text " ",
+          button [
+            class "btn btn-success",
+            onClick (Actions.AddTask task)
+          ] [text "add"]
+        ]
+      ]
     ]
   ]

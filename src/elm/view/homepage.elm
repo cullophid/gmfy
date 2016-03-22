@@ -1,4 +1,5 @@
-module Pages.HomePage where
+module View.HomePage where
+
 import Html exposing (..)
 import Html.Attributes exposing (..)
 

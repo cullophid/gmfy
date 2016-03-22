@@ -1,4 +1,5 @@
-module Pages.GamesListPage(gamesListPage) where
+module View.GamesListPage (gamesListPage) where
+
 import Html exposing (..)
 import Html.Attributes exposing (..)
 import Util.Events exposing (linkTo)
@@ -6,8 +7,9 @@ import Util.Events exposing (linkTo)
 gamesListPage games =
   div [class "card"] [
     div [class "card-block"] [
-      div [class "list-group list-group-flush"] <| List.map listItem games
+      h1 [] [text "Games"]
     ],
+    div [class "list-group list-group-flush"] <| List.map listItem games,
     div [class "card-block"] [
       button [
         class "btn btn-primary btn-outline",

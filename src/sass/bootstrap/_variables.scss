@@ -26,17 +26,17 @@
 //
 // Grayscale and brand colors for use across Bootstrap.
 
-$gray-dark:                 #373a3c !default;
+$gray-dark:                 #13293D !default;
 $gray:                      #55595c !default;
 $gray-light:                #818a91 !default;
-$gray-lighter:              #eceeef !default;
+$gray-lighter:              #E8F1F2 !default;
 $gray-lightest:             #f7f7f9 !default;
 
-$brand-primary:             #0275d8 !default;
-$brand-success:             #5cb85c !default;
-$brand-info:                #5bc0de !default;
-$brand-warning:             #f0ad4e !default;
-$brand-danger:              #d9534f !default;
+$brand-primary:             #247BA0 !default;
+$brand-success:             #1B98E0 !default;
+$brand-info:                #247BA0 !default;
+$brand-warning:             #13293D !default;
+$brand-danger:              #006494 !default;
 
 
 // Options
@@ -364,9 +364,11 @@ $zindex-modal:             1050 !default;
 
 // Navbar
 
-$navbar-border-radius:              $border-radius !default;
+$navbar-border-radius:              0 !default;
 $navbar-padding-horizontal:         $spacer !default;
 $navbar-padding-vertical:           ($spacer / 2) !default;
+$navbar-box-shadow:                 0 1px 3px rgba(0, 0, 0, 0.4) !default;
+
 
 $navbar-dark-color:                 rgba(255,255,255,.5) !default;
 $navbar-dark-hover-color:           rgba(255,255,255,.75) !default;

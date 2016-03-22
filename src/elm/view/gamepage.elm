@@ -1,4 +1,5 @@
-module Pages.GamePage where
+module View.GamePage where
+
 import String
 import Html exposing (..)
 import Html.Attributes exposing (..)
@@ -25,15 +26,13 @@ gamePage {location, games, taskForm, user} =
 
 showGamePage : Int -> Game -> Html
 showGamePage score game =
-  div [class "container-fluid"] [
-    div [class "card"] [
-      div [class "card-block"] [
-        h1 [] [text <| game.title ++ " (" ++ (toString score) ++ ")"]
-      ],
-      div [class "card-block"] [
-        ul [class "list-group list-group-flush"]
-          <| List.map gameTask game.tasks
-      ]
+  div [class "card"] [
+    div [class "card-block"] [
+      h1 [] [text <| game.title ++ " (" ++ (toString score) ++ ")"]
+    ],
+    div [class "card-block"] [
+      ul [class "list-group list-group-flush"]
+        <| List.map gameTask game.tasks
     ]
   ]
 

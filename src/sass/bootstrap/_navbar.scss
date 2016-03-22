@@ -6,6 +6,7 @@
 .navbar {
   position: relative;
   padding: $navbar-padding-vertical $navbar-padding-horizontal;
+  box-shadow : $navbar-box-shadow;
   @include clearfix;
 
   @include media-breakpoint-up(sm) {
