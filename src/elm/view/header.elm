@@ -1,7 +1,7 @@
 module View.Header where
 
 import Html exposing (..)
-import Html.Attributes exposing (..)
+import Html.Attributes exposing (class)
 import Html.Events exposing (..)
 import Util.Events exposing (linkTo)
 
@@ -21,5 +21,11 @@ header =
           linkTo "#games"
         ] [text "games"]
       ]
+    ],
+    form [class "form-inline pull-xs-right"] [
+      button [
+        class "btn btn-white-outline",
+        linkTo "#games/new"
+      ] [text "New Game"]
     ]
   ]

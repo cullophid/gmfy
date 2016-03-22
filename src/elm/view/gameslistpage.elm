@@ -9,13 +9,7 @@ gamesListPage games =
     div [class "card-block"] [
       h1 [] [text "Games"]
     ],
-    div [class "list-group list-group-flush"] <| List.map listItem games,
-    div [class "card-block"] [
-      button [
-        class "btn btn-success-outline",
-        linkTo "#games/new"
-      ][text "New Game"]
-    ]
+    div [class "list-group list-group-flush"] <| List.map listItem games
   ]
 
 listItem {title, id} =
