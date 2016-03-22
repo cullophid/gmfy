@@ -1,6 +1,8 @@
 # gmfy
 project for gmfy.life
 
+Trello can be found at https://trello.com/b/Jbll8ecG/gmfydev
+
 ## install
 
 ```
