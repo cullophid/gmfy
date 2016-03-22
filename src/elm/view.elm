@@ -17,12 +17,12 @@ view model =
   let {gameForm, games, location} = model
   in
     div [class "container-fluid full-screen bg-gray-ligthest"] [
-      div [class "col-xs-8 col-xs-offset-2"] [
+      div [class "col-md-8 col-md-offset-2"] [
         header,
         div [class ""] [
           router [
             route "#home" (homePage),
-            route "#new-game" (newGamePage model),
+            route "#games/new" (newGamePage model),
             route "#games/[0-9]*" (gamePage model),
             route "#games" (gamesListPage games)
           ] location

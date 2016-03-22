@@ -11,6 +11,7 @@ type Action
   | SetTaskValue Int
   | AddTask GameTask
   | GoTo String
+  | CompleteTask GameTask
 
 actions : Signal.Mailbox Action
 actions = Signal.mailbox NoOp

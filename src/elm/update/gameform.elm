@@ -4,12 +4,18 @@ import Model exposing (Model, Game, GameForm, emptyGame)
 
 gameForm : Action -> Model -> Model
 gameForm action model =
-  {model | gameForm = updateForm action model.gameForm}
+  let {user, gameForm} = model
+  in
+    case action of
+      Actions.GoTo "#games/new" -> {model | gameForm = setInitialPlayers user gameForm}
+      _ -> {model | gameForm = updateForm action gameForm}
+
+setInitialPlayers user gameForm =
+  {gameForm | game = {emptyGame | players = [(user.id, 0)]}}
 
 updateForm : Action -> GameForm -> GameForm
 updateForm action gameForm =
   case action of
-    Actions.GoTo "#new-game" -> {gameForm | game = emptyGame}
     _ -> {gameForm | game = updateGame action gameForm.game}
 
 updateGame : Action -> Game -> Game

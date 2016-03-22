@@ -1,11 +1,10 @@
 module Model where
 
-
-
 type alias Game = {
   id : Int,
   title : String,
-  tasks : List GameTask
+  tasks : List GameTask,
+  players: List Player
 }
 
 type alias GameForm = {
@@ -23,11 +22,21 @@ type alias TaskForm = {
   task : GameTask
 }
 
+type alias User = {
+  id: Int,
+  firstname : String,
+  lastname : String,
+  email : String
+}
+
+type alias Player = (Int, Int)
+
 type alias Model = {
   gameForm : GameForm,
   taskForm : TaskForm,
   games : List Game,
-  location : String
+  location : String,
+  user : User
 }
 
 emptyModel : Model
@@ -41,14 +50,16 @@ emptyModel =
       showTaskForm = False,
       task = emptyTask
     },
-    games = []
+    games = [],
+    user = emptyUser
   }
 
 emptyGame =
   {
     id = 0,
     title = "",
-    tasks = []
+    tasks = [],
+    players = []
   }
 
 emptyTask =
@@ -56,4 +67,12 @@ emptyTask =
     title = "",
     description = "",
     value = 10
+  }
+
+emptyUser =
+  {
+    id = 0,
+    firstname = "",
+    lastname = "",
+    email = ""
   }

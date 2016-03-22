@@ -1,8 +1,7 @@
 module Pages.NewGamePage where
 import Html exposing (..)
 import Html.Attributes exposing (class, value, type')
-import Html.Events exposing (..)
-import Util.Events exposing (onInput, onSubmit')
+import Util.Events exposing (onClick, onInput, onSubmit, linkTo)
 import Model exposing (..)
 import Actions exposing (..)
 import Pages.NewTaskForm exposing (newTaskForm)
@@ -14,7 +13,7 @@ newGamePage model =
     {game} = gameForm
   in
     div [class "card"] [
-      form [onSubmit' actions.address (Actions.CreateGame game)] [
+      form [onSubmit (Actions.CreateGame game)] [
         div [ class "card-block"] [
           h4 [class "card-title"] [text "New Game"],
           div [class "form-group"] [
@@ -22,7 +21,7 @@ newGamePage model =
             input [
               class "form-control",
               value game.title,
-              onInput actions.address Actions.SetGameTitle
+              onInput Actions.SetGameTitle
             ][]
           ]
         ],
@@ -34,8 +33,13 @@ newGamePage model =
         div [ class "card-block"] [
           button [
             type' "button",
+            class "btn btn-danger",
+            linkTo "#games"
+          ] [text "Cancel"],
+          button [
+            type' "button",
             class "btn btn-success",
-            onClick actions.address (Actions.CreateGame game)
+            onClick (Actions.CreateGame game)
           ] [text "Create Game"]
         ]
       ]

@@ -19,12 +19,6 @@ header =
           class "nav-link",
           linkTo "#games"
         ] [text "games"]
-      ],
-        li [class "nav-item"] [
-          a [
-            class "btn btn-primary-outline",
-            linkTo "#new-game"
-          ] [text "Create New Game"]
-        ]
+      ]
     ]
   ]

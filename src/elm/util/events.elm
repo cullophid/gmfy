@@ -1,15 +1,15 @@
 module Util.Events where
 import String
-import Html.Events exposing (..)
+import Html.Events exposing (on, onWithOptions, targetValue)
 import Html exposing (Attribute)
-import Actions exposing (actions)
+import Actions exposing (Action, actions)
 
-onInput address contentToValue =
-    on "input" targetValue (\str -> Signal.message address (contentToValue str))
+onInput action =
+    on "input" targetValue (\str -> Signal.message actions.address (action str))
 
-onNumberInput address contentToValue =
+onNumberInput action =
   on "input" targetValue
-    (\str -> Signal.message address <| contentToValue <| getInt str)
+    (\str -> Signal.message actions.address <| action <| getInt str)
 
 
 getInt : String -> Int
@@ -21,14 +21,16 @@ getInt str =
       _ -> 0
 
 
-onSubmit' : Signal.Address a -> a -> Attribute
-onSubmit' addr msg =
+onSubmit : Action -> Attribute
+onSubmit msg =
   onWithOptions
     "submit"
     onSubmitOptions
     targetValue
-    (\_ -> Signal.message addr msg)
+    (\_ -> Signal.message actions.address msg)
 
+onClick : Action -> Attribute
+onClick action = Html.Events.onClick actions.address action
 
 onSubmitOptions = {
   stopPropagation = True,
@@ -37,4 +39,4 @@ onSubmitOptions = {
 
 linkTo : String -> Attribute
 linkTo path =
-  onClick actions.address (Actions.GoTo path)
+  onClick (Actions.GoTo path)

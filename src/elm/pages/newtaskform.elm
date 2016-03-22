@@ -1,9 +1,8 @@
 module Pages.NewTaskForm where
 import Html exposing (..)
 import Html.Attributes exposing (class, type')
-import Html.Events exposing (..)
 import Model exposing (TaskForm, GameTask)
-import Util.Events exposing (onInput, onNumberInput)
+import Util.Events exposing (onInput, onNumberInput, onClick)
 import Actions exposing (actions)
 
 newTaskForm : TaskForm -> Html
@@ -15,7 +14,7 @@ newTaskForm taskForm =
       _ ->
         button [
           class "btn btn-success",
-          onClick actions.address (Actions.ShowTaskForm True)
+          onClick (Actions.ShowTaskForm True)
         ] [text "Add Task"]
 
 
@@ -27,14 +26,14 @@ content task =
         label [] [text "Task Title"],
         input [
           class "form-control",
-          onInput actions.address Actions.SetTaskTitle
+          onInput Actions.SetTaskTitle
         ] []
       ],
       div [class "form-group"] [
         label [] [text "Task Description"],
         textarea [
           class "form-control",
-          onInput actions.address Actions.SetTaskDescription
+          onInput Actions.SetTaskDescription
         ] []
       ],
       div [class "form-group"] [
@@ -42,16 +41,16 @@ content task =
         input [
           class "form-control",
           type' "number",
-          onNumberInput actions.address Actions.SetTaskValue
+          onNumberInput Actions.SetTaskValue
         ] []
       ],
       button [
         class "btn btn-danger",
-        onClick actions.address (Actions.ShowTaskForm False)
+        onClick (Actions.ShowTaskForm False)
       ] [text "cancel"],
       button [
         class "btn btn-success",
-        onClick actions.address (Actions.AddTask task)
+        onClick (Actions.AddTask task)
       ] [text "add"]
     ]
   ]

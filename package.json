@@ -7,7 +7,7 @@
     "build:sass": "node-sass src/sass/main.scss public/bundle.css",
     "build": "npm run build:elm && npm run build:sass",
     "watch:elm": "watch 'npm run build:elm' src/elm",
-    "watch:sass": "watch 'npm run build:sass' src/sass",
+    "watch:sass": "npm run build:sass -- -w src/sass",
     "watch": "parallelshell 'npm run watch:elm' 'npm run watch:sass'",
     "livereload": "parallelshell 'livereload public/' 'npm run watch'",
     "dev": "parallelshell 'npm start' 'npm run livereload'",
