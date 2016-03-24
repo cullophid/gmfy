@@ -1,78 +1,84 @@
 module Model where
 
-type alias Game = {
-  id : Int,
-  title : String,
-  tasks : List GameTask,
-  players: List Player
-}
+type alias Game =
+  { id : String
+  , title : String
+  , tasks : List (String, GameTask)
+  , players: List (String, Player)
+  }
 
-type alias GameForm = {
-  game : Game
-}
 
-type alias GameTask = {
-  title : String,
-  description : String,
-  value : Int
-}
+type alias GameEntry =
+  (String, Game)
 
-type alias TaskForm = {
-  showTaskForm : Bool,
-  task : GameTask
-}
+type alias GameForm =
+  { game : Game
+  }
 
-type alias User = {
-  id: Int,
-  firstname : String,
-  lastname : String,
-  email : String
-}
+type alias GameTask =
+  { id : String
+  , title : String
+  , description : String
+  , value : Int
+  }
 
-type alias Player = (Int, Int)
+type alias TaskEntry =
+  (String, GameTask)
 
-type alias Model = {
-  gameForm : GameForm,
-  taskForm : TaskForm,
-  games : List Game,
-  location : String,
-  user : User
-}
+type alias TaskForm =
+  { showTaskForm : Bool
+  , task : GameTask
+  }
+
+type alias Player =
+  { id : String
+  , firstname : String
+  , lastname: String
+  , score : Int
+  }
+
+type alias PlayerEntry =
+  (String, Player)
+
+type alias Model =
+  { gameForm : GameForm
+  , taskForm : TaskForm
+  , games : List (String, Game)
+  , location : String
+  , user : String
+  }
 
 emptyModel : Model
 emptyModel =
-  {
-    location  = "#home",
-    gameForm = {
-      game = emptyGame
-    },
-    taskForm = {
-      showTaskForm = False,
-      task = emptyTask
-    },
-    games = [],
-    user = emptyUser
+  { location  = "#home"
+  , gameForm =
+      { game = emptyGame
+      }
+  , taskForm =
+      { showTaskForm = False
+      , task = emptyTask
+      }
+  , games = []
+  , user = ""
   }
 
 emptyGame =
-  {
-    id = 0,
-    title = "",
-    tasks = [],
-    players = []
+  { id = ""
+  , title = ""
+  , tasks = []
+  , players = []
+  }
+
+emptyPlayer =
+  { id = ""
+  , firstname = ""
+  , lastname = ""
+  , score = 0
   }
 
 emptyTask =
-  {
-    title = "",
-    description = "",
-    value = 10
-  }
-
-emptyUser =
-  {
-    id = 0,
-    firstname = "",
-    lastname = "",
-    email = ""
+  { id = ""
+  , title = ""
+  , description = ""
+  , value = 10
   }

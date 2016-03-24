@@ -4,32 +4,34 @@ import Model exposing (Model, Model, Game)
 import Actions exposing (..)
 import Util.List exposing (last)
 import Util.String exposing (toInt)
+import Util.Map as Map
 
 game : Action -> Model -> Model
 game action model =
   let
-    id = Maybe.andThen (last <| String.split "/") toInt
+    updateGame' =
+      updateGame model
+    { games } =
+      model
+    gameId =
+      Maybe.withDefault "" Maybe.Maybe a(last <| String.split "/")
   in
-    case id of
-      Just i -> {model | games = updateGames (updateGame action) i model.games }
-      _ -> model
+    { model | games = Map.update id (updateGame action) games}
 
-updatePlayers : Action -> Model -> Model
+
+updateGame : Model -> Action -> Game -> Game
+updateGame model action game =
   let
-    game = getGame location games
+    updatePlayer' =
+      updatePlayer model
+    {user} = model
+    {players} =
+      game
+  in
+    {game | players = Map.update user (updatePlayer action) gameplayer}
 
-updateGames : (Game -> Game) -> Int -> List Game -> List Game
-upadteGames f id games =
-  List.map (\game -> if id == game.id then f(game) else game) games
-
-updateGame : Action -> List Game -> List Game
-updateGame action games =
+updatePlayer : Model -> Action -> Player -> Player
+updatePlayer model action game =
   case action of
-    CreateGame game -> {game | id = List.length games} :: games
-    _ -> games
-
-
-getSelectedGame : String -> List Game -> Maybe Game
-getSelectedGame location games =
-  let
-    gameId = 
+    Actions.CompleteTask points ->
+      {player | score = player.score + points}

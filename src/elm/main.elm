@@ -30,4 +30,5 @@ port updateUrl =
 port getStorage : Maybe Model
 
 port setStorage : Signal Model
-port setStorage = model
+port setStorage =
+  model

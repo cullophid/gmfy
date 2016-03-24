@@ -8,31 +8,34 @@ import Model exposing (..)
 import Actions
 import Util.Events exposing (onInput)
 import Util.List exposing (find, last)
-import Util.Game exposing (getSelectedGame)
+import Util.Map as Map
 
 gamePage : Model -> Html
 gamePage {location, games, taskForm, user} =
   let
-    userId = user.id
-    game' = getSelectedGame location games
-    playerscore = Maybe.map snd <| Maybe.andThen (Maybe.map .players game') (find (\(id, _) -> id == userId))
+    gameId =
+      Maybe.withDefault "missing" <| last <| String.split "/" location
+    game' =
+      Map.get gameId games
+    player' =
+      Maybe.andThen game' (\{players} -> Map.get user players)
+    data =
+      Maybe.map2 (\a b -> (a, b)) game' player'
   in
-    case game' of
-      Just game ->
-        case playerscore of
-          Just score -> showGamePage score game
-          _ -> text "NO player score"
-      _ -> text "No Game"
+    case data of
+      Just (game, player) ->
+          showGamePage player game
+      _ -> text ""
 
-showGamePage : Int -> Game -> Html
-showGamePage score game =
+showGamePage : Player -> Game -> Html
+showGamePage player game =
   div [class "card"] [
     div [class "card-block"] [
-      h1 [] [text <| game.title ++ " (" ++ (toString score) ++ ")"]
+      h1 [] [text <| game.title ++ " (" ++ (toString player.score) ++ ")"]
     ],
     div [class "card-block"] [
       ul [class "list-group list-group-flush"]
-        <| List.map gameTask game.tasks
+        <| List.map (gameTask << snd) game.tasks
     ]
   ]
 

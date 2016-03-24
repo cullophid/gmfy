@@ -27,11 +27,7 @@ address =
 
 signal : Signal Action
 signal =
-  Signal.map (Debug.log "Action: ") <| Signal.merge mailbox.signal <| Signal.map (\h -> Location h) <| Signal.dropRepeats hash
-
-
-locationFilter : Action -> Maybe String
-locationFilter a =
-  case a of
-    Location l -> Just l
-    _ -> Nothing
+  Signal.map (Debug.log "Action: ")
+  <| Signal.merge mailbox.signal
+  <| Signal.map (\h -> Location h)
+  <| Signal.dropRepeats hash
