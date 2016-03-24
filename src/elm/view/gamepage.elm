@@ -5,7 +5,7 @@ import Html exposing (..)
 import Html.Attributes exposing (..)
 import Html.Events exposing (..)
 import Model exposing (..)
-import Actions exposing (..)
+import Actions
 import Util.Events exposing (onInput)
 import Util.List exposing (find, last)
 import Util.Game exposing (getSelectedGame)
@@ -14,7 +14,7 @@ gamePage : Model -> Html
 gamePage {location, games, taskForm, user} =
   let
     userId = user.id
-    game' = Debug.log "game" <| getSelectedGame location games
+    game' = getSelectedGame location games
     playerscore = Maybe.map snd <| Maybe.andThen (Maybe.map .players game') (find (\(id, _) -> id == userId))
   in
     case game' of
@@ -42,7 +42,7 @@ gameTask task =
     text task.title,
     button [
       class "btn btn-sm btn-primary pull-xs-right",
-      onClick actions.address (Actions.CompleteTask task)
+      onClick Actions.address (Actions.CompleteTask task)
     ]
     [text "Complete"]
   ]

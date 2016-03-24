@@ -7,7 +7,7 @@ gameForm action model =
   let {user, gameForm} = model
   in
     case action of
-      Actions.GoTo "#games/new" -> {model | gameForm = setInitialPlayers user gameForm}
+      Actions.Location "#games/new" -> {model | gameForm = setInitialPlayers user gameForm}
       _ -> {model | gameForm = updateForm action gameForm}
 
 setInitialPlayers user gameForm =

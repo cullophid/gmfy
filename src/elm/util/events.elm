@@ -2,14 +2,14 @@ module Util.Events where
 import String
 import Html.Events exposing (on, onWithOptions, targetValue)
 import Html exposing (Attribute)
-import Actions exposing (Action, actions)
+import Actions exposing (Action)
 
 onInput action =
-    on "input" targetValue (\str -> Signal.message actions.address (action str))
+    on "input" targetValue (\str -> Signal.message Actions.address (action str))
 
 onNumberInput action =
   on "input" targetValue
-    (\str -> Signal.message actions.address <| action <| getInt str)
+    (\str -> Signal.message Actions.address <| action <| getInt str)
 
 
 getInt : String -> Int
@@ -27,16 +27,12 @@ onSubmit msg =
     "submit"
     onSubmitOptions
     targetValue
-    (\_ -> Signal.message actions.address msg)
+    (\_ -> Signal.message Actions.address msg)
 
 onClick : Action -> Attribute
-onClick action = Html.Events.onClick actions.address action
+onClick action = Html.Events.onClick Actions.address action
 
 onSubmitOptions = {
   stopPropagation = True,
   preventDefault = True
   }
-
-linkTo : String -> Attribute
-linkTo path =
-  onClick (Actions.GoTo path)

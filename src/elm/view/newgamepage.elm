@@ -1,8 +1,8 @@
 module View.NewGamePage where
 
 import Html exposing (..)
-import Html.Attributes exposing (class, value, type')
-import Util.Events exposing (onClick, onInput, onSubmit, linkTo)
+import Html.Attributes exposing (class, value, type', href)
+import Util.Events exposing (onClick, onInput, onSubmit)
 import Model exposing (..)
 import Actions exposing (..)
 import View.NewTaskForm exposing (newTaskForm)
@@ -33,10 +33,10 @@ newGamePage model =
         ],
         div [ class "card-block clearfix"] [
           div [class "pull-xs-right"] [
-            button [
+            a [
               type' "button",
               class "btn btn-danger-outline",
-              linkTo "#games"
+              href "#games"
             ] [text "Cancel"],
             text " ",
             button [

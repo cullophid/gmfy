@@ -3,7 +3,6 @@ module View where
 import Html exposing (Html, div)
 import Html.Attributes exposing (..)
 import Html.Events exposing (..)
-import Actions exposing (actions)
 import View.Router exposing (router, route)
 import View.Header exposing (header)
 import View.NewGamePage exposing (newGamePage)

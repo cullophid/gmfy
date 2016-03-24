@@ -1,5 +1,9 @@
 module Actions where
 import Model exposing (..)
+import History exposing (hash, setPath)
+import Debug
+import Task exposing (Task)
+
 type Action
   = NoOp
   | SetGameTitle String
@@ -10,8 +14,24 @@ type Action
   | SetTaskDescription String
   | SetTaskValue Int
   | AddTask GameTask
-  | GoTo String
+  | Location String
   | CompleteTask GameTask
 
-actions : Signal.Mailbox Action
-actions = Signal.mailbox NoOp
+mailbox : Signal.Mailbox Action
+mailbox =
+  Signal.mailbox NoOp
+
+address : Signal.Address Action
+address =
+  mailbox.address
+
+signal : Signal Action
+signal =
+  Signal.map (Debug.log "Action: ") <| Signal.merge mailbox.signal <| Signal.map (\h -> Location h) <| Signal.dropRepeats hash
+
+
+locationFilter : Action -> Maybe String
+locationFilter a =
+  case a of
+    Location l -> Just l
+    _ -> Nothing
