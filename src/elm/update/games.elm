@@ -1,9 +1,9 @@
 module Update.Games where
 import Actions
-import Util.Map as Map
-import Util.List exposing (last)
+import Util.List exposing (last, updateById)
 import String
-import Model exposing (Model, Model, Game, GameEntry)
+import Util
+import Model exposing (Model, Model, Game)
 import Actions exposing (..)
 
 games : Action -> Model -> Model
@@ -16,23 +16,13 @@ games action model =
     in
       case action of
         CreateGame game ->
-          {model | games = createGameEntry game games}
+          {model | games = (Util.addId game) :: games}
         CompleteTask {value} ->
           { model
-          | games = Map.update gameId (updatePlayerScore user value) games
+          | games = updateById gameId (updatePlayerScore user value) games
           }
         _ -> model
 
-
-createGameEntry : Game -> List GameEntry -> List GameEntry
-createGameEntry game gamesList =
-  let
-    id = nextId gamesList
-  in
-    (id, {game | id = id}) :: gamesList
-
-nextId games =
-  toString <| List.length games
 
 
 updatePlayerScore : String -> Int -> Game -> Game
@@ -41,5 +31,5 @@ updatePlayerScore id value game =
     {players} = game
   in
     { game
-    | players = Map.update id (\player -> {player | score = value + player.score}) players
+    | players = updateById id (\player -> {player | score = value + player.score}) players
     }

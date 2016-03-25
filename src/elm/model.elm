@@ -3,31 +3,17 @@ module Model where
 type alias Game =
   { id : String
   , title : String
-  , tasks : List (String, GameTask)
-  , players: List (String, Player)
+  , description : String
+  , tasks : List GameTask
+  , players: List Player
   }
 
-
-type alias GameEntry =
-  (String, Game)
-
-type alias GameForm =
-  { game : Game
-  }
 
 type alias GameTask =
   { id : String
   , title : String
   , description : String
   , value : Int
-  }
-
-type alias TaskEntry =
-  (String, GameTask)
-
-type alias TaskForm =
-  { showTaskForm : Bool
-  , task : GameTask
   }
 
 type alias Player =
@@ -37,13 +23,11 @@ type alias Player =
   , score : Int
   }
 
-type alias PlayerEntry =
-  (String, Player)
-
 type alias Model =
-  { gameForm : GameForm
-  , taskForm : TaskForm
-  , games : List (String, Game)
+  { showTaskForm: Bool
+  , gameForm : Game
+  , taskForm : GameTask
+  , games : List Game
   , location : String
   , user : String
   }
@@ -51,24 +35,24 @@ type alias Model =
 emptyModel : Model
 emptyModel =
   { location  = "#home"
-  , gameForm =
-      { game = emptyGame
-      }
-  , taskForm =
-      { showTaskForm = False
-      , task = emptyTask
-      }
+  , gameForm = emptyGame
+  , taskForm = emptyTask
   , games = []
   , user = ""
+  , showTaskForm = False
   }
 
+emptyGame : Game
 emptyGame =
   { id = ""
   , title = ""
+  , description = ""
   , tasks = []
   , players = []
   }
 
+
+emptyPlayer : Player
 emptyPlayer =
   { id = ""
   , firstname = ""
@@ -76,6 +60,8 @@ emptyPlayer =
   , score = 0
   }
 
+
+emptyTask : GameTask
 emptyTask =
   { id = ""
   , title = ""

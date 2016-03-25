@@ -4,17 +4,28 @@ import Html exposing (..)
 import Html.Attributes exposing (href, class)
 import Model exposing (Game)
 
-gamesListPage : List (String, Game) -> Html
+gamesListPage : List Game -> Html
 gamesListPage games =
   div [class "card"]
     [ div [class "card-block"]
       [ h1 [] [text "Games"]
       ]
     , div [class "list-group list-group-flush"]
-      <| List.map (listItem << snd) games
+      <| List.map listItem games
   ]
 
-listItem {title, id} =
+listItem : Game -> Html
+listItem {title, description, id, tasks} =
   div [class "list-group-item"] [
-    a [href ("#games/" ++ id)] [text title]
+    a [href ("#games/" ++ id)] [
+      div [class "media"] [
+        div [class "media-left"] [
+          div [class "fa fa-gamepad fa-4x text-primary"] []
+        ],
+        div [class "media-body"] [
+          h3 [] [text title],
+          p [] [text description]
+        ]
+      ]
+    ]
   ]

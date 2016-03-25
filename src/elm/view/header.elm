@@ -2,8 +2,8 @@ module View.Header where
 
 import Html exposing (..)
 import Html.Attributes exposing (class, href)
-import Html.Events exposing (..)
 
+header : Html
 header =
   nav [class "navbar navbar-dark bg-primary"]
     [ a [class "navbar-brand", href "#home"] [text "GMFY"]

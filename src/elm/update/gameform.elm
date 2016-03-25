@@ -1,37 +1,42 @@
-module Update.GameForm where
-import Actions exposing (Action)
-import Model exposing (Model, Game, GameForm, emptyGame, emptyPlayer)
+module Update.GameForm (gameForm) where
+import String
+import Util
+import Actions exposing (..)
+import Model exposing (Model, Game, GameTask, emptyGame, emptyPlayer)
 
 gameForm : Action -> Model -> Model
 gameForm action model =
-  let {user, gameForm} = model
-  in
-    case action of
-      Actions.Location "#games/new" ->
-        {model | gameForm = setInitialPlayers user gameForm}
-      _ ->
-        {model | gameForm = updateForm action gameForm}
-
-setInitialPlayers user gameForm =
-  {gameForm | game = {emptyGame | players = [(user, emptyPlayer)]}}
-
-updateForm : Action -> GameForm -> GameForm
-updateForm action gameForm =
-  case action of
-    _ -> {gameForm | game = updateGame action gameForm.game}
-
-updateGame : Action -> Game -> Game
-updateGame action game =
   let
-    newId =
-      nextId game.tasks
+    {user, gameForm,games} = model
+    {tasks, players} = gameForm
   in
     case action of
-      Actions.SetGameTitle title ->
-        {game | title = title}
-      Actions.AddTask task ->
-        {game | tasks = (newId, {task| id = newId}) :: game.tasks}
-      _ -> game
+      Location "#games/new" ->
+        { model
+        | gameForm = resetGameForm user
+        }
+      SetGameTitle title ->
+        { model
+        | gameForm = {gameForm | title = title}
+        }
 
-nextId tasks  =
-  toString <| List.length tasks
+      SetGameDescription description ->
+        { model
+        | gameForm = {gameForm | description = description}
+        }
+
+      AddTask task ->
+        {model
+        | gameForm =
+          {gameForm
+          | tasks =  (Util.addId task) :: tasks
+          }
+        }
+
+      _ ->
+        model
+
+
+resetGameForm : String -> Game
+resetGameForm user =
+  {emptyGame| players = [{emptyPlayer| id = user}]}

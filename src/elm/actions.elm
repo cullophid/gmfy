@@ -7,6 +7,7 @@ import Task exposing (Task)
 type Action
   = NoOp
   | SetGameTitle String
+  | SetGameDescription String
   | CreateGame Game
   | CreateTask GameTask
   | ShowTaskForm Bool

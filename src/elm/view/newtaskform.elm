@@ -1,21 +1,19 @@
 module View.NewTaskForm where
 import Html exposing (..)
 import Html.Attributes exposing (class, type')
-import Model exposing (TaskForm, GameTask)
+import Model exposing (GameTask)
 import Util.Events exposing (onInput, onNumberInput, onClick)
 import Actions
 
-newTaskForm : TaskForm -> Html
-newTaskForm taskForm =
-  let {showTaskForm, task} = taskForm
-  in
-    case showTaskForm of
-      True -> content task
-      _ ->
-        button [
-          class "btn btn-success-outline",
-          onClick (Actions.ShowTaskForm True)
-        ] [text "Add Task"]
+newTaskForm : (Bool, GameTask) -> Html
+newTaskForm (showTaskForm, taskForm) =
+  case showTaskForm of
+    True -> content taskForm
+    _ ->
+      button [
+        class "btn btn-success-outline",
+        onClick (Actions.ShowTaskForm True)
+      ] [text "Add Task"]
 
 
 content : GameTask -> Html
