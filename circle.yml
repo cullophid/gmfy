@@ -12,7 +12,7 @@ dependencies:
     - docker login -e $DOCKER_EMAIL -u $DOCKER_USER -p $DOCKER_PASS
   override:
     - npm install --prod
-    - ls src/
+    - ls src/elm/
     - npm run install:elm
 
 test:
