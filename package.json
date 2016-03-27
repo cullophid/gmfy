@@ -3,6 +3,7 @@
   "version": "1.1.0",
   "main": "index.js",
   "scripts": {
+    "install:elm" : "elm package install",
     "build:elm": "elm make src/elm/main.elm --output public/elm.js",
     "build:sass": "node-sass src/sass/main.scss public/bundle.css",
     "build": "npm run build:elm && npm run build:sass",
