@@ -89,11 +89,10 @@ activity activity =
       ]
     ]
 
-
 showPlayers : List Player -> Html
 showPlayers players =
   div [class "list-group list-group-flush"]
-    <| List.map gamePlayer players
+    <| List.map gamePlayer <| List.sortBy .score players
 
 
 gamePlayer : Player -> Html
@@ -104,8 +103,10 @@ gamePlayer {name, score} =
           div [class "fa fa-3x fa-check-square-o text-primary"] []
         ],
         div [class "media-body"] [
-          h5 [] [text name],
-          p [] [text <| toString score]
+          h5 [class "pull-xs-left"] [text name],
+          h3 [class "pull-xs-right"] [
+            p [class "label label-primary label-pill"] [text <| toString score]
+          ]
         ]
       ]
     ]

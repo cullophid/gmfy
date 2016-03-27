@@ -1,4 +1,6 @@
 module Model.Player where
+
+import Model.User exposing (User)
 import Json.Encode exposing (Value)
 import Json.Decode exposing (Decoder, (:=))
 
@@ -8,6 +10,7 @@ type alias Player =
   , email : String
   , score : Int
   }
+
 
 emptyPlayer : Player
 emptyPlayer =
@@ -20,12 +23,12 @@ emptyPlayer =
 
 encode : Player -> Value
 encode player =
-  Json.Encode.object [
-    ("id", Json.Encode.string player.id),
-    ("name", Json.Encode.string player.name),
-    ("email", Json.Encode.string player.name),
-    ("score", Json.Encode.int player.score)
-  ]
+  Json.Encode.object
+    [ ("id", Json.Encode.string player.id)
+    , ("name", Json.Encode.string player.name)
+    , ("email", Json.Encode.string player.name)
+    , ("score", Json.Encode.int player.score)
+    ]
 
 
 decoder : Decoder Player

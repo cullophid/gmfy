@@ -8,6 +8,8 @@ type alias User =
   , email : String
   }
 
+
+
 encode : User -> Value
 encode user =
   Json.Encode.object
