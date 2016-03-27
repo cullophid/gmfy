@@ -1,0 +1,24 @@
+machine:
+  services:
+    - docker
+  node:
+    version: 5.0.0
+
+
+dependencies:
+  cache_directories:
+    - "~/docker"
+  pre:
+    - docker login -e $DOCKER_EMAIL -u $DOCKER_USER -p $DOCKER_PASS
+  override:
+    - npm install --prod
+
+test:
+  override:
+    - npm run build
+
+deployment:
+  production:
+    branch: master
+    commands:
+      - curl -X POST $DEPLOY_TRIGGER_PRODUCTION

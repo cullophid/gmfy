@@ -20,12 +20,11 @@
   "author": "",
   "license": "ISC",
   "bugs": {},
-  "devDependencies": {
-    "elm": "^0.16.0",
-    "node-sass": "^3.4.2",
-    "watchify": "^3.7.0"
-  },
   "dependencies": {
+    "elm": "^0.16.0",
+    "node-sass": "^3.4.2"
+  },
+  "devDependencies": {
     "serve": "^1.4.0"
   }
 }
