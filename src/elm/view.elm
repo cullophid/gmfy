@@ -15,7 +15,7 @@ view : Model -> Html
 view model =
   let {gameForm, games, location} = model
   in
-    div [class "full-screen bg-gray-dark"]
+    div [class "full-screen"]
       [ header
       , div [class "container-fluid m-t-1"]
         [ div [class "row"]
