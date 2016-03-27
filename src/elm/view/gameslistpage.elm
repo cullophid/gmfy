@@ -2,7 +2,7 @@ module View.GamesListPage (gamesListPage) where
 
 import Html exposing (..)
 import Html.Attributes exposing (href, class)
-import Model exposing (Game)
+import Model.Game exposing (Game)
 
 gamesListPage : List Game -> Html
 gamesListPage games =
@@ -15,9 +15,9 @@ gamesListPage games =
   ]
 
 listItem : Game -> Html
-listItem {title, description, id, tasks} =
+listItem {title, description, id} =
   div [class "list-group-item"] [
-    a [href ("#games/" ++ id)] [
+    a [href ("#games/" ++ id ++ "/activities")] [
       div [class "media"] [
         div [class "media-left"] [
           div [class "fa fa-gamepad fa-4x text-primary"] []

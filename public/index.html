@@ -7,16 +7,16 @@
   </head>
   <body>
     <script>
-      var setLocation = function (state) {
-        return Object.assign({}, state, {location: window.location.hash})
-      }
-      var cached = localStorage.getItem('gmfy-state');
-      var state = cached ? setLocation(JSON.parse(cached)) : null;
-      console.log('starting state', state)
-      var gmfy = Elm.fullscreen(Elm.Main, { getStorage: state });
-      gmfy.ports.setStorage.subscribe(function(state) {
-        localStorage.setItem('gmfy-state', JSON.stringify(state));
-      });
+    var setLocation = function (state) {
+      return Object.assign({}, state, {location: window.location.hash})
+    }
+    var cached = localStorage.getItem('gmfy-state');
+    var state = cached ? JSON.stringify(setLocation(JSON.parse(cached))) : null;
+    console.log('starting state', state)
+    var gmfy = Elm.fullscreen(Elm.Main, {getStorage: state});
+    gmfy.ports.setStorage.subscribe(function(state) {
+      localStorage.setItem('gmfy-state', JSON.stringify(state));
+    });
     </script>
   </body>
 </html>

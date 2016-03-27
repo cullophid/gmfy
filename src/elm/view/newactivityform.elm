@@ -21,21 +21,21 @@ content activity =
   div [class "card-block"] [
     form [] [
       div [class "form-group"] [
-        label [] [text "Activity Title"],
+        label [] [text "Task Title"],
         input [
           class "form-control",
           onInput SetActivityTitle
         ] []
       ],
       div [class "form-group"] [
-        label [] [text "Activity Description"],
+        label [] [text "Task Description"],
         textarea [
           class "form-control",
           onInput SetActivityDescription
         ] []
       ],
       div [class "form-group"] [
-        label [] [text "Activity Value"],
+        label [] [text "Task Value"],
         input [
           class "form-control",
           type' "number",

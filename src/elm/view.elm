@@ -1,9 +1,9 @@
 module View where
 
+import Dict
 import Html exposing (Html, div)
 import Html.Attributes exposing (..)
-import Html.Events exposing (..)
-import View.Router exposing (router, route)
+import Util.Router exposing (router, route)
 import View.Header exposing (header)
 import View.NewGamePage exposing (newGamePage)
 import View.HomePage exposing (homePage)
@@ -23,9 +23,9 @@ view model =
             [ div [class ""]
               [ router
                 [ route "#home" (homePage)
-                , route "#games/new" (newGamePage model)
-                , route "#games/[0-9]*" (gamePage model)
-                , route "#games" (gamesListPage games)
+                , route "^#games/new$" (newGamePage model)
+                , route "^#games$" (gamesListPage <| Dict.values games)
+                , route "^#games/" (gamePage model)
                 ] location
               ]
             ]

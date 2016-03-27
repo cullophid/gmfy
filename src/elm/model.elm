@@ -1,70 +1,53 @@
 module Model where
-
-type alias Game =
-  { id : String
-  , title : String
-  , description : String
-  , tasks : List GameTask
-  , players: List Player
-  }
-
-
-type alias GameTask =
-  { id : String
-  , title : String
-  , description : String
-  , value : Int
-  }
-
-type alias Player =
-  { id : String
-  , firstname : String
-  , lastname: String
-  , score : Int
-  }
+import Dict exposing (Dict)
+import Model.Game exposing (Game, emptyGame)
+import Model.Activity exposing (Activity, emptyActivity)
+import Model.User exposing (User)
+import Util.Dict
+import Json.Encode exposing (Value)
+import Json.Decode exposing (Decoder, (:=))
 
 type alias Model =
-  { showTaskForm: Bool
+  { showActivityForm: Bool
   , gameForm : Game
-  , taskForm : GameTask
-  , games : List Game
+  , activityForm : Activity
+  , games : Dict String Game
   , location : String
-  , user : String
+  , user : User
   }
 
 emptyModel : Model
 emptyModel =
   { location  = "#home"
   , gameForm = emptyGame
-  , taskForm = emptyTask
-  , games = []
-  , user = ""
-  , showTaskForm = False
+  , activityForm = emptyActivity
+  , games = Dict.empty
+  , user =
+    { id = "andreas"
+    , name = "andreas"
+    , email = "andreas.moller@gmail.com"
+    }
+  , showActivityForm = False
   }
 
-emptyGame : Game
-emptyGame =
-  { id = ""
-  , title = ""
-  , description = ""
-  , tasks = []
-  , players = []
-  }
+encode : Model -> Value
+encode model =
+  Json.Encode.object [
+    ("showActivityForm", Json.Encode.bool model.showActivityForm),
+    ("gameForm", Model.Game.encode model.gameForm),
+    ("activityForm", Model.Activity.encode model.activityForm),
+    ("games", Util.Dict.encode Model.Game.encode model.games),
+    ("location", Json.Encode.string model.location),
+    ("user", Model.User.encode model.user)
+  ]
 
-
-emptyPlayer : Player
-emptyPlayer =
-  { id = ""
-  , firstname = ""
-  , lastname = ""
-  , score = 0
-  }
-
-
-emptyTask : GameTask
-emptyTask =
-  { id = ""
-  , title = ""
-  , description = ""
-  , value = 10
-  }
+decoder : Decoder Model
+decoder =
+  Json.Decode.object6
+    Model
+    ("showActivityForm" := Json.Decode.bool)
+    ("gameForm" := Model.Game.decoder)
+    ("activityForm" := Model.Activity.decoder)
+    ("games" := Json.Decode.dict Model.Game.decoder)
+    ("location" := Json.Decode.string)
+    ("user" := Model.User.decoder)

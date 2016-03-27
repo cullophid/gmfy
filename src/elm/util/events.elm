@@ -4,12 +4,14 @@ import Html.Events exposing (on, onWithOptions, targetValue)
 import Html exposing (Attribute)
 import Actions exposing (Action)
 
-onInput action =
-    on "input" targetValue (\str -> Signal.message Actions.address (action str))
+onInput : (String -> Action) -> Attribute
+onInput actionCreator =
+    on "input" targetValue (\str -> Signal.message Actions.address (actionCreator str))
 
-onNumberInput action =
+onNumberInput : (Int -> Action) -> Attribute
+onNumberInput actionCreator =
   on "input" targetValue
-    (\str -> Signal.message Actions.address <| action <| getInt str)
+    (\str -> Signal.message Actions.address <| actionCreator <| getInt str)
 
 
 getInt : String -> Int
@@ -32,6 +34,7 @@ onSubmit msg =
 onClick : Action -> Attribute
 onClick action = Html.Events.onClick Actions.address action
 
+onSubmitOptions : {stopPropagation : Bool, preventDefault : Bool}
 onSubmitOptions = {
   stopPropagation = True,
   preventDefault = True

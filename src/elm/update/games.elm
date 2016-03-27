@@ -3,7 +3,9 @@ import Actions
 import Util.List exposing (last, updateById)
 import String
 import Util
-import Model exposing (Model, Model, Game)
+import Dict
+import Model exposing (Model)
+import Model.Game exposing (Game)
 import Actions exposing (..)
 
 games : Action -> Model -> Model
@@ -12,14 +14,16 @@ games action model =
       {location, games, user} =
         model
       gameId =
-        Maybe.withDefault "" <| last <| String.split "/" location
+        Maybe.withDefault "" <| Util.List.nth 1 <| String.split "/" location
     in
       case action of
-        CreateGame game ->
-          {model | games = (Util.addId game) :: games}
-        CompleteTask {value} ->
+        CreateGame newGame ->
+          let game = Util.addId newGame
+          in
+            {model | games = Dict.insert game.id game games }
+        CompleteActivity {value} ->
           { model
-          | games = updateById gameId (updatePlayerScore user value) games
+          | games = Dict.update gameId (Maybe.map (updatePlayerScore user.id value)) games
           }
         _ -> model
 
@@ -31,5 +35,5 @@ updatePlayerScore id value game =
     {players} = game
   in
     { game
-    | players = updateById id (\player -> {player | score = value + player.score}) players
+    | players = Dict.update id (Maybe.map (\player -> Debug.log "PlayerScore" {player | score = value + player.score})) players
     }

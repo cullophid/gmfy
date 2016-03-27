@@ -1,19 +1,21 @@
 module View.NewGamePage where
 
+import Dict
 import Html exposing (..)
 import Html.Attributes exposing (class, value, type', href)
 import Util.Events exposing (onClick, onInput, onSubmit)
-import Model exposing (..)
+import Model exposing (Model)
+import Model.Activity exposing (Activity)
 import Actions exposing (..)
-import View.NewTaskForm exposing (newTaskForm)
+import View.NewActivityForm exposing (newActivityForm)
 
 newGamePage : Model -> Html
 newGamePage model =
   let
-    {gameForm, taskForm, showTaskForm} = model
+    {gameForm, activityForm, showActivityForm} = model
   in
     div [class "card"] [
-      form [onSubmit (Actions.CreateGame gameForm)] [
+      form [onSubmit (CreateGame gameForm)] [
         div [ class "card-block"] [
           h4 [class "card-title"] [text "New Game"],
           div [class "form-group"] [
@@ -21,7 +23,7 @@ newGamePage model =
             input [
               class "form-control",
               value gameForm.title,
-              onInput Actions.SetGameTitle
+              onInput SetGameTitle
             ] []
           ],
             div [class "form-group"] [
@@ -29,15 +31,15 @@ newGamePage model =
               textarea [
                 class "form-control",
                 value gameForm.description,
-                onInput Actions.SetGameDescription
+                onInput SetGameDescription
               ] []
             ]
         ],
         div [ class "card-block"] [
-          h4 [class "card-title"] [text "Tasks"],
+          h4 [class "card-title"] [text "Activities"],
           div [class "list-group list-group-flush"]
-                <| List.map gameTask gameForm.tasks,
-          newTaskForm (showTaskForm, taskForm)
+                <| List.map activity <| Dict.values gameForm.activities,
+          newActivityForm (showActivityForm, activityForm)
         ],
         div [ class "card-block clearfix"] [
           div [class "pull-xs-right"] [
@@ -56,6 +58,6 @@ newGamePage model =
       ]
     ]
 
-gameTask : GameTask -> Html
-gameTask task =
-  li [class "list-group-item"] [text task.title]
+activity : Activity -> Html
+activity activity =
+  li [class "list-group-item"] [text activity.title]

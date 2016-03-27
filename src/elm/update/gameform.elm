@@ -1,19 +1,22 @@
 module Update.GameForm (gameForm) where
-import String
 import Util
+import Dict
 import Actions exposing (..)
-import Model exposing (Model, Game, GameTask, emptyGame, emptyPlayer)
+import Model exposing (Model)
+import Model.User exposing (User)
+import Model.Player exposing (Player)
+import Model.Game exposing (Game, emptyGame)
 
 gameForm : Action -> Model -> Model
 gameForm action model =
   let
     {user, gameForm,games} = model
-    {tasks, players} = gameForm
+    {activities, players} = gameForm
   in
     case action of
       Location "#games/new" ->
         { model
-        | gameForm = resetGameForm user
+        | gameForm = resetGameForm <| Debug.log "USER" user
         }
       SetGameTitle title ->
         { model
@@ -25,18 +28,28 @@ gameForm action model =
         | gameForm = {gameForm | description = description}
         }
 
-      AddTask task ->
-        {model
-        | gameForm =
-          {gameForm
-          | tasks =  (Util.addId task) :: tasks
+      AddActivity newActivity ->
+        let
+          activity = Util.addId newActivity
+        in
+          {model
+          | gameForm =
+            {gameForm
+            | activities =  Dict.insert activity.id activity activities
+            }
           }
-        }
-
       _ ->
         model
 
 
-resetGameForm : String -> Game
+resetGameForm : User -> Game
 resetGameForm user =
-  {emptyGame| players = [{emptyPlayer| id = user}]}
+  {emptyGame| players = Dict.insert user.id (userPlayer user) Dict.empty }
+
+userPlayer : User -> Player
+userPlayer {id, name, email} =
+  { id = id
+  , name = name
+  , email = email
+  , score = 0
+  }

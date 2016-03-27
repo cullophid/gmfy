@@ -1,22 +1,22 @@
 module Actions where
-import Model exposing (..)
+import Model.Game exposing (Game)
+import Model.Activity exposing (Activity)
 import History exposing (hash, setPath)
 import Debug
-import Task exposing (Task)
 
 type Action
   = NoOp
   | SetGameTitle String
   | SetGameDescription String
   | CreateGame Game
-  | CreateTask GameTask
-  | ShowTaskForm Bool
-  | SetTaskTitle String
-  | SetTaskDescription String
-  | SetTaskValue Int
-  | AddTask GameTask
+  | CreateActivity Activity
+  | ShowActivityForm Bool
+  | SetActivityTitle String
+  | SetActivityDescription String
+  | SetActivityValue Int
+  | AddActivity Activity
   | Location String
-  | CompleteTask GameTask
+  | CompleteActivity Activity
 
 mailbox : Signal.Mailbox Action
 mailbox =
