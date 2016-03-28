@@ -4,7 +4,7 @@
   "main": "index.js",
   "scripts": {
     "install:elm" : "elm package install -y",
-    "build:elm": "elm make src/elm/main.elm --output public/elm.js",
+    "build:elm": "elm make src/elm/Main.elm --output public/elm.js",
     "build:sass": "node-sass src/sass/main.scss public/bundle.css",
     "build": "npm run build:elm && npm run build:sass",
     "watch:elm": "watch 'npm run build:elm' src/elm",
