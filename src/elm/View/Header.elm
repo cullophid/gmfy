@@ -11,7 +11,7 @@ header =
       [ li [class "nav-item"]
         [ a
           [ class "nav-link link-white"
-          , href "#home"
+          , href "#"
           ] [text "home"]
         ]
         , li [class "nav-item"]

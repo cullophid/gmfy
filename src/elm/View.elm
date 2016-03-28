@@ -22,10 +22,10 @@ view model =
           [ div [class "col-md-10 col-md-offset-1"]
             [ div [class ""]
               [ router
-                [ route "#home" (homePage)
-                , route "^#games/new$" (newGamePage model)
+                [ route "^#games/new$" (newGamePage model)
                 , route "^#games$" (gamesListPage <| Dict.values games)
                 , route "^#games/" (gamePage model)
+                , route "^$" (homePage)
                 ] location
               ]
             ]
