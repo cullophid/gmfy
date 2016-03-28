@@ -21,8 +21,8 @@ dependencies:
 test:
   override:
     - echo "Hello World"
-    - docker build -t cullophid/gmfy:lastest .
-    - docker push cullophid/gmfy:latest
+    - docker build -t cullophid/gmfy:latest .
+    - docker push cullophid/gmfy: latest
 
 deployment:
   production:
