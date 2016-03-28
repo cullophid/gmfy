@@ -8,6 +8,8 @@ machine:
 dependencies:
   cache_directories:
     - "~/docker"
+    - "~/elm-stuff"
+    - "~/mode_modules"
   pre:
     - docker login -e $DOCKER_EMAIL -u $DOCKER_USER -p $DOCKER_PASS
   override:
