@@ -15,7 +15,6 @@ dependencies:
   override:
     - npm install --prod
     - npm install node-sass
-    - ls src/elm/
     - npm run install:elm
     - npm run build
 
@@ -23,7 +22,7 @@ test:
   override:
     - echo "Hello World"
     - docker build -t cullophid/gmfy:lastest .
-    - docker push
+    - docker push cullophid/gmfy:latest
 
 deployment:
   production:
