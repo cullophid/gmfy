@@ -22,7 +22,7 @@ test:
   override:
     - echo "Hello World"
     - docker build -t cullophid/gmfy:latest .
-    - docker push cullophid/gmfy: latest
+    - docker push cullophid/gmfy:latest
 
 deployment:
   production:
