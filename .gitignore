@@ -1,5 +1,5 @@
 # dependencies
-elm-stuff
+elm-stuff/
 node_modules/
 
 #build
