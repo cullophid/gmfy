@@ -14,6 +14,7 @@ dependencies:
     - docker login -e $DOCKER_EMAIL -u $DOCKER_USER -p $DOCKER_PASS
   override:
     - npm install --prod
+    - npm install node-sass
     - ls src/elm/
     - npm run install:elm
     - npm run build
