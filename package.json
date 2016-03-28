@@ -6,7 +6,7 @@
     "install:elm" : "elm package install -y",
     "build:elm": "elm make src/elm/Main.elm --output public/elm.js",
     "build:sass": "node-sass src/sass/main.scss public/bundle.css",
-    "build": "npm run build:elm && npm run build:sass",
+    "build": "npm run build:sass && npm run build:elm",
     "watch:elm": "watch 'npm run build:elm' src/elm",
     "watch:sass": "npm run build:sass -- -w src/sass",
     "watch": "parallelshell 'npm run watch:elm' 'npm run watch:sass'",
