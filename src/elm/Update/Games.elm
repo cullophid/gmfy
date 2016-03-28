@@ -15,6 +15,9 @@ games action model =
         model
       gameId =
         Maybe.withDefault "" <| Util.List.nth 1 <| String.split "/" location
+
+      updateGame f =
+        {model | games = Dict.update gameId (Maybe.map f) games}
     in
       case action of
         CreateGame newGame ->
@@ -25,6 +28,11 @@ games action model =
           { model
           | games = Dict.update gameId (Maybe.map (updatePlayerScore user.id value)) games
           }
+        AddActivity newActivity ->
+          let
+            activity = Util.addId newActivity
+          in
+            updateGame (\game -> {game| activities = Dict.insert activity.id activity game.activities})
         _ -> model
 
 

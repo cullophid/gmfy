@@ -5,15 +5,17 @@ import Model.Activity exposing (Activity)
 import Util.Events exposing (onInput, onNumberInput, onClick)
 import Actions exposing (..)
 
-newActivityForm : (Bool, Activity) -> Html
-newActivityForm (showActivityForm, activityForm) =
+newActivityForm : Bool -> Activity -> Html
+newActivityForm showActivityForm activityForm =
   case showActivityForm of
     True -> content activityForm
     _ ->
-      button [
-        class "btn btn-success-outline",
-        onClick (ShowActivityForm True)
-      ] [text "Add Activity"]
+      div [class "card-block clearfix"] [
+        button [
+          class "btn btn-success-outline pull-xs-right",
+          onClick (ShowActivityForm True)
+        ] [text "Add Activity"]
+      ]
 
 
 content : Activity -> Html
@@ -21,21 +23,21 @@ content activity =
   div [class "card-block"] [
     form [] [
       div [class "form-group"] [
-        label [] [text "Task Title"],
+        label [] [text "Activity Title"],
         input [
           class "form-control",
           onInput SetActivityTitle
         ] []
       ],
       div [class "form-group"] [
-        label [] [text "Task Description"],
+        label [] [text "Activity Description"],
         textarea [
           class "form-control",
           onInput SetActivityDescription
         ] []
       ],
       div [class "form-group"] [
-        label [] [text "Task Value"],
+        label [] [text "Activity Value"],
         input [
           class "form-control",
           type' "number",

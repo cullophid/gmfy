@@ -12,10 +12,13 @@ import Actions exposing (..)
 import Util.List exposing (last, findById, nth)
 import Util.Router exposing (router, route)
 import View.NotFoundPage exposing (notFoundPage)
+import View.NewActivityForm exposing (newActivityForm)
 
 gamePage : Model -> Html
-gamePage {location, games, activityForm, user} =
+gamePage  model =
   let
+    {location, games, activityForm, user} =
+      model
     gameId =
       Maybe.withDefault "missing" <| nth 1 (String.split "/" location)
     game' =
@@ -27,11 +30,11 @@ gamePage {location, games, activityForm, user} =
   in
     case data of
       Just (game, player) ->
-          showGamePage player game location
+          showGamePage player game model
       _ -> notFoundPage
 
-showGamePage : Player -> Game -> String -> Html
-showGamePage player game location =
+showGamePage : Player -> Game -> Model -> Html
+showGamePage player game {location, showActivityForm, activityForm} =
   div [class "card"] [
     div [class "card-block"] [
       div [class "media"] [
@@ -57,18 +60,22 @@ showGamePage player game location =
         [text "Players"]
       ]
     ],
-    div [class "card-block"] [
-      router [
-        route "#games/[0-9a-z|-]*/activities" (showActivities <| Dict.values game.activities),
-        route "#games/[0-9a-z|-]*/players" (showPlayers <| Dict.values game.players)
-      ] location
-    ]
+    router [
+      route "#games/[0-9a-z|-]*/activities"
+        <| (showActivities showActivityForm activityForm
+        <| Dict.values game.activities),
+      route "#games/[0-9a-z|-]*/players" (showPlayers <| Dict.values game.players)
+    ] location
   ]
 
-showActivities : List Activity -> Html
-showActivities activities =
-  div [class "list-group list-group-flush"]
-    <| List.map activity activities
+showActivities : Bool -> Activity -> List Activity -> Html
+showActivities showActivityForm activityForm activities =
+  div [class "card-block"] [
+    div [class "list-group list-group-flush"]
+      <| List.map activity activities,
+    newActivityForm showActivityForm activityForm
+
+  ]
 
 
 activity : Activity -> Html
@@ -80,7 +87,7 @@ activity activity =
         ]
       , div [class "media-body"]
       [ button
-        [ class "btn btn-sm btn-primary pull-xs-right pull-right"
+        [ class "btn btn-primary pull-xs-right pull-right"
         , onClick Actions.address (CompleteActivity activity)
         ] [text "Complete"]
         , h5 [] [text activity.title]

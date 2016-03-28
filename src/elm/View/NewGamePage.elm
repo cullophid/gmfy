@@ -35,12 +35,6 @@ newGamePage model =
               ] []
             ]
         ],
-        div [ class "card-block"] [
-          h4 [class "card-title"] [text "Activities"],
-          div [class "list-group list-group-flush"]
-                <| List.map activity <| Dict.values gameForm.activities,
-          newActivityForm (showActivityForm, activityForm)
-        ],
         div [ class "card-block clearfix"] [
           div [class "pull-xs-right"] [
             a [ type' "button",
