@@ -23,7 +23,9 @@ model =
 
 initialModel : Model
 initialModel =
-  Maybe.withDefault emptyModel <| getStorage `Maybe.andThen` (Result.toMaybe << decodeString Model.decoder)
+  Maybe.withDefault emptyModel
+    <| Maybe.andThen getStorage (Result.toMaybe << decodeString Model.decoder)
+
 
 port updateUrl : Signal (Task error ())
 port updateUrl =
@@ -32,7 +34,9 @@ port updateUrl =
     <| Signal.map2 (\a b -> (a, b)) History.hash
     <| Signal.map .location model
 
+
 port getStorage : Maybe String
+
 
 port setStorage : Signal Value
 port setStorage =

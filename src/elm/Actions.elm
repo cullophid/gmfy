@@ -10,7 +10,6 @@ type Action
   | SetGameDescription String
   | CreateGame Game
   | CreateActivity Activity
-  | ShowActivityForm Bool
   | SetActivityTitle String
   | SetActivityDescription String
   | SetActivityValue Int

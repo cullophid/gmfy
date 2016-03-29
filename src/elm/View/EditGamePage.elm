@@ -9,10 +9,6 @@ gamePage param =
   case param of
     Just {title} ->
       div [class "container-fluid"] [
-        div [class "card"] [
-          div [class "card-block"] [
-            h1 [] [text title]
-          ]
-        ]
+        h1 [] [text title]
       ]
     _ -> div [] []

@@ -10,13 +10,8 @@ activityForm action model =
     {activityForm} = model
   in
     case action of
-      ShowActivityForm bool ->
-        {model | showActivityForm = bool}
       AddActivity activity ->
-        { model
-        | activityForm = emptyActivity
-        , showActivityForm = False
-        }
+        { model | activityForm = emptyActivity }
       SetActivityTitle title ->
         { model | activityForm = {activityForm| title = title } }
       SetActivityDescription description ->

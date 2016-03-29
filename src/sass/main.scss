@@ -7,9 +7,30 @@
 
 body {
   color: rgba(0, 0, 0, 0.6);
-  background: $gray-dark;
+  background: #f5f5f5;
 }
 
 a {
   cursor: pointer;
+}
+
+.floating-button {
+  position: fixed;
+  bottom: 20px;
+  right: 20px;
+  z-index: 100;
+  @include media-breakpoint-up ("sm") {
+    position: absolute;
+    top: 5px;
+    right: 20px;
+    display: table;
+  }
+}
+
+.relative {
+  position: relative;
+}
+
+.page-header {
+  margin: 30px;
 }

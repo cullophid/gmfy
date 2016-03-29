@@ -8,8 +8,7 @@ import Json.Encode exposing (Value)
 import Json.Decode exposing (Decoder, (:=))
 
 type alias Model =
-  { showActivityForm: Bool
-  , gameForm : Game
+  { gameForm : Game
   , activityForm : Activity
   , games : Dict String Game
   , location : String
@@ -27,13 +26,11 @@ emptyModel =
     , name = "andreas"
     , email = "andreas.moller@gmail.com"
     }
-  , showActivityForm = False
   }
 
 encode : Model -> Value
 encode model =
   Json.Encode.object [
-    ("showActivityForm", Json.Encode.bool model.showActivityForm),
     ("gameForm", Model.Game.encode model.gameForm),
     ("activityForm", Model.Activity.encode model.activityForm),
     ("games", Util.Dict.encode Model.Game.encode model.games),
@@ -43,9 +40,8 @@ encode model =
 
 decoder : Decoder Model
 decoder =
-  Json.Decode.object6
+  Json.Decode.object5
     Model
-    ("showActivityForm" := Json.Decode.bool)
     ("gameForm" := Model.Game.decoder)
     ("activityForm" := Model.Activity.decoder)
     ("games" := Json.Decode.dict Model.Game.decoder)
