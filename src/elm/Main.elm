@@ -9,6 +9,7 @@ import Task exposing (Task)
 import History exposing (setPath, hash)
 import Json.Encode exposing (Value)
 import Json.Decode exposing (decodeString)
+import History
 
 
 main : Signal Html
@@ -26,10 +27,10 @@ initialModel =
 
 port updateUrl : Signal (Task error ())
 port updateUrl =
-  Signal.map setPath
-  <| Signal.dropRepeats
-  <| Signal.map .location model
-
+  Signal.map (setPath << snd)
+    <| Signal.filter (\(a, b) -> a /= b) ("","")
+    <| Signal.map2 (\a b -> (a, b)) History.hash
+    <| Signal.map .location model
 
 port getStorage : Maybe String
 
