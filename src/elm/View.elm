@@ -22,7 +22,7 @@ view model =
           router [
             route "^#games/new$" (newGamePage model.gameForm),
             route "^#games$" (gamesListPage <| Dict.values games),
-            route "^#games/[a-z0-9]*/activities/new" (renderActivityForm model.activityForm),
+            route "^#games/[a-z0-9|-]*/activities/new" (renderActivityForm model.activityForm),
             route "^#games/" (gamePage model),
             route "^$" (homePage)
           ] location

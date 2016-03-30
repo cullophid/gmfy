@@ -45,7 +45,7 @@ showGamePage player game {location, activityForm} =
           text (" " ++ game.title)
         ],
         router [
-          route "#games/[a-z0-9]*/activities" (newActivityButton game)
+          route "#games/[a-z0-9|-]*/activities" (newActivityButton game)
         ] location
       ]
     ],
@@ -70,8 +70,6 @@ showGamePage player game {location, activityForm} =
     ],
     div [class "row card"] [
       router [
-        route "#games/[0-9a-z|-]*/activities/new"
-          <| renderActivityForm activityForm,
         route "#games/[0-9a-z|-]*/activities"
           <| renderActivities (Dict.values game.activities),
         route "#games/[0-9a-z|-]*/players"

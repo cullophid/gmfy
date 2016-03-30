@@ -34,7 +34,7 @@ listItem {title, description, id} =
     a [href ("#games/" ++ id ++ "/activities")] [
       div [class "media"] [
         div [class "media-left"] [
-          div [class "fa fa-gamepad fa-4x text-primary"] []
+          div [class "fa fa-gamepad fa-3x text-primary"] []
         ],
         div [class "media-body"] [
           h3 [] [text title],
