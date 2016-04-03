@@ -5,8 +5,7 @@ import Html.Attributes exposing (href, class)
 import Model.Game exposing (Game)
 import View.Header
 
-gamesListPage : List Game -> Html
-gamesListPage games =
+gamesListPage {games} =
   div [class "col-md-6 col-md-offset-3"] [
     div [class "row m-t-1 m-b-1 relative"] [
       div [class "container-fluid container-fluid"] [
@@ -16,7 +15,7 @@ gamesListPage games =
         ],
         a [
           class "btn btn-success-outline floating-button",
-          href "#games/new"
+          href "#/games/new"
         ] [text "New Game"]
       ]
     ],
@@ -31,7 +30,7 @@ gamesListPage games =
 listItem : Game -> Html
 listItem {title, description, id} =
   div [class "list-group-item"] [
-    a [href ("#games/" ++ id ++ "/activities")] [
+    a [href ("#/games/" ++ id ++ "/activities")] [
       div [class "media"] [
         div [class "media-left"] [
           div [class "fa fa-gamepad fa-3x text-primary"] []

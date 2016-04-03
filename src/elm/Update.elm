@@ -1,7 +1,7 @@
 module Update where
 -- import Update.GameForm exposing (gameForm)
 -- import Update.Games exposing (games)
-import Update.Location exposing (location)
+import Update.Navigate exposing (navigate)
 -- import Update.ActivityForm exposing (activityForm)
 import Update.User exposing (user)
 import Util.Functions exposing (composeAll)
@@ -20,7 +20,7 @@ update action model =
       -- , gameForm
       -- , activityForm
       -- , games
-      , location
+      , navigate
       ]
   in
     updateAll model

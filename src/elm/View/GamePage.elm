@@ -16,37 +16,31 @@ import View.GamePage.ActivityForm exposing (renderActivityForm)
 import View.GamePage.Players exposing (players)
 import View.Header
 
-gamePage : Model -> Html
-gamePage  model =
+gamePage : {a | game : Maybe Model.Game.Game} -> Html
+gamePage props =
   let
-    {location, games, activityForm, user} =
-      model
-    gameId =
-      Maybe.withDefault "missing" <| nth 1 (String.split "/" location)
-    game' =
-      Dict.get gameId games
-    player' =
-      Maybe.andThen game' (\{players} -> Dict.get user.id players)
-    data =
-      Maybe.map2 (\a b -> (a, b)) game' player'
+    {game} = props
   in
-    case data of
-      Just (game, player) ->
-          showGamePage player game model
-      _ -> notFoundPage
+    case game of
+      Nothing ->
+        notFoundPage
+      Just g ->
+        showGamePage
+          { game = g
+          }
 
-showGamePage : Player -> Game -> Model -> Html
-showGamePage player game {location, activityForm} =
+
+showGamePage {game} =
   div [class "col-md-6 col-md-offset-3"] [
     div [class "row m-t-1 m-b-1 relative"] [
       div [class "container-fluid container-fluid"] [
         h1 [] [
           a [href "#games", class "fa fa-chevron-circle-left"] [],
           text (" " ++ game.title)
-        ],
-        router [
-          route "#games/[a-z0-9|-]*/activities" (newActivityButton game)
-        ] location
+        ]
+        -- router [
+        --   route "#games/[a-z0-9|-]*/activities" (newActivityButton game)
+        -- ] location
       ]
     ],
     div [class "row"] [
@@ -69,12 +63,11 @@ showGamePage player game {location, activityForm} =
       ]
     ],
     div [class "row card"] [
-      router [
-        route "#games/[0-9a-z|-]*/activities"
-          <| renderActivities (Dict.values game.activities),
-        route "#games/[0-9a-z|-]*/players"
-          <| players (Dict.values game.players)
-      ] location
+      -- router [
+      --   route "#games/[0-9a-z|-]*/activities"
+      --     <| renderActivities (Dict.values game.activities),
+      --   route "#games/[0-9a-z|-]*/players"
+      --     <| players (Dict.values game.players)
     ]
   ]
 

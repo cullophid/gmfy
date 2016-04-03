@@ -1,18 +1,18 @@
-module Update.Location where
+module Update.Navigate where
 import Actions
 import Actions exposing (..)
 import Model exposing (Model)
-import Model.Location
+import Model.Url
 import String
 
-location : Action -> Model -> Model
-location action model =
+navigate : Action -> Model -> Model
+navigate action model =
   case action of
-    Location location ->
+    Navigate location ->
       {model | location = location}
 
     CreateGame _ ->
-      {model | location = Model.Location.parse "#games"}
+      {model | location = Model.Url.parse "#games"}
 
     _ -> model
 

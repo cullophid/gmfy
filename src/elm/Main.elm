@@ -3,6 +3,7 @@ module Main where
 import Html exposing (Html)
 import Actions exposing (Action)
 import Model exposing (Model, emptyModel)
+import Model.Url as Url
 import View exposing (view)
 import Update exposing (update)
 import Task exposing (Task)
@@ -32,7 +33,7 @@ initialModel =
 --   Signal.map (setPath << snd)
 --     <| Signal.filter (\(a, b) -> a /= b) ("","")
 --     <| Signal.map2 (\a b -> (a, b)) History.hash
---     <| Signal.map .location model
+--     <| Signal.map (Url.toString << .location) model
 
 
 port getStorage : Maybe String
