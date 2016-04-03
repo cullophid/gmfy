@@ -14,10 +14,6 @@ gameForm action model =
     {activities, players} = gameForm
   in
     case action of
-      Location "#games/new" ->
-        { model
-        | gameForm = resetGameForm <| Debug.log "USER" user
-        }
       SetGameTitle title ->
         { model
         | gameForm = {gameForm | title = title}

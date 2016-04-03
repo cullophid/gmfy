@@ -19,10 +19,10 @@ homePage =
       div [class "card-block"] [
         h2 [] [ text "Welcome to GMFY" ],
         div [] [
-          a [href "#games"] [text "View your current games"]
+          a [href "#/games"] [text "View your current games"]
         ],
         div [] [
-          a [href "#games/new"] [text "Create New Game"]
+          a [href "#/games/new"] [text "Create New Game"]
         ]
 
       ]

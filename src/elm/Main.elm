@@ -27,12 +27,12 @@ initialModel =
     <| Maybe.andThen getStorage (Result.toMaybe << decodeString Model.decoder)
 
 
-port updateUrl : Signal (Task error ())
-port updateUrl =
-  Signal.map (setPath << snd)
-    <| Signal.filter (\(a, b) -> a /= b) ("","")
-    <| Signal.map2 (\a b -> (a, b)) History.hash
-    <| Signal.map .location model
+-- port updateUrl : Signal (Task error ())
+-- port updateUrl =
+--   Signal.map (setPath << snd)
+--     <| Signal.filter (\(a, b) -> a /= b) ("","")
+--     <| Signal.map2 (\a b -> (a, b)) History.hash
+--     <| Signal.map .location model
 
 
 port getStorage : Maybe String

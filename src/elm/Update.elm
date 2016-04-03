@@ -1,8 +1,8 @@
 module Update where
-import Update.GameForm exposing (gameForm)
-import Update.Games exposing (games)
+-- import Update.GameForm exposing (gameForm)
+-- import Update.Games exposing (games)
 import Update.Location exposing (location)
-import Update.ActivityForm exposing (activityForm)
+-- import Update.ActivityForm exposing (activityForm)
 import Update.User exposing (user)
 import Util.Functions exposing (composeAll)
 
@@ -17,9 +17,9 @@ update action model =
   let
     updateAll = composeAll action
       [ user
-      , gameForm
-      , activityForm
-      , games
+      -- , gameForm
+      -- , activityForm
+      -- , games
       , location
       ]
   in

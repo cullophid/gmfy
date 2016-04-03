@@ -2,6 +2,7 @@ module Update.Location where
 import Actions
 import Actions exposing (..)
 import Model exposing (Model)
+import Model.Location
 import String
 
 location : Action -> Model -> Model
@@ -11,10 +12,8 @@ location action model =
       {model | location = location}
 
     CreateGame _ ->
-      {model | location = "#games"}
+      {model | location = Model.Location.parse "#games"}
 
-    AddActivity _ ->
-      {model| location = gotToCurrentGameActivities model.location}
     _ -> model
 
 
