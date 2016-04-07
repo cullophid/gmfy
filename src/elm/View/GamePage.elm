@@ -7,19 +7,16 @@ import Html.Events exposing (..)
 import Model exposing (Model)
 import Model.Game exposing (Game)
 import Model.Player exposing (Player)
+import Model.Page as Page
 import Actions exposing (..)
 import Util.List exposing (last, findById, nth)
 import Util.Router exposing (router, route)
 import View.NotFoundPage exposing (notFoundPage)
-import View.GamePage.Activities exposing (renderActivities)
-import View.GamePage.ActivityForm exposing (renderActivityForm)
-import View.GamePage.Players exposing (players)
 import View.Header
 
-gamePage : {a | game : Maybe Model.Game.Game} -> Html
-gamePage props =
+gamePage props childPage =
   let
-    {game} = props
+    {game, page, user} = props
   in
     case game of
       Nothing ->
@@ -27,20 +24,25 @@ gamePage props =
       Just g ->
         showGamePage
           { game = g
+          , page = props.page
+          , user = props.user
           }
+          childPage
 
 
-showGamePage {game} =
+
+showGamePage {game, page, user} childPage=
   div [class "col-md-6 col-md-offset-3"] [
     div [class "row m-t-1 m-b-1 relative"] [
       div [class "container-fluid container-fluid"] [
         h1 [] [
-          a [href "#games", class "fa fa-chevron-circle-left"] [],
+          a [href "#/games", class "fa fa-chevron-circle-left"] [],
           text (" " ++ game.title)
-        ]
-        -- router [
-        --   route "#games/[a-z0-9|-]*/activities" (newActivityButton game)
-        -- ] location
+        ],
+        case page of
+          Page.GameActivities _ ->
+            newActivityButton game
+          _ -> text ""
       ]
     ],
     div [class "row"] [
@@ -49,13 +51,13 @@ showGamePage {game} =
           li [class "nav-item"] [
             a [
               class "nav-link",
-              href ("#games/" ++ game.id ++ "/activities")
+              href ("#/games/" ++ game.id ++ "/activities")
             ] [text "Activities"]
           ],
           li [class "nav-item"] [
             a [
               class "nav-link",
-              href ("#games/" ++ game.id ++ "/players")
+              href ("#/games/" ++ game.id ++ "/players")
             ]
             [text "Players"]
           ]
@@ -63,11 +65,7 @@ showGamePage {game} =
       ]
     ],
     div [class "row card"] [
-      -- router [
-      --   route "#games/[0-9a-z|-]*/activities"
-      --     <| renderActivities (Dict.values game.activities),
-      --   route "#games/[0-9a-z|-]*/players"
-      --     <| players (Dict.values game.players)
+      childPage {game = game, user = user}
     ]
   ]
 
@@ -75,5 +73,5 @@ showGamePage {game} =
 newActivityButton game =
   a [
     class "btn btn-success-outline floating-button",
-    href ("#games/" ++ game.id ++ "/activities/new")
+    href ("#/games/" ++ game.id ++ "/activities/new")
   ] [text "New Activity"]

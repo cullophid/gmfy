@@ -10,7 +10,7 @@ homePage =
     div [class "row m-t-1 m-b-1"] [
       div [class "container-fluid container-fluid"] [
         h1 [] [
-          a [href "#", class "fa fa-home"] [],
+          a [href "#/", class "fa fa-home"] [],
           text " GMFY"
         ]
       ]
@@ -18,11 +18,11 @@ homePage =
     div [class "row card"] [
       div [class "card-block"] [
         h2 [] [ text "Welcome to GMFY" ],
-        div [] [
-          a [href "#/games"] [text "View your current games"]
+        div [class "form-group"] [
+          a [href "#/games", class "btn btn-block btn-primary"] [text "View Your games"]
         ],
         div [] [
-          a [href "#/games/new"] [text "Create New Game"]
+          a [href "#/games/new", class "btn btn-block btn-primary"] [text "Create New Game"]
         ]
 
       ]

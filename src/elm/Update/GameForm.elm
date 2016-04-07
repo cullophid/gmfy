@@ -6,6 +6,7 @@ import Model exposing (Model)
 import Model.User exposing (User)
 import Model.Player exposing (Player)
 import Model.Game exposing (Game, emptyGame)
+import Model.Page exposing (..)
 
 gameForm : Action -> Model -> Model
 gameForm action model =
@@ -14,6 +15,9 @@ gameForm action model =
     {activities, players} = gameForm
   in
     case action of
+
+      Navigate "#/games/new" ->
+        {model| gameForm = resetGameForm user}
       SetGameTitle title ->
         { model
         | gameForm = {gameForm | title = title}
@@ -24,16 +28,16 @@ gameForm action model =
         | gameForm = {gameForm | description = description}
         }
 
-      AddActivity newActivity ->
-        let
-          activity = Util.addId newActivity
-        in
-          {model
-          | gameForm =
-            {gameForm
-            | activities =  Dict.insert activity.id activity activities
-            }
-          }
+      -- AddActivity newActivity ->
+      --   let
+      --     activity = Util.addId newActivity
+      --   in
+      --     {model
+      --     | gameForm =
+      --       {gameForm
+      --       | activities =  Dict.insert activity.id activity activities
+      --       }
+      --     }
       _ ->
         model
 

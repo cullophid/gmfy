@@ -10,7 +10,7 @@ notFoundPage =
       , p [] [text "This link does not seem to lead anywhere"]
       , p []
         [ text "try going back to "
-        , a [href "#home"] [text "home"]
+        , a [href "/#/"] [text "home"]
         ]
       ]
     ]

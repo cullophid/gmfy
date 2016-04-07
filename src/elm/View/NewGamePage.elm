@@ -7,8 +7,7 @@ import Util.Events exposing (onClick, onInput, onSubmit)
 import Model.Game exposing (Game)
 import Actions exposing (..)
 
-newGamePage : Game -> Html
-newGamePage gameForm =
+newGamePage {gameForm} =
   let
     {id, title} = gameForm
   in

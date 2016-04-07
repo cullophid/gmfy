@@ -5,12 +5,12 @@ import Util.Events exposing (onClick)
 import Model.Activity exposing (Activity)
 import Model.Game exposing (Game)
 import Actions exposing (..)
+import Dict
 
-renderActivities : List Activity -> Html
-renderActivities activities =
+gameActivities {game, user} =
   div [] [
     div [class "list-group list-group-flush"]
-      <| List.map activity activities
+      <| List.map activity <| Dict.values game.activities
   ]
 
 activity : Activity -> Html

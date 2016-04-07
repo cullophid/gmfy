@@ -10,7 +10,7 @@ gamesListPage {games} =
     div [class "row m-t-1 m-b-1 relative"] [
       div [class "container-fluid container-fluid"] [
         h1 [] [
-          a [href "#", class "fa fa-chevron-circle-left"] [],
+          a [href "#/", class "fa fa-chevron-circle-left"] [],
           text " Games"
         ],
         a [
@@ -21,7 +21,7 @@ gamesListPage {games} =
     ],
     div [class "row card"] [
       div [class "list-group list-group-flush"]
-        <| List.map listItem games
+        <| List.map listItem <| Debug.log "GAMES" games
 
     ]
 

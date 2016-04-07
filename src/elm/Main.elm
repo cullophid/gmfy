@@ -1,16 +1,14 @@
 module Main where
 
 import Html exposing (Html)
-import Actions exposing (Action)
+import Actions exposing (..)
 import Model exposing (Model, emptyModel)
-import Model.Url as Url
 import View exposing (view)
 import Update exposing (update)
 import Task exposing (Task)
-import History exposing (setPath, hash)
+import History
 import Json.Encode exposing (Value)
 import Json.Decode exposing (decodeString)
-import History
 
 
 main : Signal Html
@@ -19,7 +17,7 @@ main =
 
 model : Signal Model
 model =
-  Signal.foldp update initialModel Actions.signal
+  Signal.map (Debug.log "MODEL") <| Signal.foldp update initialModel Actions.signal
 
 
 initialModel : Model
@@ -28,14 +26,23 @@ initialModel =
     <| Maybe.andThen getStorage (Result.toMaybe << decodeString Model.decoder)
 
 
--- port updateUrl : Signal (Task error ())
--- port updateUrl =
---   Signal.map (setPath << snd)
---     <| Signal.filter (\(a, b) -> a /= b) ("","")
---     <| Signal.map2 (\a b -> (a, b)) History.hash
---     <| Signal.map (Url.toString << .location) model
+port updateURL : Signal (Task error ())
+port updateURL =
+  Signal.map History.setPath
+    <| Signal.map (Debug.log "update url")
+    <| Signal.dropRepeats
+    <| Signal.filterMap
+      (\(a, b) -> if a /= b then Just a else Nothing ) ""
+    <| Signal.map2 (\a b -> (a, b)) History.hash
+    <| Signal.map .url model
 
 
+
+
+isBackAction action =
+  case action of
+    Back -> True
+    _ -> False
 port getStorage : Maybe String
 
 

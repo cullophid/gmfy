@@ -1,12 +1,11 @@
-module View.GamePage.ActivityForm where
+module View.NewActivityPage where
 import Html exposing (..)
 import Html.Attributes exposing (class, type', href)
 import Model.Activity exposing (Activity)
 import Util.Events exposing (onInput, onNumberInput, onClick)
 import Actions exposing (..)
 
-renderActivityForm : Activity -> Html
-renderActivityForm activityForm =
+newActivityPage {activityForm, gameId} =
   let
     {title, id} = activityForm
   in
@@ -14,7 +13,7 @@ renderActivityForm activityForm =
       div [class "row m-t-1 m-b-1"] [
         div [class "container-fluid container-fluid"] [
           h1 [] [
-            a [href "javascript:history.back()", class "fa fa-chevron-circle-left"] [text " "],
+            a [href ("#/games/" ++ gameId ++ "/activities" ), class "fa fa-chevron-circle-left"] [text " "],
             text (" " ++ (if id == "" then "New Activity" else title))
           ]
         ]
@@ -49,12 +48,13 @@ renderActivityForm activityForm =
                 div [class "pull-xs-right"] [
                   a [
                     class "btn btn-danger-outline",
-                    href "javascript:history.back()"
+                    href ("#/games/" ++ gameId ++ "/activities")
                   ] [text "cancel"],
                   text " ",
                   button [
+                    type' "button",
                     class "btn btn-success-outline",
-                    onClick (AddActivity activityForm)
+                    onClick (AddActivity gameId activityForm)
                   ] [text "add"]
                 ]
               ]

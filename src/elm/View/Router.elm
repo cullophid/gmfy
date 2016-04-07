@@ -4,23 +4,36 @@ import Dict
 import Util.Router exposing (route)
 import View.GamesListPage exposing (gamesListPage)
 import View.GamePage exposing (gamePage)
+import View.GamePage.Activities exposing (gameActivities)
+import View.NewGamePage exposing (newGamePage)
 import View.HomePage exposing (homePage)
 import View.NotFoundPage exposing (notFoundPage)
+import View.NewActivityPage exposing (newActivityPage)
 import Html exposing (..)
 import Model exposing (Model)
-import Model.Url as Url
+import Model.Page as Page
 appRouter : Model -> Html
 appRouter model =
-  case model.location of
-    Url.Home ->
+  case model.page of
+    Page.Home ->
       homePage
-    Url.GamesList ->
+    Page.GamesList ->
       gamesListPage
         { games = Dict.values model.games
         }
-    Url.GameActivities gameid ->
+    Page.NewGame ->
+      newGamePage
+        { gameForm = model.gameForm
+        }
+    Page.GameActivities gameId ->
       gamePage
-        { game = (Dict.get gameid model.games)
+        { game = (Dict.get gameId model.games)
         , user = model.user
+        , page = model.page
+        } gameActivities
+    Page.NewActivity gameId ->
+      newActivityPage
+        { gameId = gameId
+        , activityForm = model.activityForm
         }
     _ -> notFoundPage

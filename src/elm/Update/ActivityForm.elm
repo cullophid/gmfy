@@ -10,7 +10,7 @@ activityForm action model =
     {activityForm} = model
   in
     case action of
-      AddActivity activity ->
+      AddActivity _ _ ->
         { model | activityForm = emptyActivity }
       SetActivityTitle title ->
         { model | activityForm = {activityForm| title = title } }

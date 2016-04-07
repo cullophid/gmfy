@@ -6,18 +6,18 @@ import Util
 import Dict
 import Model exposing (Model)
 import Model.Game exposing (Game)
+import Model.Page as Page
 import Actions exposing (..)
 
 games : Action -> Model -> Model
 games action model =
     let
-      {location, games, user} =
+      {page, games, user} =
         model
       gameId =
-        Maybe.withDefault "" <| Util.List.nth 1 <| String.split "/" location
-
-      updateGame f =
-        {model | games = Dict.update gameId (Maybe.map f) games}
+        case page of
+          Page.GameActivities id -> id
+          _ -> ""
     in
       case action of
         CreateGame newGame ->
@@ -28,13 +28,14 @@ games action model =
           { model
           | games = Dict.update gameId (Maybe.map (updatePlayerScore user.id value)) games
           }
-        AddActivity newActivity ->
+        AddActivity gameId newActivity ->
           let
             activity = Util.addId newActivity
           in
-            updateGame (\game -> {game| activities = Dict.insert activity.id activity game.activities})
+            { model
+            | games = Dict.update gameId (Maybe.map (\game -> {game| activities = Dict.insert activity.id activity game.activities})) games
+            }
         _ -> model
-
 
 
 updatePlayerScore : String -> Int -> Game -> Game

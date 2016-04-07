@@ -1,21 +1,20 @@
 module Actions where
 import Model.Game exposing (Game)
 import Model.Activity exposing (Activity)
-import Model.Url exposing (Url)
 import History exposing (hash, setPath)
 import Debug
 
 type Action
   = NoOp
+  | Back
   | SetGameTitle String
   | SetGameDescription String
   | CreateGame Game
-  | CreateActivity Activity
   | SetActivityTitle String
   | SetActivityDescription String
   | SetActivityValue Int
-  | AddActivity Activity
-  | Navigate Url
+  | AddActivity String Activity
+  | Navigate String
   | CompleteActivity Activity
 
 mailbox : Signal.Mailbox Action
@@ -30,5 +29,5 @@ signal : Signal Action
 signal =
   Signal.map (Debug.log "Action: ")
   <| Signal.merge mailbox.signal
-  <| Signal.map (\h -> Navigate <| Model.Url.parse h)
+  <| Signal.map Navigate
   <| Signal.dropRepeats hash

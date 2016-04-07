@@ -1,7 +1,7 @@
 module Model where
 import Dict exposing (Dict)
 import Model.Game exposing (Game, emptyGame)
-import Model.Url exposing (Url)
+import Model.Page exposing (Page)
 import Model.Activity exposing (Activity, emptyActivity)
 import Model.User exposing (User)
 import Util.Dict
@@ -12,13 +12,15 @@ type alias Model =
   { gameForm : Game
   , activityForm : Activity
   , games : Dict String Game
-  , location : Url
+  , page : Page
+  , url : String
   , user : User
   }
 
 emptyModel : Model
 emptyModel =
-  { location  = Model.Url.Home
+  { page  = Model.Page.Home
+  , url = "#/"
   , gameForm = emptyGame
   , activityForm = emptyActivity
   , games = Dict.empty
@@ -40,10 +42,11 @@ encode model =
 
 decoder : Decoder Model
 decoder =
-  Json.Decode.object5
+  Json.Decode.object6
     Model
     ("gameForm" := Model.Game.decoder)
     ("activityForm" := Model.Activity.decoder)
     ("games" := Json.Decode.dict Model.Game.decoder)
-    ("location" := Model.Url.decoder)
+    ("page" := Model.Page.decoder)
+    ("url" := Json.Decode.string)
     ("user" := Model.User.decoder)
