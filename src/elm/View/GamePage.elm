@@ -12,7 +12,7 @@ import Actions exposing (..)
 import Util.List exposing (last, findById, nth)
 import Util.Router exposing (router, route)
 import View.NotFoundPage exposing (notFoundPage)
-import View.Header
+import View.Header as Header
 
 gamePage props childPage =
   let
@@ -32,43 +32,33 @@ gamePage props childPage =
 
 
 showGamePage {game, page, user} childPage=
-  div [class "col-md-6 col-md-offset-3"] [
-    div [class "row m-t-1 m-b-1 relative"] [
-      div [class "container-fluid container-fluid"] [
-        h1 [] [
-          a [href "#/games", class "fa fa-chevron-circle-left"] [],
-          text (" " ++ game.title)
-        ],
-        case page of
-          Page.GameActivities _ ->
-            newActivityButton game
-          _ -> text ""
-      ]
-    ],
-    div [class "row"] [
-      nav [class "navbar"] [
-        ul [class "nav navbar-nav"] [
-          li [class "nav-item"] [
-            a [
-              class "nav-link",
-              href ("#/games/" ++ game.id ++ "/activities")
-            ] [text "Activities"]
-          ],
-          li [class "nav-item"] [
-            a [
-              class "nav-link",
-              href ("#/games/" ++ game.id ++ "/players")
+  div [] [
+    Header.header game.title,
+    div [class "col-md-6 col-md-offset-3 m-t-2"] [
+      div [class "row"] [
+        nav [class "navbar"] [
+          ul [class "nav navbar-nav"] [
+            li [class "nav-item"] [
+              a [
+                class "nav-link",
+                href ("#/games/" ++ game.id ++ "/activities")
+              ] [text "Activities"]
+            ],
+            li [class "nav-item"] [
+              a [
+                class "nav-link",
+                href ("#/games/" ++ game.id ++ "/players")
+              ]
+              [text "Players"]
             ]
-            [text "Players"]
           ]
         ]
+      ],
+      div [class "row"] [
+        childPage {game = game, user = user}
       ]
-    ],
-    div [class "row card"] [
-      childPage {game = game, user = user}
     ]
   ]
-
 
 newActivityButton game =
   a [

@@ -8,7 +8,6 @@ import Update exposing (update)
 import Task exposing (Task)
 import History
 import Json.Encode exposing (Value)
-import Json.Decode exposing (decodeString)
 
 
 main : Signal Html
@@ -23,21 +22,18 @@ model =
 initialModel : Model
 initialModel =
   Maybe.withDefault emptyModel
-    <| Maybe.andThen getStorage (Result.toMaybe << decodeString Model.decoder)
+    <| (flip Maybe.andThen) Model.decode
+    <| getStorage
 
 
 port updateURL : Signal (Task error ())
 port updateURL =
   Signal.map History.setPath
-    <| Signal.map (Debug.log "update url")
     <| Signal.dropRepeats
     <| Signal.filterMap
       (\(a, b) -> if a /= b then Just a else Nothing ) ""
     <| Signal.map2 (\a b -> (a, b)) History.hash
     <| Signal.map .url model
-
-
-
 
 isBackAction action =
   case action of

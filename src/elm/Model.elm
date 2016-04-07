@@ -6,7 +6,7 @@ import Model.Activity exposing (Activity, emptyActivity)
 import Model.User exposing (User)
 import Util.Dict
 import Json.Encode exposing (Value)
-import Json.Decode exposing (Decoder, (:=))
+import Json.Decode exposing (Decoder, (:=), decodeString)
 
 type alias Model =
   { gameForm : Game
@@ -33,12 +33,19 @@ emptyModel =
 
 encode : Model -> Value
 encode model =
-  Json.Encode.object [
-    ("gameForm", Model.Game.encode model.gameForm),
-    ("activityForm", Model.Activity.encode model.activityForm),
-    ("games", Util.Dict.encode Model.Game.encode model.games),
-    ("user", Model.User.encode model.user)
-  ]
+  Json.Encode.object
+    [ ("gameForm", Model.Game.encode model.gameForm)
+    , ("activityForm", Model.Activity.encode model.activityForm)
+    , ("games", Util.Dict.encode Model.Game.encode model.games)
+    , ("user", Model.User.encode model.user)
+    , ("page", Json.Encode.null)
+    , ("url", Json.Encode.string model.url)
+    ]
+decode : String -> Maybe Model
+decode json =
+  Maybe.map (\model -> { model| page = Model.Page.fromUrl model.url })
+    <| Result.toMaybe
+    <| decodeString decoder json
 
 decoder : Decoder Model
 decoder =

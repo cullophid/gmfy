@@ -1,16 +1,20 @@
 module View.NotFoundPage where
 import Html exposing (..)
 import Html.Attributes exposing (..)
+import View.Header as Header
 
 notFoundPage : Html
 notFoundPage =
-  div [class "card"]
-    [ div [class "card-block"]
-      [ h1 [] [text "404 page not found"]
-      , p [] [text "This link does not seem to lead anywhere"]
-      , p []
-        [ text "try going back to "
-        , a [href "/#/"] [text "home"]
+  div [] [
+    Header.header "Not Found",
+    div [ class "col-md-8 col-md-offset-2"] [
+      div [] [
+        h1 [] [text "404 page not found"],
+        p [] [text "This link does not seem to lead anywhere"],
+        p [] [
+          text "try going back to ",
+          a [href "/#/"] [text "home"]
         ]
       ]
     ]
+  ]

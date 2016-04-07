@@ -9,7 +9,7 @@ import Dict
 
 gameActivities {game, user} =
   div [] [
-    div [class "list-group list-group-flush"]
+    div [class "list-group"]
       <| List.map activity <| Dict.values game.activities
   ]
 

@@ -26,17 +26,17 @@
 //
 // Grayscale and brand colors for use across Bootstrap.
 
-$gray-dark:                 #13293D !default;
+$gray-dark:                 #2F4550 !default;
 $gray:                      #55595c !default;
 $gray-light:                #818a91 !default;
 $gray-lighter:              #E8F1F2 !default;
 $gray-lightest:             #f7f7f9 !default;
 
-$brand-primary:             #247BA0 !default;
-$brand-success:             #1B98E0 !default;
-$brand-info:                #247BA0 !default;
-$brand-warning:             #13293D !default;
-$brand-danger:              #006494 !default;
+$brand-primary:             #1D2D44 !default;
+$brand-success:             #06D6A0 !default;
+$brand-info:                #118AB2 !default;
+$brand-warning:             #FFD166 !default;
+$brand-danger:              #EF476F !default;
 
 
 // Options
@@ -86,7 +86,7 @@ $border-width:               1px !default;
 // Settings for the `<body>` element.
 
 $body-bg:                    #fff !default;
-$body-color:                 $gray-dark !default;
+$body-color:                 $brand-primary !default;
 
 
 // Links
@@ -155,7 +155,7 @@ $font-size-lg:               1.25rem !default;
 $font-size-sm:               .875rem !default;
 $font-size-xs:               .75rem !default;
 
-$font-size-h1:               2.5rem !default;
+$font-size-h1:               1.8rem !default;
 $font-size-h2:               2rem !default;
 $font-size-h3:               1.75rem !default;
 $font-size-h4:               1.5rem !default;
@@ -240,7 +240,7 @@ $table-border-color:            $gray-lighter !default;
 // For each of Bootstrap's buttons, define text, background and border color.
 
 $btn-padding-x:                  1rem !default;
-$btn-padding-y:                  .375rem !default;
+$btn-padding-y:                  .675rem !default;
 $btn-font-weight:                normal !default;
 
 $btn-primary-color:              #fff !default;
@@ -283,8 +283,8 @@ $btn-border-radius-sm:           $border-radius-sm !default;
 
 // Forms
 
-$input-padding-x:                .75rem !default;
-$input-padding-y:                .375rem !default;
+$input-padding-x:                1rem !default;
+$input-padding-y:                1rem !default;
 
 $input-bg:                       #fff !default;
 $input-bg-disabled:              $gray-lighter !default;

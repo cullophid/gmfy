@@ -10,7 +10,7 @@ import Model exposing (Model)
 view : Model -> Html
 view model =
   div [class "full-screen"] [
-    div [class "container-fluid m-t-1"] [
+    div [class "container-fluid"] [
       div [class "row"] [
         appRouter model
       ]

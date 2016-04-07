@@ -3,14 +3,14 @@ module View.Header where
 import Html exposing (..)
 import Html.Attributes exposing (class, href)
 
-header : Html
-header =
-  div [class "row"] [
-    nav [class "navbar"] [
-      div [class "nav-item"] [
-        a [href "#"] [
-          span [class "fa fa-home fa-2x"] []
-        ]
+header : String -> Html
+header title =
+  div [class "row bg-primary card-block"] [
+    div [class "container-fluid"] [
+      h1 [] [
+        a [href "#/", class "fa fa-home"] [],
+        text <| " " ++ title
       ]
     ]
   ]
+  
