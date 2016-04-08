@@ -12,7 +12,7 @@ gameActivities {game, user} =
     div [class "list-group"]
       <| List.map activity <| Dict.values game.activities,
     a [
-      class "fixed-b-r btn btn-success",
+      class "fixed-bottom-right btn btn-success",
       href ("#/games/" ++ game.id ++ "/activities/new")
       ] [text "New Activity"]
 
@@ -20,7 +20,7 @@ gameActivities {game, user} =
 
 activity : Activity -> Html
 activity activity =
-  div [class "list-group-item"] [
+  div [class "list-group-item", onClick (CompleteActivity activity)] [
     div [class "media"] [
       div [class "media-left"] [
         div [class "fa fa-3x fa-check-square-o"] []

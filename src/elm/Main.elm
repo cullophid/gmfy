@@ -16,7 +16,7 @@ main =
 
 model : Signal Model
 model =
-  Signal.map (Debug.log "MODEL") <| Signal.foldp update initialModel Actions.signal
+  Signal.foldp update initialModel Actions.signal
 
 
 initialModel : Model

@@ -32,11 +32,11 @@ newGamePage {gameForm} =
               onInput SetGameDescription
             ] []
           ],
-          div [ class "clearfix fixed-b-r-sm"] [
-            div [class "pull-xs-right"] [
+          div [ class "fixed-bottom-right-sm"] [
+            div [class ""] [
               a [ type' "button",
                   class "btn btn-danger",
-                  href "javascript:history.back()"
+                  href "#/"
               ] [text "Cancel"],
               text " ",
               button [

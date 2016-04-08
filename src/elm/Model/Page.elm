@@ -12,6 +12,7 @@ type Page
   | GamesList
   | Activity String String
   | GameActivities String
+  | GamePlayers String
   | NewActivity String
   | NewGame
   | NotFound String
@@ -25,12 +26,13 @@ pathSegment i path =
   Maybe.withDefault "" (nth i <| String.split "/" path)
 
 routes =
-  [ ("^#/$", \_ -> Home)
+  [ ("^(#?/?)?$", \_ -> Home)
   , ("^#/games$",  \_ -> GamesList)
   , ("^#/games/new$", \_ -> NewGame)
   , ("^#/games/(.*)/activities$", \path -> GameActivities (pathSegment 2 path))
   , ("^#/games/(.*)/activities/new$", \path -> NewActivity (pathSegment 2 path))
-  , ("^#/games/(.*)/activities/(.*)$", \path -> Activity (pathSegment 2 path) (pathSegment 4 path))
+  , ("^#/games/(.*)/activities$", \path -> GameActivities (pathSegment 2 path))
+  , ("^#/games/(.*)/players$", \path -> GamePlayers (pathSegment 2 path))
   ]
 
 fromUrl : String -> Page
@@ -42,11 +44,3 @@ fromUrl path =
     case route of
       Just (p, f) -> Debug.log "WTF IT WORKED" <| f path
       _ -> NotFound path
-
-toString : Page -> String
-toString url =
-  case url of
-    Home -> "#"
-    GamesList -> "#/games"
-    NotFound path -> path
-    _ -> ""

@@ -15,7 +15,7 @@ gamesListPage {games} =
       ]
     ],
     a [
-      class "fixed-b-r btn btn-success",
+      class "fixed-bottom-right btn btn-success",
       href "#/games/new"
       ] [text "New Game"]
   ]

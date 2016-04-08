@@ -9,13 +9,13 @@ a {
   cursor: pointer;
 }
 
-.fixed-b-r {
+.fixed-bottom-right {
   position: fixed;
   bottom: 20px;
   right: 20px;
   z-index: 100;
 }
-.fixed-b-r-sm {
+.fixed-bottom-right-sm {
   @include media-breakpoint-down("sm") {
     position: fixed;
     bottom: 20px;

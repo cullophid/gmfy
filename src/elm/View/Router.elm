@@ -5,6 +5,7 @@ import Util.Router exposing (route)
 import View.GamesListPage exposing (gamesListPage)
 import View.GamePage exposing (gamePage)
 import View.GamePage.Activities exposing (gameActivities)
+import View.GamePage.Players exposing (gamePlayers)
 import View.NewGamePage exposing (newGamePage)
 import View.HomePage exposing (homePage)
 import View.NotFoundPage exposing (notFoundPage)
@@ -36,4 +37,10 @@ appRouter model =
         { gameId = gameId
         , activityForm = model.activityForm
         }
+    Page.GamePlayers gameId ->
+      gamePage
+        { game = (Dict.get gameId model.games)
+        , user = model.user
+        , page = model.page
+        } gamePlayers
     _ -> notFoundPage

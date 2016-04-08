@@ -54,6 +54,7 @@ a.label {
 
 .label-default {
   @include label-variant($label-default-bg);
+  color: $body-bg;
 }
 
 .label-primary {

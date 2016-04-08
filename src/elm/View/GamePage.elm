@@ -60,9 +60,3 @@ showGamePage {game, page, user} childPage=
       ]
     ]
   ]
-
-newActivityButton game =
-  a [
-    class "btn btn-success floating-button",
-    href ("#/games/" ++ game.id ++ "/activities/new")
-  ] [text "New Activity"]

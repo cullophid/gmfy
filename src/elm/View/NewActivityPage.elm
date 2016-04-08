@@ -36,7 +36,7 @@ newActivityPage {activityForm, gameId} =
               onNumberInput SetActivityValue
             ] []
           ],
-          div [class "clearfix"] [
+          div [class "clearfix fixed-bottom-right-sm"] [
             div [class "pull-xs-right"] [
               a [
                 class "btn btn-danger",
