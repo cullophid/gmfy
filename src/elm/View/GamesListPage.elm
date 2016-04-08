@@ -8,7 +8,7 @@ import View.Header as Header
 gamesListPage {games} =
   div [] [
     Header.header "Games",
-    div [class "col-md-6 col-md-offset-3 m-t-2"] [
+    div [class "col-md-6 col-md-offset-3"] [
       div [class "row"] [
         div [class "list-group"]
           <| List.map listItem <| Debug.log "GAMES" games

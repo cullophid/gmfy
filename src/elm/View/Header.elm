@@ -5,7 +5,7 @@ import Html.Attributes exposing (class, href)
 
 header : String -> Html
 header title =
-  div [class "row bg-primary card-block"] [
+  div [class "row card-block"] [
     div [class "container-fluid"] [
       h1 [] [
         a [href "#/", class "fa fa-home"] [],
@@ -13,4 +13,3 @@ header title =
       ]
     ]
   ]
-  

@@ -7,7 +7,7 @@ notFoundPage : Html
 notFoundPage =
   div [] [
     Header.header "Not Found",
-    div [ class "col-md-8 col-md-offset-2"] [
+    div [ class "col-md-6 col-md-offset-3"] [
       div [] [
         h1 [] [text "404 page not found"],
         p [] [text "This link does not seem to lead anywhere"],

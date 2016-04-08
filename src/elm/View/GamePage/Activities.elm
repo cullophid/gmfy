@@ -18,7 +18,7 @@ activity activity =
   div [class "list-group-item"] [
     div [class "media"] [
       div [class "media-left"] [
-        div [class "fa fa-3x fa-check-square-o text-primary"] []
+        div [class "fa fa-3x fa-check-square-o"] []
       ],
       div [class "media-body"] [
         h5 [] [text activity.title],

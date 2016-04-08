@@ -84,11 +84,7 @@ fieldset[disabled] a.btn {
 }
 
 .btn-default-outline {
-  background: transparent;
-  border: $border-width solid $body-color;
-  &:hover {
-    box-shadow: 0 0 3px $body-color;
-  }
+  @include button-outline-variant($body-color);
 }
 // Remove all backgrounds
 .btn-primary-outline {

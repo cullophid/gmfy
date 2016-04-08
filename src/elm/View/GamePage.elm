@@ -34,7 +34,7 @@ gamePage props childPage =
 showGamePage {game, page, user} childPage=
   div [] [
     Header.header game.title,
-    div [class "col-md-6 col-md-offset-3 m-t-2"] [
+    div [class "col-md-6 col-md-offset-3"] [
       div [class "row"] [
         nav [class "navbar"] [
           ul [class "nav navbar-nav"] [
@@ -54,6 +54,7 @@ showGamePage {game, page, user} childPage=
           ]
         ]
       ],
+      hr [][],
       div [class "row"] [
         childPage {game = game, user = user}
       ]
@@ -62,6 +63,6 @@ showGamePage {game, page, user} childPage=
 
 newActivityButton game =
   a [
-    class "btn btn-success-outline floating-button",
+    class "btn btn-success floating-button",
     href ("#/games/" ++ game.id ++ "/activities/new")
   ] [text "New Activity"]
