@@ -32,7 +32,7 @@ newGamePage {gameForm} =
               onInput SetGameDescription
             ] []
           ],
-          div [ class "clearfix"] [
+          div [ class "clearfix fixed-b-r-sm"] [
             div [class "pull-xs-right"] [
               a [ type' "button",
                   class "btn btn-danger",

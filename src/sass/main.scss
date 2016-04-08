@@ -9,16 +9,18 @@ a {
   cursor: pointer;
 }
 
-.floating-button {
+.fixed-b-r {
   position: fixed;
   bottom: 20px;
   right: 20px;
   z-index: 100;
-  @include media-breakpoint-up ("sm") {
-    position: absolute;
-    top: 5px;
+}
+.fixed-b-r-sm {
+  @include media-breakpoint-down("sm") {
+    position: fixed;
+    bottom: 20px;
     right: 20px;
-    display: table;
+    z-index: 100;
   }
 }
 

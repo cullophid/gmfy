@@ -10,7 +10,12 @@ import Dict
 gameActivities {game, user} =
   div [] [
     div [class "list-group"]
-      <| List.map activity <| Dict.values game.activities
+      <| List.map activity <| Dict.values game.activities,
+    a [
+      class "fixed-b-r btn btn-success",
+      href ("#/games/" ++ game.id ++ "/activities/new")
+      ] [text "New Activity"]
+
   ]
 
 activity : Activity -> Html

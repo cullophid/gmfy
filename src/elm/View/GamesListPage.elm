@@ -13,7 +13,11 @@ gamesListPage {games} =
         div [class "list-group"]
           <| List.map listItem <| Debug.log "GAMES" games
       ]
-    ]
+    ],
+    a [
+      class "fixed-b-r btn btn-success",
+      href "#/games/new"
+      ] [text "New Game"]
   ]
 
 listItem : Game -> Html
