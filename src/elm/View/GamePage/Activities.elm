@@ -20,10 +20,10 @@ gameActivities {game, user} =
 
 activity : Activity -> Html
 activity activity =
-  div [class "list-group-item", onClick (CompleteActivity activity)] [
+  div [class "list-group-item"  , onClick (CompleteActivity activity)] [
     div [class "media"] [
       div [class "media-left"] [
-        div [class "fa fa-3x fa-check-square-o"] []
+        div [class "fa fa-3x fa-check-square-o"] [  ]
       ],
       div [class "media-body"] [
         h5 [] [text activity.title],
