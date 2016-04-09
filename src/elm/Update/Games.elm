@@ -17,6 +17,9 @@ games action model =
       gameId =
         case page of
           Page.GameActivities id -> id
+          Page.GamePlayers id -> id
+          Page.Activity id _ -> id
+          Page.NewActivity id -> id
           _ -> ""
     in
       case action of

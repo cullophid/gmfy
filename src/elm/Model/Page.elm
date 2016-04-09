@@ -32,6 +32,7 @@ routes =
   , ("^#/games/(.*)/activities$", \path -> GameActivities (pathSegment 2 path))
   , ("^#/games/(.*)/activities/new$", \path -> NewActivity (pathSegment 2 path))
   , ("^#/games/(.*)/activities$", \path -> GameActivities (pathSegment 2 path))
+  , ("^#/games/(.*)/activities/(.*)$", \path -> Activity (pathSegment 2 path) (pathSegment 4 path))
   , ("^#/games/(.*)/players$", \path -> GamePlayers (pathSegment 2 path))
   ]
 

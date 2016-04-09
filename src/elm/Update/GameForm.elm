@@ -28,16 +28,6 @@ gameForm action model =
         | gameForm = {gameForm | description = description}
         }
 
-      -- AddActivity newActivity ->
-      --   let
-      --     activity = Util.addId newActivity
-      --   in
-      --     {model
-      --     | gameForm =
-      --       {gameForm
-      --       | activities =  Dict.insert activity.id activity activities
-      --       }
-      --     }
       _ ->
         model
 

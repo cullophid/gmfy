@@ -31,7 +31,7 @@ port updateURL =
   Signal.map History.setPath
     <| Signal.dropRepeats
     <| Signal.filterMap
-      (\(a, b) -> if a /= b then Just a else Nothing ) ""
+      (\(a, b) -> if a /= b then Just b else Nothing ) ""
     <| Signal.map2 (\a b -> (a, b)) History.hash
     <| Signal.map .url model
 

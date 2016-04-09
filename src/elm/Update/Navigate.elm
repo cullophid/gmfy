@@ -27,5 +27,13 @@ navigate action model =
         | page = Model.Page.fromUrl url
         , url = url
         }
+    CompleteActivity _ ->
+      let url = String.join "/" <| List.take 4 <| String.split "/" model.url
+      in
+        { model
+        | page = Model.Page.fromUrl <| Debug.log "complete" url
+        , url = url
+        }
+
 
     _ -> model

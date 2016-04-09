@@ -9,6 +9,7 @@ import View.GamePage.Players exposing (gamePlayers)
 import View.NewGamePage exposing (newGamePage)
 import View.HomePage exposing (homePage)
 import View.NotFoundPage exposing (notFoundPage)
+import View.ActivityPage exposing (activityPage)
 import View.NewActivityPage exposing (newActivityPage)
 import Html exposing (..)
 import Model exposing (Model)
@@ -43,4 +44,11 @@ appRouter model =
         , user = model.user
         , page = model.page
         } gamePlayers
+    Page.Activity gameId activityId ->
+      let
+        game = Dict.get gameId model.games
+        activity = Maybe.andThen game <| (Dict.get activityId << .activities)
+      in
+        activityPage
+          { activity = activity }
     _ -> notFoundPage

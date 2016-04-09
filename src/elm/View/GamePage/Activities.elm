@@ -10,7 +10,7 @@ import Dict
 gameActivities {game, user} =
   div [] [
     div [class "list-group"]
-      <| List.map activity <| Dict.values game.activities,
+      <| List.map (activity game) <| Dict.values game.activities,
     a [
       class "fixed-bottom-right btn btn-success",
       href ("#/games/" ++ game.id ++ "/activities/new")
@@ -18,9 +18,8 @@ gameActivities {game, user} =
 
   ]
 
-activity : Activity -> Html
-activity activity =
-  div [class "list-group-item"  , onClick (CompleteActivity activity)] [
+activity game activity =
+  a [class "list-group-item"  , href ("#/games/" ++ game.id ++ "/activities/" ++ activity.id)] [
     div [class "media"] [
       div [class "media-left"] [
         div [class "fa fa-3x fa-check-square-o"] [  ]
