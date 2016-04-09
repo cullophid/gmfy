@@ -32,16 +32,17 @@ newGamePage {gameForm} =
               onInput SetGameDescription
             ] []
           ],
-          div [ class "fixed-bottom-right-sm"] [
-            div [class ""] [
+          div [ class "row"] [
+            div [class "col-xs-6"] [
               a [ type' "button",
-                  class "btn btn-danger",
+                  class "btn btn-danger btn-block",
                   href "#/"
-              ] [text "Cancel"],
-              text " ",
+              ] [text "Cancel"]
+            ],
+            div [class "col-xs-6"] [
               button [
                 type' "button",
-                class "btn btn-success",
+                class "btn btn-success btn-block",
                 onClick (Actions.CreateGame gameForm)
               ] [text "Create Game"]
             ]

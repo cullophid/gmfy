@@ -36,16 +36,18 @@ newActivityPage {activityForm, gameId} =
               onNumberInput SetActivityValue
             ] []
           ],
-          div [class "clearfix fixed-bottom-right-sm"] [
-            div [class "pull-xs-right"] [
+          div [class "row"] [
+            div [class "col-xs-6"] [
               a [
-                class "btn btn-danger",
+                class "btn btn-danger btn-block",
                 href ("#/games/" ++ gameId ++ "/activities")
               ] [text "cancel"],
-              text " ",
+              text " "
+            ],
+            div [class "col-xs-6"] [
               button [
                 type' "button",
-                class "btn btn-success",
+                class "btn btn-success btn-block",
                 onClick (AddActivity gameId activityForm)
               ] [text "add"]
             ]
