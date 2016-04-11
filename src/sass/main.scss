@@ -41,3 +41,36 @@ a {
   display: flex;
   justify-content: space-between;
 }
+
+.dropdown {
+  position: relative;
+  cursor: pointer;
+  .dropdown-list {
+    display:none;
+  }
+  &.is-open .dropdown-list {
+    display: block;
+    position: absolute;
+    width: 150px;
+    right: 0;
+    top: 30px;
+    padding: 10px;
+    background: white;
+    color: $brand-primary;
+    box-shadow: 0 1px 4px rgba(0, 0, 0, 0.4);
+    z-index: 20;
+  }
+}
+
+.page-overlay {
+  display:none;
+  position:fixed;
+  width: 100vw;
+  height: 100vh;
+  left:0;
+  top:0;
+  z-index: 10;
+  &.is-visible {
+    display: block;
+  }
+}

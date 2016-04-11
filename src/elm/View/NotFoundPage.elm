@@ -6,7 +6,7 @@ import View.Header as Header
 notFoundPage : Html
 notFoundPage =
   div [] [
-    Header.header "Not Found",
+    Header.header "Not Found" (span [][]),
     div [ class "col-md-6 col-md-offset-3"] [
       div [] [
         h1 [] [text "404 page not found"],

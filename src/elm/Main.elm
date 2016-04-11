@@ -2,7 +2,7 @@ module Main where
 
 import Html exposing (Html)
 import Actions exposing (..)
-import Model exposing (Model, emptyModel)
+import Model exposing (Model, JsonModel, emptyModel)
 import View exposing (view)
 import Update exposing (update)
 import Task exposing (Task)
@@ -22,7 +22,7 @@ model =
 initialModel : Model
 initialModel =
   Maybe.withDefault emptyModel
-    <| (flip Maybe.andThen) Model.decode
+    <| Maybe.map Model.fromJson
     <| getStorage
 
 
@@ -39,9 +39,10 @@ isBackAction action =
   case action of
     Back -> True
     _ -> False
-port getStorage : Maybe String
+
+port getStorage : Maybe JsonModel
 
 
-port setStorage : Signal Value
+port setStorage : Signal JsonModel
 port setStorage =
-  Signal.map Model.encode model
+  Signal.map Model.toJson model

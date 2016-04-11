@@ -7,7 +7,7 @@ import View.Header as Header
 homePage : Html
 homePage =
   div [] [
-    Header.header "GMFY",
+    Header.header "GMFY" (div [] []),
     div [class "col-md-6 col-md-offset-3"] [
       h2 [] [ text "Welcome to GMFY" ],
       div [class "form-group"] [

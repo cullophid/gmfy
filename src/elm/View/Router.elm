@@ -32,6 +32,7 @@ appRouter model =
         { game = (Dict.get gameId model.games)
         , user = model.user
         , page = model.page
+        , showHeaderMenu = model.showHeaderMenu
         } gameActivities
     Page.NewActivity gameId ->
       newActivityPage
@@ -43,6 +44,7 @@ appRouter model =
         { game = (Dict.get gameId model.games)
         , user = model.user
         , page = model.page
+        , showHeaderMenu = model.showHeaderMenu
         } gamePlayers
     Page.Activity gameId activityId ->
       let
@@ -50,5 +52,8 @@ appRouter model =
         activity = Maybe.andThen game <| (Dict.get activityId << .activities)
       in
         activityPage
-          { activity = activity }
+          { activity = activity
+          , gameId = gameId
+          , showHeaderMenu = model.showHeaderMenu
+          }
     _ -> notFoundPage

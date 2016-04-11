@@ -7,7 +7,7 @@ import View.Header as Header
 
 gamesListPage {games} =
   div [] [
-    Header.header "Games",
+    Header.header "Games" (div [] []),
     div [class "col-md-6 col-md-offset-3"] [
       div [class "row"] [
         div [class "list-group"]
@@ -26,7 +26,7 @@ listItem {title, description, id} =
     a [href ("#/games/" ++ id ++ "/activities")] [
       div [class "media"] [
         div [class "media-left"] [
-          div [class "fa fa-gamepad fa-3x"] []
+          div [class "fa fa-circle-o fa-3x"] []
         ],
         div [class "media-body"] [
           h3 [] [text title],

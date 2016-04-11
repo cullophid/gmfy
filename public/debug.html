@@ -6,6 +6,7 @@
       <meta name="mobile-web-app-capable" content="yes">
       <meta name="theme-color" content="#3F51B5">
       <meta name="viewport" content="width=device-width, initial-scale=1, user-scalable=no">
+      <script type="text/javascript" src="/_reactor/debug.js"></script>
     <link rel="stylesheet" href="bundle.css">
     <script src="/elm.js" charset="utf-8"></script>
   </head>
@@ -17,7 +18,7 @@
     var cached = localStorage.getItem('gmfy-state');
     var state = cached ? setUrl(JSON.parse(cached)) : null;
     console.log('starting state', state)
-    var gmfy = Elm.fullscreen(Elm.Main, {getStorage: state});
+    var gmfy = Elm.fullscreenDebug('Main', 'src/elm/Main.elm', {getStorage: state});
     gmfy.ports.setStorage.subscribe(function(state) {
       localStorage.setItem('gmfy-state', JSON.stringify(state));
     });

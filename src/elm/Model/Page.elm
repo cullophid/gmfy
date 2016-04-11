@@ -43,5 +43,5 @@ fromUrl path =
       find ((flip contains) path << regex << fst) routes
   in
     case route of
-      Just (p, f) -> Debug.log "WTF IT WORKED" <| f path
+      Just (p, f) -> f path
       _ -> NotFound path

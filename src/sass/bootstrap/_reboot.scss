@@ -74,6 +74,7 @@ body {
   // Go easy on the eyes and use something other than `#000` for text
   color: $body-color;
   // By default, `<body>` has no `background-color` so we set one as a best practice.
+  min-height: 100vh;
   background-color: $body-bg;
 }
 

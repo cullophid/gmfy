@@ -19,6 +19,11 @@ navigate action model =
       | page = Model.Page.fromUrl "#/games"
       , url = "#/games"
       }
+    DeleteGame _ ->
+      { model
+      | page = Model.Page.fromUrl "#/games"
+      , url = "#/games"
+      }
 
     AddActivity gameId _ ->
       let url = "#/games/" ++ gameId ++ "/activities"
@@ -32,6 +37,14 @@ navigate action model =
       in
         { model
         | page = Model.Page.fromUrl <| Debug.log "complete" url
+        , url = url
+        }
+    DeleteActivity _ _ ->
+      let
+        url = String.join "/" <| List.take 4 <| String.split "/" model.url
+      in
+        { model
+        | page = Model.Page.fromUrl url
         , url = url
         }
 

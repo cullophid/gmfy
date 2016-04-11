@@ -13,7 +13,7 @@ newGamePage {gameForm} =
     {id, title} = gameForm
   in
     div [] [
-      Header.header "New Game",
+      Header.header "New Game" (div [] []),
       div [class "col-md-6 col-md-offset-3"] [
         form [onSubmit (CreateGame gameForm)] [
           div [class "form-group"] [

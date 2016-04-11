@@ -6,6 +6,8 @@ import Html.Attributes exposing (..)
 import View.Router exposing (appRouter)
 import View.Header exposing (header)
 import Model exposing (Model)
+import Util.Events exposing (onClick)
+import Actions exposing (..)
 
 view : Model -> Html
 view model =
@@ -14,5 +16,10 @@ view model =
       div [class "row"] [
         appRouter model
       ]
-    ]
+    ],
+    div [
+      class ("page-overlay" ++ if model.showHeaderMenu then " is-visible" else ""),
+      onClick (ToggleHeaderMenu False)
+      ] []
+
   ]

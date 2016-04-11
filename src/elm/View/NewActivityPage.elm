@@ -11,7 +11,7 @@ newActivityPage {activityForm, gameId} =
     {title, id} = activityForm
   in
     div [] [
-      Header.header "New Activity",
+      Header.header "New Activity" (div [] []),
       div [class "col-md-6 col-md-offset-3"] [
         form [] [
           div [class "form-group"] [

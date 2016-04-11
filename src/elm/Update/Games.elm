@@ -27,6 +27,8 @@ games action model =
           let game = Util.addId newGame
           in
             {model | games = Dict.insert game.id game games }
+        DeleteGame gameId ->
+          {model | games = Dict.remove gameId games }
         CompleteActivity {value} ->
           { model
           | games = Dict.update gameId (Maybe.map (updatePlayerScore user.id value)) games

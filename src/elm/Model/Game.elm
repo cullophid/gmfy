@@ -14,6 +14,14 @@ type alias Game =
   , players: Dict String Player
   }
 
+type alias JsonGame =
+  { id : String
+  , title : String
+  , description : String
+  , activities : List (String, Activity)
+  , players: List (String, Player)
+  }
+
 emptyGame : Game
 emptyGame =
   { id = ""
@@ -23,22 +31,18 @@ emptyGame =
   , players = Dict.empty
   }
 
-encode : Game -> Value
-encode game =
-  Json.Encode.object [
-    ("id", Json.Encode.string game.id),
-    ("title", Json.Encode.string game.title),
-    ("description", Json.Encode.string game.description),
-    ("activities", Util.Dict.encode Model.Activity.encode game.activities),
-    ("players", Util.Dict.encode Model.Player.encode game.players)
-  ]
+toJson game =
+  { id = game.id
+  , title = game.title
+  , description = game.description
+  , activities = Dict.toList game.activities
+  , players = Dict.toList game.players
+  }
 
-decoder : Decoder Game
-decoder =
-  Json.Decode.object5
-    Game
-    ("id" := Json.Decode.string)
-    ("title" := Json.Decode.string)
-    ("description" := Json.Decode.string)
-    ("activities" := Json.Decode.dict Model.Activity.decoder)
-    ("players" := Json.Decode.dict Model.Player.decoder)
+fromJson data =
+  { id = data.id
+  , title = data.title
+  , description = data.description
+  , activities = Dict.fromList data.activities
+  , players = Dict.fromList data.players
+  }

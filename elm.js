@@ -5421,6 +5421,1633 @@ Elm.Signal.make = function (_elm) {
                                ,forwardTo: forwardTo
                                ,Mailbox: Mailbox};
 };
+// setPath : String -> Task error ()
+function set (Task, Utils){
+  return function (key) {
+    return function (data) {
+      return Task.asyncFunction(function(callback){
+        setTimeout(function(){
+          localStorage.setItem(key, data);
+        },0);
+        return callback(Task.succeed(Utils.Tuple0));
+      });
+    };
+  };
+};
+function setJson (Task, Utils){
+  return function (key) {
+    return function (data) {
+      return Task.asyncFunction(function(callback){
+        setTimeout(function(){
+          try {
+            localStorage.setItem(key, JSON.stringify(data));
+            return callback(Task.succeed(Utils.Tuple0));
+          } catch (e) {
+            return callback(Task.fail(Utils.Tuple0));
+          }
+        },0);
+
+      });
+    };
+  };
+};
+
+function get (Maybe) {
+  return function (key) {
+    var data = localStorage.getItem(key)
+    if (data) {
+      return Maybe.Just(data);
+    }
+    return Maybe.Nothing;
+  }
+}
+function getJson (Maybe) {
+  return function (key) {
+    var data = localStorage.getItem(key)
+    try {
+      return Maybe.Just(JSON.parse(data));
+    } catch (e) {
+      return Maybe.Nothing;
+    }
+  }
+}
+
+Elm.Native.LocalStorage = {};
+Elm.Native.LocalStorage.make = function (elm) {
+    elm.Native = elm.Native || {};
+    elm.Native.LocalStorage = elm.Native.LocalStorage || {};
+
+    if (elm.Native.LocalStorage.values) return elm.Native.LocalStorage.values;
+
+    var Task = Elm.Native.Task.make(elm);
+    var Utils = Elm.Native.Utils.make(elm);
+    var Maybe = Elm.Maybe.make(elm);
+    console.log(Elm.Native)
+
+    return {
+        'get': get(Maybe),
+        'getJson': get(Maybe),
+        'set': set(Task, Utils),
+        'setJson': set(Task, Utils)
+    };
+};
+
+Elm.LocalStorage = Elm.LocalStorage || {};
+Elm.LocalStorage.make = function (_elm) {
+   "use strict";
+   _elm.LocalStorage = _elm.LocalStorage || {};
+   if (_elm.LocalStorage.values) return _elm.LocalStorage.values;
+   var _U = Elm.Native.Utils.make(_elm),
+   $Basics = Elm.Basics.make(_elm),
+   $Debug = Elm.Debug.make(_elm),
+   $List = Elm.List.make(_elm),
+   $Maybe = Elm.Maybe.make(_elm),
+   $Native$LocalStorage = Elm.Native.LocalStorage.make(_elm),
+   $Result = Elm.Result.make(_elm),
+   $Signal = Elm.Signal.make(_elm),
+   $Task = Elm.Task.make(_elm);
+   var _op = {};
+   var get = $Native$LocalStorage.get;
+   var set = $Native$LocalStorage.set;
+   return _elm.LocalStorage.values = {_op: _op,get: get,set: set};
+};
+Elm.Native.Json = {};
+
+Elm.Native.Json.make = function(localRuntime) {
+	localRuntime.Native = localRuntime.Native || {};
+	localRuntime.Native.Json = localRuntime.Native.Json || {};
+	if (localRuntime.Native.Json.values) {
+		return localRuntime.Native.Json.values;
+	}
+
+	var ElmArray = Elm.Native.Array.make(localRuntime);
+	var List = Elm.Native.List.make(localRuntime);
+	var Maybe = Elm.Maybe.make(localRuntime);
+	var Result = Elm.Result.make(localRuntime);
+	var Utils = Elm.Native.Utils.make(localRuntime);
+
+
+	function crash(expected, actual) {
+		throw new Error(
+			'expecting ' + expected + ' but got ' + JSON.stringify(actual)
+		);
+	}
+
+
+	// PRIMITIVE VALUES
+
+	function decodeNull(successValue) {
+		return function(value) {
+			if (value === null) {
+				return successValue;
+			}
+			crash('null', value);
+		};
+	}
+
+
+	function decodeString(value) {
+		if (typeof value === 'string' || value instanceof String) {
+			return value;
+		}
+		crash('a String', value);
+	}
+
+
+	function decodeFloat(value) {
+		if (typeof value === 'number') {
+			return value;
+		}
+		crash('a Float', value);
+	}
+
+
+	function decodeInt(value) {
+		if (typeof value !== 'number') {
+			crash('an Int', value);
+		}
+
+		if (value < 2147483647 && value > -2147483647 && (value | 0) === value) {
+			return value;
+		}
+
+		if (isFinite(value) && !(value % 1)) {
+			return value;
+		}
+
+		crash('an Int', value);
+	}
+
+
+	function decodeBool(value) {
+		if (typeof value === 'boolean') {
+			return value;
+		}
+		crash('a Bool', value);
+	}
+
+
+	// ARRAY
+
+	function decodeArray(decoder) {
+		return function(value) {
+			if (value instanceof Array) {
+				var len = value.length;
+				var array = new Array(len);
+				for (var i = len; i--; ) {
+					array[i] = decoder(value[i]);
+				}
+				return ElmArray.fromJSArray(array);
+			}
+			crash('an Array', value);
+		};
+	}
+
+
+	// LIST
+
+	function decodeList(decoder) {
+		return function(value) {
+			if (value instanceof Array) {
+				var len = value.length;
+				var list = List.Nil;
+				for (var i = len; i--; ) {
+					list = List.Cons( decoder(value[i]), list );
+				}
+				return list;
+			}
+			crash('a List', value);
+		};
+	}
+
+
+	// MAYBE
+
+	function decodeMaybe(decoder) {
+		return function(value) {
+			try {
+				return Maybe.Just(decoder(value));
+			} catch(e) {
+				return Maybe.Nothing;
+			}
+		};
+	}
+
+
+	// FIELDS
+
+	function decodeField(field, decoder) {
+		return function(value) {
+			var subValue = value[field];
+			if (subValue !== undefined) {
+				return decoder(subValue);
+			}
+			crash("an object with field '" + field + "'", value);
+		};
+	}
+
+
+	// OBJECTS
+
+	function decodeKeyValuePairs(decoder) {
+		return function(value) {
+			var isObject =
+				typeof value === 'object'
+					&& value !== null
+					&& !(value instanceof Array);
+
+			if (isObject) {
+				var keyValuePairs = List.Nil;
+				for (var key in value)
+				{
+					var elmValue = decoder(value[key]);
+					var pair = Utils.Tuple2(key, elmValue);
+					keyValuePairs = List.Cons(pair, keyValuePairs);
+				}
+				return keyValuePairs;
+			}
+
+			crash('an object', value);
+		};
+	}
+
+	function decodeObject1(f, d1) {
+		return function(value) {
+			return f(d1(value));
+		};
+	}
+
+	function decodeObject2(f, d1, d2) {
+		return function(value) {
+			return A2( f, d1(value), d2(value) );
+		};
+	}
+
+	function decodeObject3(f, d1, d2, d3) {
+		return function(value) {
+			return A3( f, d1(value), d2(value), d3(value) );
+		};
+	}
+
+	function decodeObject4(f, d1, d2, d3, d4) {
+		return function(value) {
+			return A4( f, d1(value), d2(value), d3(value), d4(value) );
+		};
+	}
+
+	function decodeObject5(f, d1, d2, d3, d4, d5) {
+		return function(value) {
+			return A5( f, d1(value), d2(value), d3(value), d4(value), d5(value) );
+		};
+	}
+
+	function decodeObject6(f, d1, d2, d3, d4, d5, d6) {
+		return function(value) {
+			return A6( f,
+				d1(value),
+				d2(value),
+				d3(value),
+				d4(value),
+				d5(value),
+				d6(value)
+			);
+		};
+	}
+
+	function decodeObject7(f, d1, d2, d3, d4, d5, d6, d7) {
+		return function(value) {
+			return A7( f,
+				d1(value),
+				d2(value),
+				d3(value),
+				d4(value),
+				d5(value),
+				d6(value),
+				d7(value)
+			);
+		};
+	}
+
+	function decodeObject8(f, d1, d2, d3, d4, d5, d6, d7, d8) {
+		return function(value) {
+			return A8( f,
+				d1(value),
+				d2(value),
+				d3(value),
+				d4(value),
+				d5(value),
+				d6(value),
+				d7(value),
+				d8(value)
+			);
+		};
+	}
+
+
+	// TUPLES
+
+	function decodeTuple1(f, d1) {
+		return function(value) {
+			if ( !(value instanceof Array) || value.length !== 1 ) {
+				crash('a Tuple of length 1', value);
+			}
+			return f( d1(value[0]) );
+		};
+	}
+
+	function decodeTuple2(f, d1, d2) {
+		return function(value) {
+			if ( !(value instanceof Array) || value.length !== 2 ) {
+				crash('a Tuple of length 2', value);
+			}
+			return A2( f, d1(value[0]), d2(value[1]) );
+		};
+	}
+
+	function decodeTuple3(f, d1, d2, d3) {
+		return function(value) {
+			if ( !(value instanceof Array) || value.length !== 3 ) {
+				crash('a Tuple of length 3', value);
+			}
+			return A3( f, d1(value[0]), d2(value[1]), d3(value[2]) );
+		};
+	}
+
+
+	function decodeTuple4(f, d1, d2, d3, d4) {
+		return function(value) {
+			if ( !(value instanceof Array) || value.length !== 4 ) {
+				crash('a Tuple of length 4', value);
+			}
+			return A4( f, d1(value[0]), d2(value[1]), d3(value[2]), d4(value[3]) );
+		};
+	}
+
+
+	function decodeTuple5(f, d1, d2, d3, d4, d5) {
+		return function(value) {
+			if ( !(value instanceof Array) || value.length !== 5 ) {
+				crash('a Tuple of length 5', value);
+			}
+			return A5( f,
+				d1(value[0]),
+				d2(value[1]),
+				d3(value[2]),
+				d4(value[3]),
+				d5(value[4])
+			);
+		};
+	}
+
+
+	function decodeTuple6(f, d1, d2, d3, d4, d5, d6) {
+		return function(value) {
+			if ( !(value instanceof Array) || value.length !== 6 ) {
+				crash('a Tuple of length 6', value);
+			}
+			return A6( f,
+				d1(value[0]),
+				d2(value[1]),
+				d3(value[2]),
+				d4(value[3]),
+				d5(value[4]),
+				d6(value[5])
+			);
+		};
+	}
+
+	function decodeTuple7(f, d1, d2, d3, d4, d5, d6, d7) {
+		return function(value) {
+			if ( !(value instanceof Array) || value.length !== 7 ) {
+				crash('a Tuple of length 7', value);
+			}
+			return A7( f,
+				d1(value[0]),
+				d2(value[1]),
+				d3(value[2]),
+				d4(value[3]),
+				d5(value[4]),
+				d6(value[5]),
+				d7(value[6])
+			);
+		};
+	}
+
+
+	function decodeTuple8(f, d1, d2, d3, d4, d5, d6, d7, d8) {
+		return function(value) {
+			if ( !(value instanceof Array) || value.length !== 8 ) {
+				crash('a Tuple of length 8', value);
+			}
+			return A8( f,
+				d1(value[0]),
+				d2(value[1]),
+				d3(value[2]),
+				d4(value[3]),
+				d5(value[4]),
+				d6(value[5]),
+				d7(value[6]),
+				d8(value[7])
+			);
+		};
+	}
+
+
+	// CUSTOM DECODERS
+
+	function decodeValue(value) {
+		return value;
+	}
+
+	function runDecoderValue(decoder, value) {
+		try {
+			return Result.Ok(decoder(value));
+		} catch(e) {
+			return Result.Err(e.message);
+		}
+	}
+
+	function customDecoder(decoder, callback) {
+		return function(value) {
+			var result = callback(decoder(value));
+			if (result.ctor === 'Err') {
+				throw new Error('custom decoder failed: ' + result._0);
+			}
+			return result._0;
+		};
+	}
+
+	function andThen(decode, callback) {
+		return function(value) {
+			var result = decode(value);
+			return callback(result)(value);
+		};
+	}
+
+	function fail(msg) {
+		return function(value) {
+			throw new Error(msg);
+		};
+	}
+
+	function succeed(successValue) {
+		return function(value) {
+			return successValue;
+		};
+	}
+
+
+	// ONE OF MANY
+
+	function oneOf(decoders) {
+		return function(value) {
+			var errors = [];
+			var temp = decoders;
+			while (temp.ctor !== '[]') {
+				try {
+					return temp._0(value);
+				} catch(e) {
+					errors.push(e.message);
+				}
+				temp = temp._1;
+			}
+			throw new Error('expecting one of the following:\n    ' + errors.join('\n    '));
+		};
+	}
+
+	function get(decoder, value) {
+		try {
+			return Result.Ok(decoder(value));
+		} catch(e) {
+			return Result.Err(e.message);
+		}
+	}
+
+
+	// ENCODE / DECODE
+
+	function runDecoderString(decoder, string) {
+		try {
+			return Result.Ok(decoder(JSON.parse(string)));
+		} catch(e) {
+			return Result.Err(e.message);
+		}
+	}
+
+	function encode(indentLevel, value) {
+		return JSON.stringify(value, null, indentLevel);
+	}
+
+	function identity(value) {
+		return value;
+	}
+
+	function encodeObject(keyValuePairs) {
+		var obj = {};
+		while (keyValuePairs.ctor !== '[]') {
+			var pair = keyValuePairs._0;
+			obj[pair._0] = pair._1;
+			keyValuePairs = keyValuePairs._1;
+		}
+		return obj;
+	}
+
+	return localRuntime.Native.Json.values = {
+		encode: F2(encode),
+		runDecoderString: F2(runDecoderString),
+		runDecoderValue: F2(runDecoderValue),
+
+		get: F2(get),
+		oneOf: oneOf,
+
+		decodeNull: decodeNull,
+		decodeInt: decodeInt,
+		decodeFloat: decodeFloat,
+		decodeString: decodeString,
+		decodeBool: decodeBool,
+
+		decodeMaybe: decodeMaybe,
+
+		decodeList: decodeList,
+		decodeArray: decodeArray,
+
+		decodeField: F2(decodeField),
+
+		decodeObject1: F2(decodeObject1),
+		decodeObject2: F3(decodeObject2),
+		decodeObject3: F4(decodeObject3),
+		decodeObject4: F5(decodeObject4),
+		decodeObject5: F6(decodeObject5),
+		decodeObject6: F7(decodeObject6),
+		decodeObject7: F8(decodeObject7),
+		decodeObject8: F9(decodeObject8),
+		decodeKeyValuePairs: decodeKeyValuePairs,
+
+		decodeTuple1: F2(decodeTuple1),
+		decodeTuple2: F3(decodeTuple2),
+		decodeTuple3: F4(decodeTuple3),
+		decodeTuple4: F5(decodeTuple4),
+		decodeTuple5: F6(decodeTuple5),
+		decodeTuple6: F7(decodeTuple6),
+		decodeTuple7: F8(decodeTuple7),
+		decodeTuple8: F9(decodeTuple8),
+
+		andThen: F2(andThen),
+		decodeValue: decodeValue,
+		customDecoder: F2(customDecoder),
+		fail: fail,
+		succeed: succeed,
+
+		identity: identity,
+		encodeNull: null,
+		encodeArray: ElmArray.toJSArray,
+		encodeList: List.toArray,
+		encodeObject: encodeObject
+
+	};
+};
+
+Elm.Native.Array = {};
+Elm.Native.Array.make = function(localRuntime) {
+
+	localRuntime.Native = localRuntime.Native || {};
+	localRuntime.Native.Array = localRuntime.Native.Array || {};
+	if (localRuntime.Native.Array.values)
+	{
+		return localRuntime.Native.Array.values;
+	}
+	if ('values' in Elm.Native.Array)
+	{
+		return localRuntime.Native.Array.values = Elm.Native.Array.values;
+	}
+
+	var List = Elm.Native.List.make(localRuntime);
+
+	// A RRB-Tree has two distinct data types.
+	// Leaf -> "height"  is always 0
+	//         "table"   is an array of elements
+	// Node -> "height"  is always greater than 0
+	//         "table"   is an array of child nodes
+	//         "lengths" is an array of accumulated lengths of the child nodes
+
+	// M is the maximal table size. 32 seems fast. E is the allowed increase
+	// of search steps when concatting to find an index. Lower values will
+	// decrease balancing, but will increase search steps.
+	var M = 32;
+	var E = 2;
+
+	// An empty array.
+	var empty = {
+		ctor: '_Array',
+		height: 0,
+		table: []
+	};
+
+
+	function get(i, array)
+	{
+		if (i < 0 || i >= length(array))
+		{
+			throw new Error(
+				'Index ' + i + ' is out of range. Check the length of ' +
+				'your array first or use getMaybe or getWithDefault.');
+		}
+		return unsafeGet(i, array);
+	}
+
+
+	function unsafeGet(i, array)
+	{
+		for (var x = array.height; x > 0; x--)
+		{
+			var slot = i >> (x * 5);
+			while (array.lengths[slot] <= i)
+			{
+				slot++;
+			}
+			if (slot > 0)
+			{
+				i -= array.lengths[slot - 1];
+			}
+			array = array.table[slot];
+		}
+		return array.table[i];
+	}
+
+
+	// Sets the value at the index i. Only the nodes leading to i will get
+	// copied and updated.
+	function set(i, item, array)
+	{
+		if (i < 0 || length(array) <= i)
+		{
+			return array;
+		}
+		return unsafeSet(i, item, array);
+	}
+
+
+	function unsafeSet(i, item, array)
+	{
+		array = nodeCopy(array);
+
+		if (array.height === 0)
+		{
+			array.table[i] = item;
+		}
+		else
+		{
+			var slot = getSlot(i, array);
+			if (slot > 0)
+			{
+				i -= array.lengths[slot - 1];
+			}
+			array.table[slot] = unsafeSet(i, item, array.table[slot]);
+		}
+		return array;
+	}
+
+
+	function initialize(len, f)
+	{
+		if (len <= 0)
+		{
+			return empty;
+		}
+		var h = Math.floor( Math.log(len) / Math.log(M) );
+		return initialize_(f, h, 0, len);
+	}
+
+	function initialize_(f, h, from, to)
+	{
+		if (h === 0)
+		{
+			var table = new Array((to - from) % (M + 1));
+			for (var i = 0; i < table.length; i++)
+			{
+			  table[i] = f(from + i);
+			}
+			return {
+				ctor: '_Array',
+				height: 0,
+				table: table
+			};
+		}
+
+		var step = Math.pow(M, h);
+		var table = new Array(Math.ceil((to - from) / step));
+		var lengths = new Array(table.length);
+		for (var i = 0; i < table.length; i++)
+		{
+			table[i] = initialize_(f, h - 1, from + (i * step), Math.min(from + ((i + 1) * step), to));
+			lengths[i] = length(table[i]) + (i > 0 ? lengths[i-1] : 0);
+		}
+		return {
+			ctor: '_Array',
+			height: h,
+			table: table,
+			lengths: lengths
+		};
+	}
+
+	function fromList(list)
+	{
+		if (list === List.Nil)
+		{
+			return empty;
+		}
+
+		// Allocate M sized blocks (table) and write list elements to it.
+		var table = new Array(M);
+		var nodes = [];
+		var i = 0;
+
+		while (list.ctor !== '[]')
+		{
+			table[i] = list._0;
+			list = list._1;
+			i++;
+
+			// table is full, so we can push a leaf containing it into the
+			// next node.
+			if (i === M)
+			{
+				var leaf = {
+					ctor: '_Array',
+					height: 0,
+					table: table
+				};
+				fromListPush(leaf, nodes);
+				table = new Array(M);
+				i = 0;
+			}
+		}
+
+		// Maybe there is something left on the table.
+		if (i > 0)
+		{
+			var leaf = {
+				ctor: '_Array',
+				height: 0,
+				table: table.splice(0, i)
+			};
+			fromListPush(leaf, nodes);
+		}
+
+		// Go through all of the nodes and eventually push them into higher nodes.
+		for (var h = 0; h < nodes.length - 1; h++)
+		{
+			if (nodes[h].table.length > 0)
+			{
+				fromListPush(nodes[h], nodes);
+			}
+		}
+
+		var head = nodes[nodes.length - 1];
+		if (head.height > 0 && head.table.length === 1)
+		{
+			return head.table[0];
+		}
+		else
+		{
+			return head;
+		}
+	}
+
+	// Push a node into a higher node as a child.
+	function fromListPush(toPush, nodes)
+	{
+		var h = toPush.height;
+
+		// Maybe the node on this height does not exist.
+		if (nodes.length === h)
+		{
+			var node = {
+				ctor: '_Array',
+				height: h + 1,
+				table: [],
+				lengths: []
+			};
+			nodes.push(node);
+		}
+
+		nodes[h].table.push(toPush);
+		var len = length(toPush);
+		if (nodes[h].lengths.length > 0)
+		{
+			len += nodes[h].lengths[nodes[h].lengths.length - 1];
+		}
+		nodes[h].lengths.push(len);
+
+		if (nodes[h].table.length === M)
+		{
+			fromListPush(nodes[h], nodes);
+			nodes[h] = {
+				ctor: '_Array',
+				height: h + 1,
+				table: [],
+				lengths: []
+			};
+		}
+	}
+
+	// Pushes an item via push_ to the bottom right of a tree.
+	function push(item, a)
+	{
+		var pushed = push_(item, a);
+		if (pushed !== null)
+		{
+			return pushed;
+		}
+
+		var newTree = create(item, a.height);
+		return siblise(a, newTree);
+	}
+
+	// Recursively tries to push an item to the bottom-right most
+	// tree possible. If there is no space left for the item,
+	// null will be returned.
+	function push_(item, a)
+	{
+		// Handle resursion stop at leaf level.
+		if (a.height === 0)
+		{
+			if (a.table.length < M)
+			{
+				var newA = {
+					ctor: '_Array',
+					height: 0,
+					table: a.table.slice()
+				};
+				newA.table.push(item);
+				return newA;
+			}
+			else
+			{
+			  return null;
+			}
+		}
+
+		// Recursively push
+		var pushed = push_(item, botRight(a));
+
+		// There was space in the bottom right tree, so the slot will
+		// be updated.
+		if (pushed !== null)
+		{
+			var newA = nodeCopy(a);
+			newA.table[newA.table.length - 1] = pushed;
+			newA.lengths[newA.lengths.length - 1]++;
+			return newA;
+		}
+
+		// When there was no space left, check if there is space left
+		// for a new slot with a tree which contains only the item
+		// at the bottom.
+		if (a.table.length < M)
+		{
+			var newSlot = create(item, a.height - 1);
+			var newA = nodeCopy(a);
+			newA.table.push(newSlot);
+			newA.lengths.push(newA.lengths[newA.lengths.length - 1] + length(newSlot));
+			return newA;
+		}
+		else
+		{
+			return null;
+		}
+	}
+
+	// Converts an array into a list of elements.
+	function toList(a)
+	{
+		return toList_(List.Nil, a);
+	}
+
+	function toList_(list, a)
+	{
+		for (var i = a.table.length - 1; i >= 0; i--)
+		{
+			list =
+				a.height === 0
+					? List.Cons(a.table[i], list)
+					: toList_(list, a.table[i]);
+		}
+		return list;
+	}
+
+	// Maps a function over the elements of an array.
+	function map(f, a)
+	{
+		var newA = {
+			ctor: '_Array',
+			height: a.height,
+			table: new Array(a.table.length)
+		};
+		if (a.height > 0)
+		{
+			newA.lengths = a.lengths;
+		}
+		for (var i = 0; i < a.table.length; i++)
+		{
+			newA.table[i] =
+				a.height === 0
+					? f(a.table[i])
+					: map(f, a.table[i]);
+		}
+		return newA;
+	}
+
+	// Maps a function over the elements with their index as first argument.
+	function indexedMap(f, a)
+	{
+		return indexedMap_(f, a, 0);
+	}
+
+	function indexedMap_(f, a, from)
+	{
+		var newA = {
+			ctor: '_Array',
+			height: a.height,
+			table: new Array(a.table.length)
+		};
+		if (a.height > 0)
+		{
+			newA.lengths = a.lengths;
+		}
+		for (var i = 0; i < a.table.length; i++)
+		{
+			newA.table[i] =
+				a.height === 0
+					? A2(f, from + i, a.table[i])
+					: indexedMap_(f, a.table[i], i == 0 ? from : from + a.lengths[i - 1]);
+		}
+		return newA;
+	}
+
+	function foldl(f, b, a)
+	{
+		if (a.height === 0)
+		{
+			for (var i = 0; i < a.table.length; i++)
+			{
+				b = A2(f, a.table[i], b);
+			}
+		}
+		else
+		{
+			for (var i = 0; i < a.table.length; i++)
+			{
+				b = foldl(f, b, a.table[i]);
+			}
+		}
+		return b;
+	}
+
+	function foldr(f, b, a)
+	{
+		if (a.height === 0)
+		{
+			for (var i = a.table.length; i--; )
+			{
+				b = A2(f, a.table[i], b);
+			}
+		}
+		else
+		{
+			for (var i = a.table.length; i--; )
+			{
+				b = foldr(f, b, a.table[i]);
+			}
+		}
+		return b;
+	}
+
+	// TODO: currently, it slices the right, then the left. This can be
+	// optimized.
+	function slice(from, to, a)
+	{
+		if (from < 0)
+		{
+			from += length(a);
+		}
+		if (to < 0)
+		{
+			to += length(a);
+		}
+		return sliceLeft(from, sliceRight(to, a));
+	}
+
+	function sliceRight(to, a)
+	{
+		if (to === length(a))
+		{
+			return a;
+		}
+
+		// Handle leaf level.
+		if (a.height === 0)
+		{
+			var newA = { ctor:'_Array', height:0 };
+			newA.table = a.table.slice(0, to);
+			return newA;
+		}
+
+		// Slice the right recursively.
+		var right = getSlot(to, a);
+		var sliced = sliceRight(to - (right > 0 ? a.lengths[right - 1] : 0), a.table[right]);
+
+		// Maybe the a node is not even needed, as sliced contains the whole slice.
+		if (right === 0)
+		{
+			return sliced;
+		}
+
+		// Create new node.
+		var newA = {
+			ctor: '_Array',
+			height: a.height,
+			table: a.table.slice(0, right),
+			lengths: a.lengths.slice(0, right)
+		};
+		if (sliced.table.length > 0)
+		{
+			newA.table[right] = sliced;
+			newA.lengths[right] = length(sliced) + (right > 0 ? newA.lengths[right - 1] : 0);
+		}
+		return newA;
+	}
+
+	function sliceLeft(from, a)
+	{
+		if (from === 0)
+		{
+			return a;
+		}
+
+		// Handle leaf level.
+		if (a.height === 0)
+		{
+			var newA = { ctor:'_Array', height:0 };
+			newA.table = a.table.slice(from, a.table.length + 1);
+			return newA;
+		}
+
+		// Slice the left recursively.
+		var left = getSlot(from, a);
+		var sliced = sliceLeft(from - (left > 0 ? a.lengths[left - 1] : 0), a.table[left]);
+
+		// Maybe the a node is not even needed, as sliced contains the whole slice.
+		if (left === a.table.length - 1)
+		{
+			return sliced;
+		}
+
+		// Create new node.
+		var newA = {
+			ctor: '_Array',
+			height: a.height,
+			table: a.table.slice(left, a.table.length + 1),
+			lengths: new Array(a.table.length - left)
+		};
+		newA.table[0] = sliced;
+		var len = 0;
+		for (var i = 0; i < newA.table.length; i++)
+		{
+			len += length(newA.table[i]);
+			newA.lengths[i] = len;
+		}
+
+		return newA;
+	}
+
+	// Appends two trees.
+	function append(a,b)
+	{
+		if (a.table.length === 0)
+		{
+			return b;
+		}
+		if (b.table.length === 0)
+		{
+			return a;
+		}
+
+		var c = append_(a, b);
+
+		// Check if both nodes can be crunshed together.
+		if (c[0].table.length + c[1].table.length <= M)
+		{
+			if (c[0].table.length === 0)
+			{
+				return c[1];
+			}
+			if (c[1].table.length === 0)
+			{
+				return c[0];
+			}
+
+			// Adjust .table and .lengths
+			c[0].table = c[0].table.concat(c[1].table);
+			if (c[0].height > 0)
+			{
+				var len = length(c[0]);
+				for (var i = 0; i < c[1].lengths.length; i++)
+				{
+					c[1].lengths[i] += len;
+				}
+				c[0].lengths = c[0].lengths.concat(c[1].lengths);
+			}
+
+			return c[0];
+		}
+
+		if (c[0].height > 0)
+		{
+			var toRemove = calcToRemove(a, b);
+			if (toRemove > E)
+			{
+				c = shuffle(c[0], c[1], toRemove);
+			}
+		}
+
+		return siblise(c[0], c[1]);
+	}
+
+	// Returns an array of two nodes; right and left. One node _may_ be empty.
+	function append_(a, b)
+	{
+		if (a.height === 0 && b.height === 0)
+		{
+			return [a, b];
+		}
+
+		if (a.height !== 1 || b.height !== 1)
+		{
+			if (a.height === b.height)
+			{
+				a = nodeCopy(a);
+				b = nodeCopy(b);
+				var appended = append_(botRight(a), botLeft(b));
+
+				insertRight(a, appended[1]);
+				insertLeft(b, appended[0]);
+			}
+			else if (a.height > b.height)
+			{
+				a = nodeCopy(a);
+				var appended = append_(botRight(a), b);
+
+				insertRight(a, appended[0]);
+				b = parentise(appended[1], appended[1].height + 1);
+			}
+			else
+			{
+				b = nodeCopy(b);
+				var appended = append_(a, botLeft(b));
+
+				var left = appended[0].table.length === 0 ? 0 : 1;
+				var right = left === 0 ? 1 : 0;
+				insertLeft(b, appended[left]);
+				a = parentise(appended[right], appended[right].height + 1);
+			}
+		}
+
+		// Check if balancing is needed and return based on that.
+		if (a.table.length === 0 || b.table.length === 0)
+		{
+			return [a, b];
+		}
+
+		var toRemove = calcToRemove(a, b);
+		if (toRemove <= E)
+		{
+			return [a, b];
+		}
+		return shuffle(a, b, toRemove);
+	}
+
+	// Helperfunctions for append_. Replaces a child node at the side of the parent.
+	function insertRight(parent, node)
+	{
+		var index = parent.table.length - 1;
+		parent.table[index] = node;
+		parent.lengths[index] = length(node);
+		parent.lengths[index] += index > 0 ? parent.lengths[index - 1] : 0;
+	}
+
+	function insertLeft(parent, node)
+	{
+		if (node.table.length > 0)
+		{
+			parent.table[0] = node;
+			parent.lengths[0] = length(node);
+
+			var len = length(parent.table[0]);
+			for (var i = 1; i < parent.lengths.length; i++)
+			{
+				len += length(parent.table[i]);
+				parent.lengths[i] = len;
+			}
+		}
+		else
+		{
+			parent.table.shift();
+			for (var i = 1; i < parent.lengths.length; i++)
+			{
+				parent.lengths[i] = parent.lengths[i] - parent.lengths[0];
+			}
+			parent.lengths.shift();
+		}
+	}
+
+	// Returns the extra search steps for E. Refer to the paper.
+	function calcToRemove(a, b)
+	{
+		var subLengths = 0;
+		for (var i = 0; i < a.table.length; i++)
+		{
+			subLengths += a.table[i].table.length;
+		}
+		for (var i = 0; i < b.table.length; i++)
+		{
+			subLengths += b.table[i].table.length;
+		}
+
+		var toRemove = a.table.length + b.table.length;
+		return toRemove - (Math.floor((subLengths - 1) / M) + 1);
+	}
+
+	// get2, set2 and saveSlot are helpers for accessing elements over two arrays.
+	function get2(a, b, index)
+	{
+		return index < a.length
+			? a[index]
+			: b[index - a.length];
+	}
+
+	function set2(a, b, index, value)
+	{
+		if (index < a.length)
+		{
+			a[index] = value;
+		}
+		else
+		{
+			b[index - a.length] = value;
+		}
+	}
+
+	function saveSlot(a, b, index, slot)
+	{
+		set2(a.table, b.table, index, slot);
+
+		var l = (index === 0 || index === a.lengths.length)
+			? 0
+			: get2(a.lengths, a.lengths, index - 1);
+
+		set2(a.lengths, b.lengths, index, l + length(slot));
+	}
+
+	// Creates a node or leaf with a given length at their arrays for perfomance.
+	// Is only used by shuffle.
+	function createNode(h, length)
+	{
+		if (length < 0)
+		{
+			length = 0;
+		}
+		var a = {
+			ctor: '_Array',
+			height: h,
+			table: new Array(length)
+		};
+		if (h > 0)
+		{
+			a.lengths = new Array(length);
+		}
+		return a;
+	}
+
+	// Returns an array of two balanced nodes.
+	function shuffle(a, b, toRemove)
+	{
+		var newA = createNode(a.height, Math.min(M, a.table.length + b.table.length - toRemove));
+		var newB = createNode(a.height, newA.table.length - (a.table.length + b.table.length - toRemove));
+
+		// Skip the slots with size M. More precise: copy the slot references
+		// to the new node
+		var read = 0;
+		while (get2(a.table, b.table, read).table.length % M === 0)
+		{
+			set2(newA.table, newB.table, read, get2(a.table, b.table, read));
+			set2(newA.lengths, newB.lengths, read, get2(a.lengths, b.lengths, read));
+			read++;
+		}
+
+		// Pulling items from left to right, caching in a slot before writing
+		// it into the new nodes.
+		var write = read;
+		var slot = new createNode(a.height - 1, 0);
+		var from = 0;
+
+		// If the current slot is still containing data, then there will be at
+		// least one more write, so we do not break this loop yet.
+		while (read - write - (slot.table.length > 0 ? 1 : 0) < toRemove)
+		{
+			// Find out the max possible items for copying.
+			var source = get2(a.table, b.table, read);
+			var to = Math.min(M - slot.table.length, source.table.length);
+
+			// Copy and adjust size table.
+			slot.table = slot.table.concat(source.table.slice(from, to));
+			if (slot.height > 0)
+			{
+				var len = slot.lengths.length;
+				for (var i = len; i < len + to - from; i++)
+				{
+					slot.lengths[i] = length(slot.table[i]);
+					slot.lengths[i] += (i > 0 ? slot.lengths[i - 1] : 0);
+				}
+			}
+
+			from += to;
+
+			// Only proceed to next slots[i] if the current one was
+			// fully copied.
+			if (source.table.length <= to)
+			{
+				read++; from = 0;
+			}
+
+			// Only create a new slot if the current one is filled up.
+			if (slot.table.length === M)
+			{
+				saveSlot(newA, newB, write, slot);
+				slot = createNode(a.height - 1, 0);
+				write++;
+			}
+		}
+
+		// Cleanup after the loop. Copy the last slot into the new nodes.
+		if (slot.table.length > 0)
+		{
+			saveSlot(newA, newB, write, slot);
+			write++;
+		}
+
+		// Shift the untouched slots to the left
+		while (read < a.table.length + b.table.length )
+		{
+			saveSlot(newA, newB, write, get2(a.table, b.table, read));
+			read++;
+			write++;
+		}
+
+		return [newA, newB];
+	}
+
+	// Navigation functions
+	function botRight(a)
+	{
+		return a.table[a.table.length - 1];
+	}
+	function botLeft(a)
+	{
+		return a.table[0];
+	}
+
+	// Copies a node for updating. Note that you should not use this if
+	// only updating only one of "table" or "lengths" for performance reasons.
+	function nodeCopy(a)
+	{
+		var newA = {
+			ctor: '_Array',
+			height: a.height,
+			table: a.table.slice()
+		};
+		if (a.height > 0)
+		{
+			newA.lengths = a.lengths.slice();
+		}
+		return newA;
+	}
+
+	// Returns how many items are in the tree.
+	function length(array)
+	{
+		if (array.height === 0)
+		{
+			return array.table.length;
+		}
+		else
+		{
+			return array.lengths[array.lengths.length - 1];
+		}
+	}
+
+	// Calculates in which slot of "table" the item probably is, then
+	// find the exact slot via forward searching in  "lengths". Returns the index.
+	function getSlot(i, a)
+	{
+		var slot = i >> (5 * a.height);
+		while (a.lengths[slot] <= i)
+		{
+			slot++;
+		}
+		return slot;
+	}
+
+	// Recursively creates a tree with a given height containing
+	// only the given item.
+	function create(item, h)
+	{
+		if (h === 0)
+		{
+			return {
+				ctor: '_Array',
+				height: 0,
+				table: [item]
+			};
+		}
+		return {
+			ctor: '_Array',
+			height: h,
+			table: [create(item, h - 1)],
+			lengths: [1]
+		};
+	}
+
+	// Recursively creates a tree that contains the given tree.
+	function parentise(tree, h)
+	{
+		if (h === tree.height)
+		{
+			return tree;
+		}
+
+		return {
+			ctor: '_Array',
+			height: h,
+			table: [parentise(tree, h - 1)],
+			lengths: [length(tree)]
+		};
+	}
+
+	// Emphasizes blood brotherhood beneath two trees.
+	function siblise(a, b)
+	{
+		return {
+			ctor: '_Array',
+			height: a.height + 1,
+			table: [a, b],
+			lengths: [length(a), length(a) + length(b)]
+		};
+	}
+
+	function toJSArray(a)
+	{
+		var jsArray = new Array(length(a));
+		toJSArray_(jsArray, 0, a);
+		return jsArray;
+	}
+
+	function toJSArray_(jsArray, i, a)
+	{
+		for (var t = 0; t < a.table.length; t++)
+		{
+			if (a.height === 0)
+			{
+				jsArray[i + t] = a.table[t];
+			}
+			else
+			{
+				var inc = t === 0 ? 0 : a.lengths[t - 1];
+				toJSArray_(jsArray, i + inc, a.table[t]);
+			}
+		}
+	}
+
+	function fromJSArray(jsArray)
+	{
+		if (jsArray.length === 0)
+		{
+			return empty;
+		}
+		var h = Math.floor(Math.log(jsArray.length) / Math.log(M));
+		return fromJSArray_(jsArray, h, 0, jsArray.length);
+	}
+
+	function fromJSArray_(jsArray, h, from, to)
+	{
+		if (h === 0)
+		{
+			return {
+				ctor: '_Array',
+				height: 0,
+				table: jsArray.slice(from, to)
+			};
+		}
+
+		var step = Math.pow(M, h);
+		var table = new Array(Math.ceil((to - from) / step));
+		var lengths = new Array(table.length);
+		for (var i = 0; i < table.length; i++)
+		{
+			table[i] = fromJSArray_(jsArray, h - 1, from + (i * step), Math.min(from + ((i + 1) * step), to));
+			lengths[i] = length(table[i]) + (i > 0 ? lengths[i - 1] : 0);
+		}
+		return {
+			ctor: '_Array',
+			height: h,
+			table: table,
+			lengths: lengths
+		};
+	}
+
+	Elm.Native.Array.values = {
+		empty: empty,
+		fromList: fromList,
+		toList: toList,
+		initialize: F2(initialize),
+		append: F2(append),
+		push: F2(push),
+		slice: F3(slice),
+		get: F2(get),
+		set: F3(set),
+		map: F2(map),
+		indexedMap: F2(indexedMap),
+		foldl: F3(foldl),
+		foldr: F3(foldr),
+		length: length,
+
+		toJSArray: toJSArray,
+		fromJSArray: fromJSArray
+	};
+
+	return localRuntime.Native.Array.values = Elm.Native.Array.values;
+};
+
+Elm.Array = Elm.Array || {};
+Elm.Array.make = function (_elm) {
+   "use strict";
+   _elm.Array = _elm.Array || {};
+   if (_elm.Array.values) return _elm.Array.values;
+   var _U = Elm.Native.Utils.make(_elm),
+   $Basics = Elm.Basics.make(_elm),
+   $List = Elm.List.make(_elm),
+   $Maybe = Elm.Maybe.make(_elm),
+   $Native$Array = Elm.Native.Array.make(_elm);
+   var _op = {};
+   var append = $Native$Array.append;
+   var length = $Native$Array.length;
+   var isEmpty = function (array) {    return _U.eq(length(array),0);};
+   var slice = $Native$Array.slice;
+   var set = $Native$Array.set;
+   var get = F2(function (i,array) {
+      return _U.cmp(0,i) < 1 && _U.cmp(i,$Native$Array.length(array)) < 0 ? $Maybe.Just(A2($Native$Array.get,i,array)) : $Maybe.Nothing;
+   });
+   var push = $Native$Array.push;
+   var empty = $Native$Array.empty;
+   var filter = F2(function (isOkay,arr) {
+      var update = F2(function (x,xs) {    return isOkay(x) ? A2($Native$Array.push,x,xs) : xs;});
+      return A3($Native$Array.foldl,update,$Native$Array.empty,arr);
+   });
+   var foldr = $Native$Array.foldr;
+   var foldl = $Native$Array.foldl;
+   var indexedMap = $Native$Array.indexedMap;
+   var map = $Native$Array.map;
+   var toIndexedList = function (array) {
+      return A3($List.map2,
+      F2(function (v0,v1) {    return {ctor: "_Tuple2",_0: v0,_1: v1};}),
+      _U.range(0,$Native$Array.length(array) - 1),
+      $Native$Array.toList(array));
+   };
+   var toList = $Native$Array.toList;
+   var fromList = $Native$Array.fromList;
+   var initialize = $Native$Array.initialize;
+   var repeat = F2(function (n,e) {    return A2(initialize,n,$Basics.always(e));});
+   var Array = {ctor: "Array"};
+   return _elm.Array.values = {_op: _op
+                              ,empty: empty
+                              ,repeat: repeat
+                              ,initialize: initialize
+                              ,fromList: fromList
+                              ,isEmpty: isEmpty
+                              ,length: length
+                              ,push: push
+                              ,append: append
+                              ,get: get
+                              ,set: set
+                              ,slice: slice
+                              ,toList: toList
+                              ,toIndexedList: toIndexedList
+                              ,map: map
+                              ,indexedMap: indexedMap
+                              ,filter: filter
+                              ,foldl: foldl
+                              ,foldr: foldr};
+};
 Elm.Native.String = {};
 
 Elm.Native.String.make = function(localRuntime) {
@@ -6470,1543 +8097,6 @@ Elm.Dict.make = function (_elm) {
                              ,toList: toList
                              ,fromList: fromList};
 };
-Elm.Native.Array = {};
-Elm.Native.Array.make = function(localRuntime) {
-
-	localRuntime.Native = localRuntime.Native || {};
-	localRuntime.Native.Array = localRuntime.Native.Array || {};
-	if (localRuntime.Native.Array.values)
-	{
-		return localRuntime.Native.Array.values;
-	}
-	if ('values' in Elm.Native.Array)
-	{
-		return localRuntime.Native.Array.values = Elm.Native.Array.values;
-	}
-
-	var List = Elm.Native.List.make(localRuntime);
-
-	// A RRB-Tree has two distinct data types.
-	// Leaf -> "height"  is always 0
-	//         "table"   is an array of elements
-	// Node -> "height"  is always greater than 0
-	//         "table"   is an array of child nodes
-	//         "lengths" is an array of accumulated lengths of the child nodes
-
-	// M is the maximal table size. 32 seems fast. E is the allowed increase
-	// of search steps when concatting to find an index. Lower values will
-	// decrease balancing, but will increase search steps.
-	var M = 32;
-	var E = 2;
-
-	// An empty array.
-	var empty = {
-		ctor: '_Array',
-		height: 0,
-		table: []
-	};
-
-
-	function get(i, array)
-	{
-		if (i < 0 || i >= length(array))
-		{
-			throw new Error(
-				'Index ' + i + ' is out of range. Check the length of ' +
-				'your array first or use getMaybe or getWithDefault.');
-		}
-		return unsafeGet(i, array);
-	}
-
-
-	function unsafeGet(i, array)
-	{
-		for (var x = array.height; x > 0; x--)
-		{
-			var slot = i >> (x * 5);
-			while (array.lengths[slot] <= i)
-			{
-				slot++;
-			}
-			if (slot > 0)
-			{
-				i -= array.lengths[slot - 1];
-			}
-			array = array.table[slot];
-		}
-		return array.table[i];
-	}
-
-
-	// Sets the value at the index i. Only the nodes leading to i will get
-	// copied and updated.
-	function set(i, item, array)
-	{
-		if (i < 0 || length(array) <= i)
-		{
-			return array;
-		}
-		return unsafeSet(i, item, array);
-	}
-
-
-	function unsafeSet(i, item, array)
-	{
-		array = nodeCopy(array);
-
-		if (array.height === 0)
-		{
-			array.table[i] = item;
-		}
-		else
-		{
-			var slot = getSlot(i, array);
-			if (slot > 0)
-			{
-				i -= array.lengths[slot - 1];
-			}
-			array.table[slot] = unsafeSet(i, item, array.table[slot]);
-		}
-		return array;
-	}
-
-
-	function initialize(len, f)
-	{
-		if (len <= 0)
-		{
-			return empty;
-		}
-		var h = Math.floor( Math.log(len) / Math.log(M) );
-		return initialize_(f, h, 0, len);
-	}
-
-	function initialize_(f, h, from, to)
-	{
-		if (h === 0)
-		{
-			var table = new Array((to - from) % (M + 1));
-			for (var i = 0; i < table.length; i++)
-			{
-			  table[i] = f(from + i);
-			}
-			return {
-				ctor: '_Array',
-				height: 0,
-				table: table
-			};
-		}
-
-		var step = Math.pow(M, h);
-		var table = new Array(Math.ceil((to - from) / step));
-		var lengths = new Array(table.length);
-		for (var i = 0; i < table.length; i++)
-		{
-			table[i] = initialize_(f, h - 1, from + (i * step), Math.min(from + ((i + 1) * step), to));
-			lengths[i] = length(table[i]) + (i > 0 ? lengths[i-1] : 0);
-		}
-		return {
-			ctor: '_Array',
-			height: h,
-			table: table,
-			lengths: lengths
-		};
-	}
-
-	function fromList(list)
-	{
-		if (list === List.Nil)
-		{
-			return empty;
-		}
-
-		// Allocate M sized blocks (table) and write list elements to it.
-		var table = new Array(M);
-		var nodes = [];
-		var i = 0;
-
-		while (list.ctor !== '[]')
-		{
-			table[i] = list._0;
-			list = list._1;
-			i++;
-
-			// table is full, so we can push a leaf containing it into the
-			// next node.
-			if (i === M)
-			{
-				var leaf = {
-					ctor: '_Array',
-					height: 0,
-					table: table
-				};
-				fromListPush(leaf, nodes);
-				table = new Array(M);
-				i = 0;
-			}
-		}
-
-		// Maybe there is something left on the table.
-		if (i > 0)
-		{
-			var leaf = {
-				ctor: '_Array',
-				height: 0,
-				table: table.splice(0, i)
-			};
-			fromListPush(leaf, nodes);
-		}
-
-		// Go through all of the nodes and eventually push them into higher nodes.
-		for (var h = 0; h < nodes.length - 1; h++)
-		{
-			if (nodes[h].table.length > 0)
-			{
-				fromListPush(nodes[h], nodes);
-			}
-		}
-
-		var head = nodes[nodes.length - 1];
-		if (head.height > 0 && head.table.length === 1)
-		{
-			return head.table[0];
-		}
-		else
-		{
-			return head;
-		}
-	}
-
-	// Push a node into a higher node as a child.
-	function fromListPush(toPush, nodes)
-	{
-		var h = toPush.height;
-
-		// Maybe the node on this height does not exist.
-		if (nodes.length === h)
-		{
-			var node = {
-				ctor: '_Array',
-				height: h + 1,
-				table: [],
-				lengths: []
-			};
-			nodes.push(node);
-		}
-
-		nodes[h].table.push(toPush);
-		var len = length(toPush);
-		if (nodes[h].lengths.length > 0)
-		{
-			len += nodes[h].lengths[nodes[h].lengths.length - 1];
-		}
-		nodes[h].lengths.push(len);
-
-		if (nodes[h].table.length === M)
-		{
-			fromListPush(nodes[h], nodes);
-			nodes[h] = {
-				ctor: '_Array',
-				height: h + 1,
-				table: [],
-				lengths: []
-			};
-		}
-	}
-
-	// Pushes an item via push_ to the bottom right of a tree.
-	function push(item, a)
-	{
-		var pushed = push_(item, a);
-		if (pushed !== null)
-		{
-			return pushed;
-		}
-
-		var newTree = create(item, a.height);
-		return siblise(a, newTree);
-	}
-
-	// Recursively tries to push an item to the bottom-right most
-	// tree possible. If there is no space left for the item,
-	// null will be returned.
-	function push_(item, a)
-	{
-		// Handle resursion stop at leaf level.
-		if (a.height === 0)
-		{
-			if (a.table.length < M)
-			{
-				var newA = {
-					ctor: '_Array',
-					height: 0,
-					table: a.table.slice()
-				};
-				newA.table.push(item);
-				return newA;
-			}
-			else
-			{
-			  return null;
-			}
-		}
-
-		// Recursively push
-		var pushed = push_(item, botRight(a));
-
-		// There was space in the bottom right tree, so the slot will
-		// be updated.
-		if (pushed !== null)
-		{
-			var newA = nodeCopy(a);
-			newA.table[newA.table.length - 1] = pushed;
-			newA.lengths[newA.lengths.length - 1]++;
-			return newA;
-		}
-
-		// When there was no space left, check if there is space left
-		// for a new slot with a tree which contains only the item
-		// at the bottom.
-		if (a.table.length < M)
-		{
-			var newSlot = create(item, a.height - 1);
-			var newA = nodeCopy(a);
-			newA.table.push(newSlot);
-			newA.lengths.push(newA.lengths[newA.lengths.length - 1] + length(newSlot));
-			return newA;
-		}
-		else
-		{
-			return null;
-		}
-	}
-
-	// Converts an array into a list of elements.
-	function toList(a)
-	{
-		return toList_(List.Nil, a);
-	}
-
-	function toList_(list, a)
-	{
-		for (var i = a.table.length - 1; i >= 0; i--)
-		{
-			list =
-				a.height === 0
-					? List.Cons(a.table[i], list)
-					: toList_(list, a.table[i]);
-		}
-		return list;
-	}
-
-	// Maps a function over the elements of an array.
-	function map(f, a)
-	{
-		var newA = {
-			ctor: '_Array',
-			height: a.height,
-			table: new Array(a.table.length)
-		};
-		if (a.height > 0)
-		{
-			newA.lengths = a.lengths;
-		}
-		for (var i = 0; i < a.table.length; i++)
-		{
-			newA.table[i] =
-				a.height === 0
-					? f(a.table[i])
-					: map(f, a.table[i]);
-		}
-		return newA;
-	}
-
-	// Maps a function over the elements with their index as first argument.
-	function indexedMap(f, a)
-	{
-		return indexedMap_(f, a, 0);
-	}
-
-	function indexedMap_(f, a, from)
-	{
-		var newA = {
-			ctor: '_Array',
-			height: a.height,
-			table: new Array(a.table.length)
-		};
-		if (a.height > 0)
-		{
-			newA.lengths = a.lengths;
-		}
-		for (var i = 0; i < a.table.length; i++)
-		{
-			newA.table[i] =
-				a.height === 0
-					? A2(f, from + i, a.table[i])
-					: indexedMap_(f, a.table[i], i == 0 ? from : from + a.lengths[i - 1]);
-		}
-		return newA;
-	}
-
-	function foldl(f, b, a)
-	{
-		if (a.height === 0)
-		{
-			for (var i = 0; i < a.table.length; i++)
-			{
-				b = A2(f, a.table[i], b);
-			}
-		}
-		else
-		{
-			for (var i = 0; i < a.table.length; i++)
-			{
-				b = foldl(f, b, a.table[i]);
-			}
-		}
-		return b;
-	}
-
-	function foldr(f, b, a)
-	{
-		if (a.height === 0)
-		{
-			for (var i = a.table.length; i--; )
-			{
-				b = A2(f, a.table[i], b);
-			}
-		}
-		else
-		{
-			for (var i = a.table.length; i--; )
-			{
-				b = foldr(f, b, a.table[i]);
-			}
-		}
-		return b;
-	}
-
-	// TODO: currently, it slices the right, then the left. This can be
-	// optimized.
-	function slice(from, to, a)
-	{
-		if (from < 0)
-		{
-			from += length(a);
-		}
-		if (to < 0)
-		{
-			to += length(a);
-		}
-		return sliceLeft(from, sliceRight(to, a));
-	}
-
-	function sliceRight(to, a)
-	{
-		if (to === length(a))
-		{
-			return a;
-		}
-
-		// Handle leaf level.
-		if (a.height === 0)
-		{
-			var newA = { ctor:'_Array', height:0 };
-			newA.table = a.table.slice(0, to);
-			return newA;
-		}
-
-		// Slice the right recursively.
-		var right = getSlot(to, a);
-		var sliced = sliceRight(to - (right > 0 ? a.lengths[right - 1] : 0), a.table[right]);
-
-		// Maybe the a node is not even needed, as sliced contains the whole slice.
-		if (right === 0)
-		{
-			return sliced;
-		}
-
-		// Create new node.
-		var newA = {
-			ctor: '_Array',
-			height: a.height,
-			table: a.table.slice(0, right),
-			lengths: a.lengths.slice(0, right)
-		};
-		if (sliced.table.length > 0)
-		{
-			newA.table[right] = sliced;
-			newA.lengths[right] = length(sliced) + (right > 0 ? newA.lengths[right - 1] : 0);
-		}
-		return newA;
-	}
-
-	function sliceLeft(from, a)
-	{
-		if (from === 0)
-		{
-			return a;
-		}
-
-		// Handle leaf level.
-		if (a.height === 0)
-		{
-			var newA = { ctor:'_Array', height:0 };
-			newA.table = a.table.slice(from, a.table.length + 1);
-			return newA;
-		}
-
-		// Slice the left recursively.
-		var left = getSlot(from, a);
-		var sliced = sliceLeft(from - (left > 0 ? a.lengths[left - 1] : 0), a.table[left]);
-
-		// Maybe the a node is not even needed, as sliced contains the whole slice.
-		if (left === a.table.length - 1)
-		{
-			return sliced;
-		}
-
-		// Create new node.
-		var newA = {
-			ctor: '_Array',
-			height: a.height,
-			table: a.table.slice(left, a.table.length + 1),
-			lengths: new Array(a.table.length - left)
-		};
-		newA.table[0] = sliced;
-		var len = 0;
-		for (var i = 0; i < newA.table.length; i++)
-		{
-			len += length(newA.table[i]);
-			newA.lengths[i] = len;
-		}
-
-		return newA;
-	}
-
-	// Appends two trees.
-	function append(a,b)
-	{
-		if (a.table.length === 0)
-		{
-			return b;
-		}
-		if (b.table.length === 0)
-		{
-			return a;
-		}
-
-		var c = append_(a, b);
-
-		// Check if both nodes can be crunshed together.
-		if (c[0].table.length + c[1].table.length <= M)
-		{
-			if (c[0].table.length === 0)
-			{
-				return c[1];
-			}
-			if (c[1].table.length === 0)
-			{
-				return c[0];
-			}
-
-			// Adjust .table and .lengths
-			c[0].table = c[0].table.concat(c[1].table);
-			if (c[0].height > 0)
-			{
-				var len = length(c[0]);
-				for (var i = 0; i < c[1].lengths.length; i++)
-				{
-					c[1].lengths[i] += len;
-				}
-				c[0].lengths = c[0].lengths.concat(c[1].lengths);
-			}
-
-			return c[0];
-		}
-
-		if (c[0].height > 0)
-		{
-			var toRemove = calcToRemove(a, b);
-			if (toRemove > E)
-			{
-				c = shuffle(c[0], c[1], toRemove);
-			}
-		}
-
-		return siblise(c[0], c[1]);
-	}
-
-	// Returns an array of two nodes; right and left. One node _may_ be empty.
-	function append_(a, b)
-	{
-		if (a.height === 0 && b.height === 0)
-		{
-			return [a, b];
-		}
-
-		if (a.height !== 1 || b.height !== 1)
-		{
-			if (a.height === b.height)
-			{
-				a = nodeCopy(a);
-				b = nodeCopy(b);
-				var appended = append_(botRight(a), botLeft(b));
-
-				insertRight(a, appended[1]);
-				insertLeft(b, appended[0]);
-			}
-			else if (a.height > b.height)
-			{
-				a = nodeCopy(a);
-				var appended = append_(botRight(a), b);
-
-				insertRight(a, appended[0]);
-				b = parentise(appended[1], appended[1].height + 1);
-			}
-			else
-			{
-				b = nodeCopy(b);
-				var appended = append_(a, botLeft(b));
-
-				var left = appended[0].table.length === 0 ? 0 : 1;
-				var right = left === 0 ? 1 : 0;
-				insertLeft(b, appended[left]);
-				a = parentise(appended[right], appended[right].height + 1);
-			}
-		}
-
-		// Check if balancing is needed and return based on that.
-		if (a.table.length === 0 || b.table.length === 0)
-		{
-			return [a, b];
-		}
-
-		var toRemove = calcToRemove(a, b);
-		if (toRemove <= E)
-		{
-			return [a, b];
-		}
-		return shuffle(a, b, toRemove);
-	}
-
-	// Helperfunctions for append_. Replaces a child node at the side of the parent.
-	function insertRight(parent, node)
-	{
-		var index = parent.table.length - 1;
-		parent.table[index] = node;
-		parent.lengths[index] = length(node);
-		parent.lengths[index] += index > 0 ? parent.lengths[index - 1] : 0;
-	}
-
-	function insertLeft(parent, node)
-	{
-		if (node.table.length > 0)
-		{
-			parent.table[0] = node;
-			parent.lengths[0] = length(node);
-
-			var len = length(parent.table[0]);
-			for (var i = 1; i < parent.lengths.length; i++)
-			{
-				len += length(parent.table[i]);
-				parent.lengths[i] = len;
-			}
-		}
-		else
-		{
-			parent.table.shift();
-			for (var i = 1; i < parent.lengths.length; i++)
-			{
-				parent.lengths[i] = parent.lengths[i] - parent.lengths[0];
-			}
-			parent.lengths.shift();
-		}
-	}
-
-	// Returns the extra search steps for E. Refer to the paper.
-	function calcToRemove(a, b)
-	{
-		var subLengths = 0;
-		for (var i = 0; i < a.table.length; i++)
-		{
-			subLengths += a.table[i].table.length;
-		}
-		for (var i = 0; i < b.table.length; i++)
-		{
-			subLengths += b.table[i].table.length;
-		}
-
-		var toRemove = a.table.length + b.table.length;
-		return toRemove - (Math.floor((subLengths - 1) / M) + 1);
-	}
-
-	// get2, set2 and saveSlot are helpers for accessing elements over two arrays.
-	function get2(a, b, index)
-	{
-		return index < a.length
-			? a[index]
-			: b[index - a.length];
-	}
-
-	function set2(a, b, index, value)
-	{
-		if (index < a.length)
-		{
-			a[index] = value;
-		}
-		else
-		{
-			b[index - a.length] = value;
-		}
-	}
-
-	function saveSlot(a, b, index, slot)
-	{
-		set2(a.table, b.table, index, slot);
-
-		var l = (index === 0 || index === a.lengths.length)
-			? 0
-			: get2(a.lengths, a.lengths, index - 1);
-
-		set2(a.lengths, b.lengths, index, l + length(slot));
-	}
-
-	// Creates a node or leaf with a given length at their arrays for perfomance.
-	// Is only used by shuffle.
-	function createNode(h, length)
-	{
-		if (length < 0)
-		{
-			length = 0;
-		}
-		var a = {
-			ctor: '_Array',
-			height: h,
-			table: new Array(length)
-		};
-		if (h > 0)
-		{
-			a.lengths = new Array(length);
-		}
-		return a;
-	}
-
-	// Returns an array of two balanced nodes.
-	function shuffle(a, b, toRemove)
-	{
-		var newA = createNode(a.height, Math.min(M, a.table.length + b.table.length - toRemove));
-		var newB = createNode(a.height, newA.table.length - (a.table.length + b.table.length - toRemove));
-
-		// Skip the slots with size M. More precise: copy the slot references
-		// to the new node
-		var read = 0;
-		while (get2(a.table, b.table, read).table.length % M === 0)
-		{
-			set2(newA.table, newB.table, read, get2(a.table, b.table, read));
-			set2(newA.lengths, newB.lengths, read, get2(a.lengths, b.lengths, read));
-			read++;
-		}
-
-		// Pulling items from left to right, caching in a slot before writing
-		// it into the new nodes.
-		var write = read;
-		var slot = new createNode(a.height - 1, 0);
-		var from = 0;
-
-		// If the current slot is still containing data, then there will be at
-		// least one more write, so we do not break this loop yet.
-		while (read - write - (slot.table.length > 0 ? 1 : 0) < toRemove)
-		{
-			// Find out the max possible items for copying.
-			var source = get2(a.table, b.table, read);
-			var to = Math.min(M - slot.table.length, source.table.length);
-
-			// Copy and adjust size table.
-			slot.table = slot.table.concat(source.table.slice(from, to));
-			if (slot.height > 0)
-			{
-				var len = slot.lengths.length;
-				for (var i = len; i < len + to - from; i++)
-				{
-					slot.lengths[i] = length(slot.table[i]);
-					slot.lengths[i] += (i > 0 ? slot.lengths[i - 1] : 0);
-				}
-			}
-
-			from += to;
-
-			// Only proceed to next slots[i] if the current one was
-			// fully copied.
-			if (source.table.length <= to)
-			{
-				read++; from = 0;
-			}
-
-			// Only create a new slot if the current one is filled up.
-			if (slot.table.length === M)
-			{
-				saveSlot(newA, newB, write, slot);
-				slot = createNode(a.height - 1, 0);
-				write++;
-			}
-		}
-
-		// Cleanup after the loop. Copy the last slot into the new nodes.
-		if (slot.table.length > 0)
-		{
-			saveSlot(newA, newB, write, slot);
-			write++;
-		}
-
-		// Shift the untouched slots to the left
-		while (read < a.table.length + b.table.length )
-		{
-			saveSlot(newA, newB, write, get2(a.table, b.table, read));
-			read++;
-			write++;
-		}
-
-		return [newA, newB];
-	}
-
-	// Navigation functions
-	function botRight(a)
-	{
-		return a.table[a.table.length - 1];
-	}
-	function botLeft(a)
-	{
-		return a.table[0];
-	}
-
-	// Copies a node for updating. Note that you should not use this if
-	// only updating only one of "table" or "lengths" for performance reasons.
-	function nodeCopy(a)
-	{
-		var newA = {
-			ctor: '_Array',
-			height: a.height,
-			table: a.table.slice()
-		};
-		if (a.height > 0)
-		{
-			newA.lengths = a.lengths.slice();
-		}
-		return newA;
-	}
-
-	// Returns how many items are in the tree.
-	function length(array)
-	{
-		if (array.height === 0)
-		{
-			return array.table.length;
-		}
-		else
-		{
-			return array.lengths[array.lengths.length - 1];
-		}
-	}
-
-	// Calculates in which slot of "table" the item probably is, then
-	// find the exact slot via forward searching in  "lengths". Returns the index.
-	function getSlot(i, a)
-	{
-		var slot = i >> (5 * a.height);
-		while (a.lengths[slot] <= i)
-		{
-			slot++;
-		}
-		return slot;
-	}
-
-	// Recursively creates a tree with a given height containing
-	// only the given item.
-	function create(item, h)
-	{
-		if (h === 0)
-		{
-			return {
-				ctor: '_Array',
-				height: 0,
-				table: [item]
-			};
-		}
-		return {
-			ctor: '_Array',
-			height: h,
-			table: [create(item, h - 1)],
-			lengths: [1]
-		};
-	}
-
-	// Recursively creates a tree that contains the given tree.
-	function parentise(tree, h)
-	{
-		if (h === tree.height)
-		{
-			return tree;
-		}
-
-		return {
-			ctor: '_Array',
-			height: h,
-			table: [parentise(tree, h - 1)],
-			lengths: [length(tree)]
-		};
-	}
-
-	// Emphasizes blood brotherhood beneath two trees.
-	function siblise(a, b)
-	{
-		return {
-			ctor: '_Array',
-			height: a.height + 1,
-			table: [a, b],
-			lengths: [length(a), length(a) + length(b)]
-		};
-	}
-
-	function toJSArray(a)
-	{
-		var jsArray = new Array(length(a));
-		toJSArray_(jsArray, 0, a);
-		return jsArray;
-	}
-
-	function toJSArray_(jsArray, i, a)
-	{
-		for (var t = 0; t < a.table.length; t++)
-		{
-			if (a.height === 0)
-			{
-				jsArray[i + t] = a.table[t];
-			}
-			else
-			{
-				var inc = t === 0 ? 0 : a.lengths[t - 1];
-				toJSArray_(jsArray, i + inc, a.table[t]);
-			}
-		}
-	}
-
-	function fromJSArray(jsArray)
-	{
-		if (jsArray.length === 0)
-		{
-			return empty;
-		}
-		var h = Math.floor(Math.log(jsArray.length) / Math.log(M));
-		return fromJSArray_(jsArray, h, 0, jsArray.length);
-	}
-
-	function fromJSArray_(jsArray, h, from, to)
-	{
-		if (h === 0)
-		{
-			return {
-				ctor: '_Array',
-				height: 0,
-				table: jsArray.slice(from, to)
-			};
-		}
-
-		var step = Math.pow(M, h);
-		var table = new Array(Math.ceil((to - from) / step));
-		var lengths = new Array(table.length);
-		for (var i = 0; i < table.length; i++)
-		{
-			table[i] = fromJSArray_(jsArray, h - 1, from + (i * step), Math.min(from + ((i + 1) * step), to));
-			lengths[i] = length(table[i]) + (i > 0 ? lengths[i - 1] : 0);
-		}
-		return {
-			ctor: '_Array',
-			height: h,
-			table: table,
-			lengths: lengths
-		};
-	}
-
-	Elm.Native.Array.values = {
-		empty: empty,
-		fromList: fromList,
-		toList: toList,
-		initialize: F2(initialize),
-		append: F2(append),
-		push: F2(push),
-		slice: F3(slice),
-		get: F2(get),
-		set: F3(set),
-		map: F2(map),
-		indexedMap: F2(indexedMap),
-		foldl: F3(foldl),
-		foldr: F3(foldr),
-		length: length,
-
-		toJSArray: toJSArray,
-		fromJSArray: fromJSArray
-	};
-
-	return localRuntime.Native.Array.values = Elm.Native.Array.values;
-};
-
-Elm.Array = Elm.Array || {};
-Elm.Array.make = function (_elm) {
-   "use strict";
-   _elm.Array = _elm.Array || {};
-   if (_elm.Array.values) return _elm.Array.values;
-   var _U = Elm.Native.Utils.make(_elm),
-   $Basics = Elm.Basics.make(_elm),
-   $List = Elm.List.make(_elm),
-   $Maybe = Elm.Maybe.make(_elm),
-   $Native$Array = Elm.Native.Array.make(_elm);
-   var _op = {};
-   var append = $Native$Array.append;
-   var length = $Native$Array.length;
-   var isEmpty = function (array) {    return _U.eq(length(array),0);};
-   var slice = $Native$Array.slice;
-   var set = $Native$Array.set;
-   var get = F2(function (i,array) {
-      return _U.cmp(0,i) < 1 && _U.cmp(i,$Native$Array.length(array)) < 0 ? $Maybe.Just(A2($Native$Array.get,i,array)) : $Maybe.Nothing;
-   });
-   var push = $Native$Array.push;
-   var empty = $Native$Array.empty;
-   var filter = F2(function (isOkay,arr) {
-      var update = F2(function (x,xs) {    return isOkay(x) ? A2($Native$Array.push,x,xs) : xs;});
-      return A3($Native$Array.foldl,update,$Native$Array.empty,arr);
-   });
-   var foldr = $Native$Array.foldr;
-   var foldl = $Native$Array.foldl;
-   var indexedMap = $Native$Array.indexedMap;
-   var map = $Native$Array.map;
-   var toIndexedList = function (array) {
-      return A3($List.map2,
-      F2(function (v0,v1) {    return {ctor: "_Tuple2",_0: v0,_1: v1};}),
-      _U.range(0,$Native$Array.length(array) - 1),
-      $Native$Array.toList(array));
-   };
-   var toList = $Native$Array.toList;
-   var fromList = $Native$Array.fromList;
-   var initialize = $Native$Array.initialize;
-   var repeat = F2(function (n,e) {    return A2(initialize,n,$Basics.always(e));});
-   var Array = {ctor: "Array"};
-   return _elm.Array.values = {_op: _op
-                              ,empty: empty
-                              ,repeat: repeat
-                              ,initialize: initialize
-                              ,fromList: fromList
-                              ,isEmpty: isEmpty
-                              ,length: length
-                              ,push: push
-                              ,append: append
-                              ,get: get
-                              ,set: set
-                              ,slice: slice
-                              ,toList: toList
-                              ,toIndexedList: toIndexedList
-                              ,map: map
-                              ,indexedMap: indexedMap
-                              ,filter: filter
-                              ,foldl: foldl
-                              ,foldr: foldr};
-};
-Elm.Native.Json = {};
-
-Elm.Native.Json.make = function(localRuntime) {
-	localRuntime.Native = localRuntime.Native || {};
-	localRuntime.Native.Json = localRuntime.Native.Json || {};
-	if (localRuntime.Native.Json.values) {
-		return localRuntime.Native.Json.values;
-	}
-
-	var ElmArray = Elm.Native.Array.make(localRuntime);
-	var List = Elm.Native.List.make(localRuntime);
-	var Maybe = Elm.Maybe.make(localRuntime);
-	var Result = Elm.Result.make(localRuntime);
-	var Utils = Elm.Native.Utils.make(localRuntime);
-
-
-	function crash(expected, actual) {
-		throw new Error(
-			'expecting ' + expected + ' but got ' + JSON.stringify(actual)
-		);
-	}
-
-
-	// PRIMITIVE VALUES
-
-	function decodeNull(successValue) {
-		return function(value) {
-			if (value === null) {
-				return successValue;
-			}
-			crash('null', value);
-		};
-	}
-
-
-	function decodeString(value) {
-		if (typeof value === 'string' || value instanceof String) {
-			return value;
-		}
-		crash('a String', value);
-	}
-
-
-	function decodeFloat(value) {
-		if (typeof value === 'number') {
-			return value;
-		}
-		crash('a Float', value);
-	}
-
-
-	function decodeInt(value) {
-		if (typeof value !== 'number') {
-			crash('an Int', value);
-		}
-
-		if (value < 2147483647 && value > -2147483647 && (value | 0) === value) {
-			return value;
-		}
-
-		if (isFinite(value) && !(value % 1)) {
-			return value;
-		}
-
-		crash('an Int', value);
-	}
-
-
-	function decodeBool(value) {
-		if (typeof value === 'boolean') {
-			return value;
-		}
-		crash('a Bool', value);
-	}
-
-
-	// ARRAY
-
-	function decodeArray(decoder) {
-		return function(value) {
-			if (value instanceof Array) {
-				var len = value.length;
-				var array = new Array(len);
-				for (var i = len; i--; ) {
-					array[i] = decoder(value[i]);
-				}
-				return ElmArray.fromJSArray(array);
-			}
-			crash('an Array', value);
-		};
-	}
-
-
-	// LIST
-
-	function decodeList(decoder) {
-		return function(value) {
-			if (value instanceof Array) {
-				var len = value.length;
-				var list = List.Nil;
-				for (var i = len; i--; ) {
-					list = List.Cons( decoder(value[i]), list );
-				}
-				return list;
-			}
-			crash('a List', value);
-		};
-	}
-
-
-	// MAYBE
-
-	function decodeMaybe(decoder) {
-		return function(value) {
-			try {
-				return Maybe.Just(decoder(value));
-			} catch(e) {
-				return Maybe.Nothing;
-			}
-		};
-	}
-
-
-	// FIELDS
-
-	function decodeField(field, decoder) {
-		return function(value) {
-			var subValue = value[field];
-			if (subValue !== undefined) {
-				return decoder(subValue);
-			}
-			crash("an object with field '" + field + "'", value);
-		};
-	}
-
-
-	// OBJECTS
-
-	function decodeKeyValuePairs(decoder) {
-		return function(value) {
-			var isObject =
-				typeof value === 'object'
-					&& value !== null
-					&& !(value instanceof Array);
-
-			if (isObject) {
-				var keyValuePairs = List.Nil;
-				for (var key in value)
-				{
-					var elmValue = decoder(value[key]);
-					var pair = Utils.Tuple2(key, elmValue);
-					keyValuePairs = List.Cons(pair, keyValuePairs);
-				}
-				return keyValuePairs;
-			}
-
-			crash('an object', value);
-		};
-	}
-
-	function decodeObject1(f, d1) {
-		return function(value) {
-			return f(d1(value));
-		};
-	}
-
-	function decodeObject2(f, d1, d2) {
-		return function(value) {
-			return A2( f, d1(value), d2(value) );
-		};
-	}
-
-	function decodeObject3(f, d1, d2, d3) {
-		return function(value) {
-			return A3( f, d1(value), d2(value), d3(value) );
-		};
-	}
-
-	function decodeObject4(f, d1, d2, d3, d4) {
-		return function(value) {
-			return A4( f, d1(value), d2(value), d3(value), d4(value) );
-		};
-	}
-
-	function decodeObject5(f, d1, d2, d3, d4, d5) {
-		return function(value) {
-			return A5( f, d1(value), d2(value), d3(value), d4(value), d5(value) );
-		};
-	}
-
-	function decodeObject6(f, d1, d2, d3, d4, d5, d6) {
-		return function(value) {
-			return A6( f,
-				d1(value),
-				d2(value),
-				d3(value),
-				d4(value),
-				d5(value),
-				d6(value)
-			);
-		};
-	}
-
-	function decodeObject7(f, d1, d2, d3, d4, d5, d6, d7) {
-		return function(value) {
-			return A7( f,
-				d1(value),
-				d2(value),
-				d3(value),
-				d4(value),
-				d5(value),
-				d6(value),
-				d7(value)
-			);
-		};
-	}
-
-	function decodeObject8(f, d1, d2, d3, d4, d5, d6, d7, d8) {
-		return function(value) {
-			return A8( f,
-				d1(value),
-				d2(value),
-				d3(value),
-				d4(value),
-				d5(value),
-				d6(value),
-				d7(value),
-				d8(value)
-			);
-		};
-	}
-
-
-	// TUPLES
-
-	function decodeTuple1(f, d1) {
-		return function(value) {
-			if ( !(value instanceof Array) || value.length !== 1 ) {
-				crash('a Tuple of length 1', value);
-			}
-			return f( d1(value[0]) );
-		};
-	}
-
-	function decodeTuple2(f, d1, d2) {
-		return function(value) {
-			if ( !(value instanceof Array) || value.length !== 2 ) {
-				crash('a Tuple of length 2', value);
-			}
-			return A2( f, d1(value[0]), d2(value[1]) );
-		};
-	}
-
-	function decodeTuple3(f, d1, d2, d3) {
-		return function(value) {
-			if ( !(value instanceof Array) || value.length !== 3 ) {
-				crash('a Tuple of length 3', value);
-			}
-			return A3( f, d1(value[0]), d2(value[1]), d3(value[2]) );
-		};
-	}
-
-
-	function decodeTuple4(f, d1, d2, d3, d4) {
-		return function(value) {
-			if ( !(value instanceof Array) || value.length !== 4 ) {
-				crash('a Tuple of length 4', value);
-			}
-			return A4( f, d1(value[0]), d2(value[1]), d3(value[2]), d4(value[3]) );
-		};
-	}
-
-
-	function decodeTuple5(f, d1, d2, d3, d4, d5) {
-		return function(value) {
-			if ( !(value instanceof Array) || value.length !== 5 ) {
-				crash('a Tuple of length 5', value);
-			}
-			return A5( f,
-				d1(value[0]),
-				d2(value[1]),
-				d3(value[2]),
-				d4(value[3]),
-				d5(value[4])
-			);
-		};
-	}
-
-
-	function decodeTuple6(f, d1, d2, d3, d4, d5, d6) {
-		return function(value) {
-			if ( !(value instanceof Array) || value.length !== 6 ) {
-				crash('a Tuple of length 6', value);
-			}
-			return A6( f,
-				d1(value[0]),
-				d2(value[1]),
-				d3(value[2]),
-				d4(value[3]),
-				d5(value[4]),
-				d6(value[5])
-			);
-		};
-	}
-
-	function decodeTuple7(f, d1, d2, d3, d4, d5, d6, d7) {
-		return function(value) {
-			if ( !(value instanceof Array) || value.length !== 7 ) {
-				crash('a Tuple of length 7', value);
-			}
-			return A7( f,
-				d1(value[0]),
-				d2(value[1]),
-				d3(value[2]),
-				d4(value[3]),
-				d5(value[4]),
-				d6(value[5]),
-				d7(value[6])
-			);
-		};
-	}
-
-
-	function decodeTuple8(f, d1, d2, d3, d4, d5, d6, d7, d8) {
-		return function(value) {
-			if ( !(value instanceof Array) || value.length !== 8 ) {
-				crash('a Tuple of length 8', value);
-			}
-			return A8( f,
-				d1(value[0]),
-				d2(value[1]),
-				d3(value[2]),
-				d4(value[3]),
-				d5(value[4]),
-				d6(value[5]),
-				d7(value[6]),
-				d8(value[7])
-			);
-		};
-	}
-
-
-	// CUSTOM DECODERS
-
-	function decodeValue(value) {
-		return value;
-	}
-
-	function runDecoderValue(decoder, value) {
-		try {
-			return Result.Ok(decoder(value));
-		} catch(e) {
-			return Result.Err(e.message);
-		}
-	}
-
-	function customDecoder(decoder, callback) {
-		return function(value) {
-			var result = callback(decoder(value));
-			if (result.ctor === 'Err') {
-				throw new Error('custom decoder failed: ' + result._0);
-			}
-			return result._0;
-		};
-	}
-
-	function andThen(decode, callback) {
-		return function(value) {
-			var result = decode(value);
-			return callback(result)(value);
-		};
-	}
-
-	function fail(msg) {
-		return function(value) {
-			throw new Error(msg);
-		};
-	}
-
-	function succeed(successValue) {
-		return function(value) {
-			return successValue;
-		};
-	}
-
-
-	// ONE OF MANY
-
-	function oneOf(decoders) {
-		return function(value) {
-			var errors = [];
-			var temp = decoders;
-			while (temp.ctor !== '[]') {
-				try {
-					return temp._0(value);
-				} catch(e) {
-					errors.push(e.message);
-				}
-				temp = temp._1;
-			}
-			throw new Error('expecting one of the following:\n    ' + errors.join('\n    '));
-		};
-	}
-
-	function get(decoder, value) {
-		try {
-			return Result.Ok(decoder(value));
-		} catch(e) {
-			return Result.Err(e.message);
-		}
-	}
-
-
-	// ENCODE / DECODE
-
-	function runDecoderString(decoder, string) {
-		try {
-			return Result.Ok(decoder(JSON.parse(string)));
-		} catch(e) {
-			return Result.Err(e.message);
-		}
-	}
-
-	function encode(indentLevel, value) {
-		return JSON.stringify(value, null, indentLevel);
-	}
-
-	function identity(value) {
-		return value;
-	}
-
-	function encodeObject(keyValuePairs) {
-		var obj = {};
-		while (keyValuePairs.ctor !== '[]') {
-			var pair = keyValuePairs._0;
-			obj[pair._0] = pair._1;
-			keyValuePairs = keyValuePairs._1;
-		}
-		return obj;
-	}
-
-	return localRuntime.Native.Json.values = {
-		encode: F2(encode),
-		runDecoderString: F2(runDecoderString),
-		runDecoderValue: F2(runDecoderValue),
-
-		get: F2(get),
-		oneOf: oneOf,
-
-		decodeNull: decodeNull,
-		decodeInt: decodeInt,
-		decodeFloat: decodeFloat,
-		decodeString: decodeString,
-		decodeBool: decodeBool,
-
-		decodeMaybe: decodeMaybe,
-
-		decodeList: decodeList,
-		decodeArray: decodeArray,
-
-		decodeField: F2(decodeField),
-
-		decodeObject1: F2(decodeObject1),
-		decodeObject2: F3(decodeObject2),
-		decodeObject3: F4(decodeObject3),
-		decodeObject4: F5(decodeObject4),
-		decodeObject5: F6(decodeObject5),
-		decodeObject6: F7(decodeObject6),
-		decodeObject7: F8(decodeObject7),
-		decodeObject8: F9(decodeObject8),
-		decodeKeyValuePairs: decodeKeyValuePairs,
-
-		decodeTuple1: F2(decodeTuple1),
-		decodeTuple2: F3(decodeTuple2),
-		decodeTuple3: F4(decodeTuple3),
-		decodeTuple4: F5(decodeTuple4),
-		decodeTuple5: F6(decodeTuple5),
-		decodeTuple6: F7(decodeTuple6),
-		decodeTuple7: F8(decodeTuple7),
-		decodeTuple8: F9(decodeTuple8),
-
-		andThen: F2(andThen),
-		decodeValue: decodeValue,
-		customDecoder: F2(customDecoder),
-		fail: fail,
-		succeed: succeed,
-
-		identity: identity,
-		encodeNull: null,
-		encodeArray: ElmArray.toJSArray,
-		encodeList: List.toArray,
-		encodeObject: encodeObject
-
-	};
-};
-
 Elm.Json = Elm.Json || {};
 Elm.Json.Encode = Elm.Json.Encode || {};
 Elm.Json.Encode.make = function (_elm) {
@@ -8128,371 +8218,6 @@ Elm.Json.Decode.make = function (_elm) {
                                     ,andThen: andThen
                                     ,value: value
                                     ,customDecoder: customDecoder};
-};
-Elm.Model = Elm.Model || {};
-Elm.Model.User = Elm.Model.User || {};
-Elm.Model.User.make = function (_elm) {
-   "use strict";
-   _elm.Model = _elm.Model || {};
-   _elm.Model.User = _elm.Model.User || {};
-   if (_elm.Model.User.values) return _elm.Model.User.values;
-   var _U = Elm.Native.Utils.make(_elm),
-   $Basics = Elm.Basics.make(_elm),
-   $Debug = Elm.Debug.make(_elm),
-   $Json$Decode = Elm.Json.Decode.make(_elm),
-   $Json$Encode = Elm.Json.Encode.make(_elm),
-   $List = Elm.List.make(_elm),
-   $Maybe = Elm.Maybe.make(_elm),
-   $Result = Elm.Result.make(_elm),
-   $Signal = Elm.Signal.make(_elm);
-   var _op = {};
-   var encode = function (user) {
-      return $Json$Encode.object(_U.list([{ctor: "_Tuple2",_0: "id",_1: $Json$Encode.string(user.id)}
-                                         ,{ctor: "_Tuple2",_0: "name",_1: $Json$Encode.string(user.name)}
-                                         ,{ctor: "_Tuple2",_0: "email",_1: $Json$Encode.string(user.name)}]));
-   };
-   var User = F3(function (a,b,c) {    return {id: a,name: b,email: c};});
-   var decoder = A4($Json$Decode.object3,
-   User,
-   A2($Json$Decode._op[":="],"id",$Json$Decode.string),
-   A2($Json$Decode._op[":="],"name",$Json$Decode.string),
-   A2($Json$Decode._op[":="],"email",$Json$Decode.string));
-   return _elm.Model.User.values = {_op: _op,User: User,encode: encode,decoder: decoder};
-};
-Elm.Model = Elm.Model || {};
-Elm.Model.Player = Elm.Model.Player || {};
-Elm.Model.Player.make = function (_elm) {
-   "use strict";
-   _elm.Model = _elm.Model || {};
-   _elm.Model.Player = _elm.Model.Player || {};
-   if (_elm.Model.Player.values) return _elm.Model.Player.values;
-   var _U = Elm.Native.Utils.make(_elm),
-   $Basics = Elm.Basics.make(_elm),
-   $Debug = Elm.Debug.make(_elm),
-   $Json$Decode = Elm.Json.Decode.make(_elm),
-   $Json$Encode = Elm.Json.Encode.make(_elm),
-   $List = Elm.List.make(_elm),
-   $Maybe = Elm.Maybe.make(_elm),
-   $Result = Elm.Result.make(_elm),
-   $Signal = Elm.Signal.make(_elm);
-   var _op = {};
-   var encode = function (player) {
-      return $Json$Encode.object(_U.list([{ctor: "_Tuple2",_0: "id",_1: $Json$Encode.string(player.id)}
-                                         ,{ctor: "_Tuple2",_0: "name",_1: $Json$Encode.string(player.name)}
-                                         ,{ctor: "_Tuple2",_0: "email",_1: $Json$Encode.string(player.name)}
-                                         ,{ctor: "_Tuple2",_0: "score",_1: $Json$Encode.$int(player.score)}]));
-   };
-   var emptyPlayer = {id: "",name: "",email: "",score: 0};
-   var Player = F4(function (a,b,c,d) {    return {id: a,name: b,email: c,score: d};});
-   var decoder = A5($Json$Decode.object4,
-   Player,
-   A2($Json$Decode._op[":="],"id",$Json$Decode.string),
-   A2($Json$Decode._op[":="],"name",$Json$Decode.string),
-   A2($Json$Decode._op[":="],"email",$Json$Decode.string),
-   A2($Json$Decode._op[":="],"score",$Json$Decode.$int));
-   return _elm.Model.Player.values = {_op: _op,Player: Player,emptyPlayer: emptyPlayer,encode: encode,decoder: decoder};
-};
-Elm.Model = Elm.Model || {};
-Elm.Model.Activity = Elm.Model.Activity || {};
-Elm.Model.Activity.make = function (_elm) {
-   "use strict";
-   _elm.Model = _elm.Model || {};
-   _elm.Model.Activity = _elm.Model.Activity || {};
-   if (_elm.Model.Activity.values) return _elm.Model.Activity.values;
-   var _U = Elm.Native.Utils.make(_elm),
-   $Basics = Elm.Basics.make(_elm),
-   $Debug = Elm.Debug.make(_elm),
-   $Json$Decode = Elm.Json.Decode.make(_elm),
-   $Json$Encode = Elm.Json.Encode.make(_elm),
-   $List = Elm.List.make(_elm),
-   $Maybe = Elm.Maybe.make(_elm),
-   $Result = Elm.Result.make(_elm),
-   $Signal = Elm.Signal.make(_elm);
-   var _op = {};
-   var encode = function (activity) {
-      return $Json$Encode.object(_U.list([{ctor: "_Tuple2",_0: "id",_1: $Json$Encode.string(activity.id)}
-                                         ,{ctor: "_Tuple2",_0: "title",_1: $Json$Encode.string(activity.title)}
-                                         ,{ctor: "_Tuple2",_0: "description",_1: $Json$Encode.string(activity.description)}
-                                         ,{ctor: "_Tuple2",_0: "value",_1: $Json$Encode.$int(activity.value)}]));
-   };
-   var emptyActivity = {id: "",title: "",description: "",value: 10};
-   var Activity = F4(function (a,b,c,d) {    return {id: a,title: b,description: c,value: d};});
-   var decoder = A5($Json$Decode.object4,
-   Activity,
-   A2($Json$Decode._op[":="],"id",$Json$Decode.string),
-   A2($Json$Decode._op[":="],"title",$Json$Decode.string),
-   A2($Json$Decode._op[":="],"description",$Json$Decode.string),
-   A2($Json$Decode._op[":="],"value",$Json$Decode.$int));
-   return _elm.Model.Activity.values = {_op: _op,Activity: Activity,emptyActivity: emptyActivity,encode: encode,decoder: decoder};
-};
-Elm.Util = Elm.Util || {};
-Elm.Util.Dict = Elm.Util.Dict || {};
-Elm.Util.Dict.make = function (_elm) {
-   "use strict";
-   _elm.Util = _elm.Util || {};
-   _elm.Util.Dict = _elm.Util.Dict || {};
-   if (_elm.Util.Dict.values) return _elm.Util.Dict.values;
-   var _U = Elm.Native.Utils.make(_elm),
-   $Basics = Elm.Basics.make(_elm),
-   $Debug = Elm.Debug.make(_elm),
-   $Dict = Elm.Dict.make(_elm),
-   $Json$Encode = Elm.Json.Encode.make(_elm),
-   $List = Elm.List.make(_elm),
-   $Maybe = Elm.Maybe.make(_elm),
-   $Result = Elm.Result.make(_elm),
-   $Signal = Elm.Signal.make(_elm);
-   var _op = {};
-   var encode = F2(function (enc,dict) {
-      return $Json$Encode.object(A2($List.map,function (_p0) {    var _p1 = _p0;return {ctor: "_Tuple2",_0: _p1._0,_1: enc(_p1._1)};},$Dict.toList(dict)));
-   });
-   return _elm.Util.Dict.values = {_op: _op,encode: encode};
-};
-Elm.Model = Elm.Model || {};
-Elm.Model.Game = Elm.Model.Game || {};
-Elm.Model.Game.make = function (_elm) {
-   "use strict";
-   _elm.Model = _elm.Model || {};
-   _elm.Model.Game = _elm.Model.Game || {};
-   if (_elm.Model.Game.values) return _elm.Model.Game.values;
-   var _U = Elm.Native.Utils.make(_elm),
-   $Basics = Elm.Basics.make(_elm),
-   $Debug = Elm.Debug.make(_elm),
-   $Dict = Elm.Dict.make(_elm),
-   $Json$Decode = Elm.Json.Decode.make(_elm),
-   $Json$Encode = Elm.Json.Encode.make(_elm),
-   $List = Elm.List.make(_elm),
-   $Maybe = Elm.Maybe.make(_elm),
-   $Model$Activity = Elm.Model.Activity.make(_elm),
-   $Model$Player = Elm.Model.Player.make(_elm),
-   $Result = Elm.Result.make(_elm),
-   $Signal = Elm.Signal.make(_elm),
-   $Util$Dict = Elm.Util.Dict.make(_elm);
-   var _op = {};
-   var encode = function (game) {
-      return $Json$Encode.object(_U.list([{ctor: "_Tuple2",_0: "id",_1: $Json$Encode.string(game.id)}
-                                         ,{ctor: "_Tuple2",_0: "title",_1: $Json$Encode.string(game.title)}
-                                         ,{ctor: "_Tuple2",_0: "description",_1: $Json$Encode.string(game.description)}
-                                         ,{ctor: "_Tuple2",_0: "activities",_1: A2($Util$Dict.encode,$Model$Activity.encode,game.activities)}
-                                         ,{ctor: "_Tuple2",_0: "players",_1: A2($Util$Dict.encode,$Model$Player.encode,game.players)}]));
-   };
-   var emptyGame = {id: "",title: "",description: "",activities: $Dict.empty,players: $Dict.empty};
-   var Game = F5(function (a,b,c,d,e) {    return {id: a,title: b,description: c,activities: d,players: e};});
-   var decoder = A6($Json$Decode.object5,
-   Game,
-   A2($Json$Decode._op[":="],"id",$Json$Decode.string),
-   A2($Json$Decode._op[":="],"title",$Json$Decode.string),
-   A2($Json$Decode._op[":="],"description",$Json$Decode.string),
-   A2($Json$Decode._op[":="],"activities",$Json$Decode.dict($Model$Activity.decoder)),
-   A2($Json$Decode._op[":="],"players",$Json$Decode.dict($Model$Player.decoder)));
-   return _elm.Model.Game.values = {_op: _op,Game: Game,emptyGame: emptyGame,encode: encode,decoder: decoder};
-};
-Elm.Model = Elm.Model || {};
-Elm.Model.Url = Elm.Model.Url || {};
-Elm.Model.Url.make = function (_elm) {
-   "use strict";
-   _elm.Model = _elm.Model || {};
-   _elm.Model.Url = _elm.Model.Url || {};
-   if (_elm.Model.Url.values) return _elm.Model.Url.values;
-   var _U = Elm.Native.Utils.make(_elm),
-   $Basics = Elm.Basics.make(_elm),
-   $Debug = Elm.Debug.make(_elm),
-   $Json$Decode = Elm.Json.Decode.make(_elm),
-   $List = Elm.List.make(_elm),
-   $Maybe = Elm.Maybe.make(_elm),
-   $Result = Elm.Result.make(_elm),
-   $Signal = Elm.Signal.make(_elm);
-   var _op = {};
-   var NotFound = {ctor: "NotFound"};
-   var GamePage = function (a) {    return {ctor: "GamePage",_0: a};};
-   var GamesList = {ctor: "GamesList"};
-   var Home = {ctor: "Home"};
-   var decoder = $Json$Decode.succeed(Home);
-   var parse = function (path) {    var _p0 = path;switch (_p0) {case "#(/)?$": return Home;case "#/games$": return GamesList;default: return NotFound;}};
-   return _elm.Model.Url.values = {_op: _op,Home: Home,GamesList: GamesList,GamePage: GamePage,NotFound: NotFound,decoder: decoder,parse: parse};
-};
-Elm.Native = Elm.Native || {};
-Elm.Native.History = {};
-Elm.Native.History.make = function(localRuntime){
-
-  localRuntime.Native = localRuntime.Native || {};
-  localRuntime.Native.History = localRuntime.Native.History || {};
-
-  if (localRuntime.Native.History.values){
-    return localRuntime.Native.History.values;
-  }
-
-  var NS = Elm.Native.Signal.make(localRuntime);
-  var Task = Elm.Native.Task.make(localRuntime);
-  var Utils = Elm.Native.Utils.make(localRuntime);
-  var node = window;
-
-  // path : Signal String
-  var path = NS.input('History.path', window.location.pathname);
-
-  // length : Signal Int
-  var length = NS.input('History.length', window.history.length);
-
-  // hash : Signal String
-  var hash = NS.input('History.hash', window.location.hash);
-
-  localRuntime.addListener([path.id, length.id], node, 'popstate', function getPath(event){
-    localRuntime.notify(path.id, window.location.pathname);
-    localRuntime.notify(length.id, window.history.length);
-    localRuntime.notify(hash.id, window.location.hash);
-  });
-
-  localRuntime.addListener([hash.id], node, 'hashchange', function getHash(event){
-    localRuntime.notify(hash.id, window.location.hash);
-  });
-
-  // setPath : String -> Task error ()
-  var setPath = function(urlpath){
-    return Task.asyncFunction(function(callback){
-      setTimeout(function(){
-        localRuntime.notify(path.id, urlpath);
-        window.history.pushState({}, "", urlpath);
-        localRuntime.notify(hash.id, window.location.hash);
-        localRuntime.notify(length.id, window.history.length);
-
-      },0);
-      return callback(Task.succeed(Utils.Tuple0));
-    });
-  };
-
-  // replacePath : String -> Task error ()
-  var replacePath = function(urlpath){
-    return Task.asyncFunction(function(callback){
-      setTimeout(function(){
-        localRuntime.notify(path.id, urlpath);
-        window.history.replaceState({}, "", urlpath);
-        localRuntime.notify(hash.id, window.location.hash);
-        localRuntime.notify(length.id, window.history.length);
-      },0);
-      return callback(Task.succeed(Utils.Tuple0));
-    });
-  };
-
-  // go : Int -> Task error ()
-  var go = function(n){
-    return Task.asyncFunction(function(callback){
-      setTimeout(function(){
-        window.history.go(n);
-        localRuntime.notify(length.id, window.history.length);
-        localRuntime.notify(hash.id, window.location.hash);
-      }, 0);
-      return callback(Task.succeed(Utils.Tuple0));
-    });
-  };
-
-  // back : Task error ()
-  var back = Task.asyncFunction(function(callback){
-    setTimeout(function(){
-      localRuntime.notify(hash.id, window.location.hash);
-      window.history.back();
-      localRuntime.notify(length.id, window.history.length);
-
-    }, 0);
-    return callback(Task.succeed(Utils.Tuple0));
-  });
-
-  // forward : Task error ()
-  var forward = Task.asyncFunction(function(callback){
-    setTimeout(function(){
-      window.history.forward();
-      localRuntime.notify(length.id, window.history.length);
-      localRuntime.notify(hash.id, window.location.hash);
-    }, 0);
-    return callback(Task.succeed(Utils.Tuple0));
-  });
-
-
-
-  return {
-    path        : path,
-    setPath     : setPath,
-    replacePath : replacePath,
-    go          : go,
-    back        : back,
-    forward     : forward,
-    length      : length,
-    hash        : hash
-  };
-
-};
-
-Elm.History = Elm.History || {};
-Elm.History.make = function (_elm) {
-   "use strict";
-   _elm.History = _elm.History || {};
-   if (_elm.History.values) return _elm.History.values;
-   var _U = Elm.Native.Utils.make(_elm),
-   $Basics = Elm.Basics.make(_elm),
-   $Debug = Elm.Debug.make(_elm),
-   $List = Elm.List.make(_elm),
-   $Maybe = Elm.Maybe.make(_elm),
-   $Native$History = Elm.Native.History.make(_elm),
-   $Result = Elm.Result.make(_elm),
-   $Signal = Elm.Signal.make(_elm),
-   $Task = Elm.Task.make(_elm);
-   var _op = {};
-   var path = $Native$History.path;
-   var hash = $Native$History.hash;
-   var length = $Native$History.length;
-   var forward = $Native$History.forward;
-   var back = $Native$History.back;
-   var go = $Native$History.go;
-   var replacePath = $Native$History.replacePath;
-   var setPath = $Native$History.setPath;
-   return _elm.History.values = {_op: _op,setPath: setPath,replacePath: replacePath,go: go,back: back,forward: forward,length: length,hash: hash,path: path};
-};
-Elm.Actions = Elm.Actions || {};
-Elm.Actions.make = function (_elm) {
-   "use strict";
-   _elm.Actions = _elm.Actions || {};
-   if (_elm.Actions.values) return _elm.Actions.values;
-   var _U = Elm.Native.Utils.make(_elm),
-   $Basics = Elm.Basics.make(_elm),
-   $Debug = Elm.Debug.make(_elm),
-   $History = Elm.History.make(_elm),
-   $List = Elm.List.make(_elm),
-   $Maybe = Elm.Maybe.make(_elm),
-   $Model$Activity = Elm.Model.Activity.make(_elm),
-   $Model$Game = Elm.Model.Game.make(_elm),
-   $Model$Url = Elm.Model.Url.make(_elm),
-   $Result = Elm.Result.make(_elm),
-   $Signal = Elm.Signal.make(_elm);
-   var _op = {};
-   var CompleteActivity = function (a) {    return {ctor: "CompleteActivity",_0: a};};
-   var Navigate = function (a) {    return {ctor: "Navigate",_0: a};};
-   var AddActivity = function (a) {    return {ctor: "AddActivity",_0: a};};
-   var SetActivityValue = function (a) {    return {ctor: "SetActivityValue",_0: a};};
-   var SetActivityDescription = function (a) {    return {ctor: "SetActivityDescription",_0: a};};
-   var SetActivityTitle = function (a) {    return {ctor: "SetActivityTitle",_0: a};};
-   var CreateActivity = function (a) {    return {ctor: "CreateActivity",_0: a};};
-   var CreateGame = function (a) {    return {ctor: "CreateGame",_0: a};};
-   var SetGameDescription = function (a) {    return {ctor: "SetGameDescription",_0: a};};
-   var SetGameTitle = function (a) {    return {ctor: "SetGameTitle",_0: a};};
-   var NoOp = {ctor: "NoOp"};
-   var mailbox = $Signal.mailbox(NoOp);
-   var address = mailbox.address;
-   var signal = A2($Signal.map,
-   $Debug.log("Action: "),
-   A2($Signal.merge,mailbox.signal,A2($Signal.map,function (h) {    return Navigate($Model$Url.parse(h));},$Signal.dropRepeats($History.hash))));
-   return _elm.Actions.values = {_op: _op
-                                ,NoOp: NoOp
-                                ,SetGameTitle: SetGameTitle
-                                ,SetGameDescription: SetGameDescription
-                                ,CreateGame: CreateGame
-                                ,CreateActivity: CreateActivity
-                                ,SetActivityTitle: SetActivityTitle
-                                ,SetActivityDescription: SetActivityDescription
-                                ,SetActivityValue: SetActivityValue
-                                ,AddActivity: AddActivity
-                                ,Navigate: Navigate
-                                ,CompleteActivity: CompleteActivity
-                                ,mailbox: mailbox
-                                ,address: address
-                                ,signal: signal};
 };
 (function e(t,n,r){function s(o,u){if(!n[o]){if(!t[o]){var a=typeof require=="function"&&require;if(!u&&a)return a(o,!0);if(i)return i(o,!0);var f=new Error("Cannot find module '"+o+"'");throw f.code="MODULE_NOT_FOUND",f}var l=n[o]={exports:{}};t[o][0].call(l.exports,function(e){var n=t[o][1][e];return s(n?n:e)},l,l.exports,e,t,n,r)}return n[o].exports}var i=typeof require=="function"&&require;for(var o=0;o<r.length;o++)s(r[o]);return s})({1:[function(require,module,exports){
 
@@ -10360,1199 +10085,23 @@ Elm.Html.make = function (_elm) {
                              ,menuitem: menuitem
                              ,menu: menu};
 };
-Elm.Model = Elm.Model || {};
-Elm.Model.make = function (_elm) {
+Elm.Test = Elm.Test || {};
+Elm.Test.make = function (_elm) {
    "use strict";
-   _elm.Model = _elm.Model || {};
-   if (_elm.Model.values) return _elm.Model.values;
-   var _U = Elm.Native.Utils.make(_elm),
-   $Basics = Elm.Basics.make(_elm),
-   $Debug = Elm.Debug.make(_elm),
-   $Dict = Elm.Dict.make(_elm),
-   $Json$Decode = Elm.Json.Decode.make(_elm),
-   $Json$Encode = Elm.Json.Encode.make(_elm),
-   $List = Elm.List.make(_elm),
-   $Maybe = Elm.Maybe.make(_elm),
-   $Model$Activity = Elm.Model.Activity.make(_elm),
-   $Model$Game = Elm.Model.Game.make(_elm),
-   $Model$Url = Elm.Model.Url.make(_elm),
-   $Model$User = Elm.Model.User.make(_elm),
-   $Result = Elm.Result.make(_elm),
-   $Signal = Elm.Signal.make(_elm),
-   $Util$Dict = Elm.Util.Dict.make(_elm);
-   var _op = {};
-   var encode = function (model) {
-      return $Json$Encode.object(_U.list([{ctor: "_Tuple2",_0: "gameForm",_1: $Model$Game.encode(model.gameForm)}
-                                         ,{ctor: "_Tuple2",_0: "activityForm",_1: $Model$Activity.encode(model.activityForm)}
-                                         ,{ctor: "_Tuple2",_0: "games",_1: A2($Util$Dict.encode,$Model$Game.encode,model.games)}
-                                         ,{ctor: "_Tuple2",_0: "user",_1: $Model$User.encode(model.user)}]));
-   };
-   var emptyModel = {location: $Model$Url.Home
-                    ,gameForm: $Model$Game.emptyGame
-                    ,activityForm: $Model$Activity.emptyActivity
-                    ,games: $Dict.empty
-                    ,user: {id: "andreas",name: "andreas",email: "andreas.moller@gmail.com"}};
-   var Model = F5(function (a,b,c,d,e) {    return {gameForm: a,activityForm: b,games: c,location: d,user: e};});
-   var decoder = A6($Json$Decode.object5,
-   Model,
-   A2($Json$Decode._op[":="],"gameForm",$Model$Game.decoder),
-   A2($Json$Decode._op[":="],"activityForm",$Model$Activity.decoder),
-   A2($Json$Decode._op[":="],"games",$Json$Decode.dict($Model$Game.decoder)),
-   A2($Json$Decode._op[":="],"location",$Model$Url.decoder),
-   A2($Json$Decode._op[":="],"user",$Model$User.decoder));
-   return _elm.Model.values = {_op: _op,Model: Model,emptyModel: emptyModel,encode: encode,decoder: decoder};
-};
-Elm.Html = Elm.Html || {};
-Elm.Html.Attributes = Elm.Html.Attributes || {};
-Elm.Html.Attributes.make = function (_elm) {
-   "use strict";
-   _elm.Html = _elm.Html || {};
-   _elm.Html.Attributes = _elm.Html.Attributes || {};
-   if (_elm.Html.Attributes.values) return _elm.Html.Attributes.values;
+   _elm.Test = _elm.Test || {};
+   if (_elm.Test.values) return _elm.Test.values;
    var _U = Elm.Native.Utils.make(_elm),
    $Basics = Elm.Basics.make(_elm),
    $Debug = Elm.Debug.make(_elm),
    $Html = Elm.Html.make(_elm),
-   $Json$Encode = Elm.Json.Encode.make(_elm),
    $List = Elm.List.make(_elm),
+   $LocalStorage = Elm.LocalStorage.make(_elm),
    $Maybe = Elm.Maybe.make(_elm),
    $Result = Elm.Result.make(_elm),
    $Signal = Elm.Signal.make(_elm),
-   $String = Elm.String.make(_elm),
-   $VirtualDom = Elm.VirtualDom.make(_elm);
+   $Task = Elm.Task.make(_elm);
    var _op = {};
-   var attribute = $VirtualDom.attribute;
-   var contextmenu = function (value) {    return A2(attribute,"contextmenu",value);};
-   var property = $VirtualDom.property;
-   var stringProperty = F2(function (name,string) {    return A2(property,name,$Json$Encode.string(string));});
-   var $class = function (name) {    return A2(stringProperty,"className",name);};
-   var id = function (name) {    return A2(stringProperty,"id",name);};
-   var title = function (name) {    return A2(stringProperty,"title",name);};
-   var accesskey = function ($char) {    return A2(stringProperty,"accessKey",$String.fromChar($char));};
-   var dir = function (value) {    return A2(stringProperty,"dir",value);};
-   var draggable = function (value) {    return A2(stringProperty,"draggable",value);};
-   var dropzone = function (value) {    return A2(stringProperty,"dropzone",value);};
-   var itemprop = function (value) {    return A2(stringProperty,"itemprop",value);};
-   var lang = function (value) {    return A2(stringProperty,"lang",value);};
-   var tabindex = function (n) {    return A2(stringProperty,"tabIndex",$Basics.toString(n));};
-   var charset = function (value) {    return A2(stringProperty,"charset",value);};
-   var content = function (value) {    return A2(stringProperty,"content",value);};
-   var httpEquiv = function (value) {    return A2(stringProperty,"httpEquiv",value);};
-   var language = function (value) {    return A2(stringProperty,"language",value);};
-   var src = function (value) {    return A2(stringProperty,"src",value);};
-   var height = function (value) {    return A2(stringProperty,"height",$Basics.toString(value));};
-   var width = function (value) {    return A2(stringProperty,"width",$Basics.toString(value));};
-   var alt = function (value) {    return A2(stringProperty,"alt",value);};
-   var preload = function (value) {    return A2(stringProperty,"preload",value);};
-   var poster = function (value) {    return A2(stringProperty,"poster",value);};
-   var kind = function (value) {    return A2(stringProperty,"kind",value);};
-   var srclang = function (value) {    return A2(stringProperty,"srclang",value);};
-   var sandbox = function (value) {    return A2(stringProperty,"sandbox",value);};
-   var srcdoc = function (value) {    return A2(stringProperty,"srcdoc",value);};
-   var type$ = function (value) {    return A2(stringProperty,"type",value);};
-   var value = function (value) {    return A2(stringProperty,"value",value);};
-   var placeholder = function (value) {    return A2(stringProperty,"placeholder",value);};
-   var accept = function (value) {    return A2(stringProperty,"accept",value);};
-   var acceptCharset = function (value) {    return A2(stringProperty,"acceptCharset",value);};
-   var action = function (value) {    return A2(stringProperty,"action",value);};
-   var autocomplete = function (bool) {    return A2(stringProperty,"autocomplete",bool ? "on" : "off");};
-   var autosave = function (value) {    return A2(stringProperty,"autosave",value);};
-   var enctype = function (value) {    return A2(stringProperty,"enctype",value);};
-   var formaction = function (value) {    return A2(stringProperty,"formAction",value);};
-   var list = function (value) {    return A2(stringProperty,"list",value);};
-   var minlength = function (n) {    return A2(stringProperty,"minLength",$Basics.toString(n));};
-   var maxlength = function (n) {    return A2(stringProperty,"maxLength",$Basics.toString(n));};
-   var method = function (value) {    return A2(stringProperty,"method",value);};
-   var name = function (value) {    return A2(stringProperty,"name",value);};
-   var pattern = function (value) {    return A2(stringProperty,"pattern",value);};
-   var size = function (n) {    return A2(stringProperty,"size",$Basics.toString(n));};
-   var $for = function (value) {    return A2(stringProperty,"htmlFor",value);};
-   var form = function (value) {    return A2(stringProperty,"form",value);};
-   var max = function (value) {    return A2(stringProperty,"max",value);};
-   var min = function (value) {    return A2(stringProperty,"min",value);};
-   var step = function (n) {    return A2(stringProperty,"step",n);};
-   var cols = function (n) {    return A2(stringProperty,"cols",$Basics.toString(n));};
-   var rows = function (n) {    return A2(stringProperty,"rows",$Basics.toString(n));};
-   var wrap = function (value) {    return A2(stringProperty,"wrap",value);};
-   var usemap = function (value) {    return A2(stringProperty,"useMap",value);};
-   var shape = function (value) {    return A2(stringProperty,"shape",value);};
-   var coords = function (value) {    return A2(stringProperty,"coords",value);};
-   var challenge = function (value) {    return A2(stringProperty,"challenge",value);};
-   var keytype = function (value) {    return A2(stringProperty,"keytype",value);};
-   var align = function (value) {    return A2(stringProperty,"align",value);};
-   var cite = function (value) {    return A2(stringProperty,"cite",value);};
-   var href = function (value) {    return A2(stringProperty,"href",value);};
-   var target = function (value) {    return A2(stringProperty,"target",value);};
-   var downloadAs = function (value) {    return A2(stringProperty,"download",value);};
-   var hreflang = function (value) {    return A2(stringProperty,"hreflang",value);};
-   var media = function (value) {    return A2(stringProperty,"media",value);};
-   var ping = function (value) {    return A2(stringProperty,"ping",value);};
-   var rel = function (value) {    return A2(stringProperty,"rel",value);};
-   var datetime = function (value) {    return A2(stringProperty,"datetime",value);};
-   var pubdate = function (value) {    return A2(stringProperty,"pubdate",value);};
-   var start = function (n) {    return A2(stringProperty,"start",$Basics.toString(n));};
-   var colspan = function (n) {    return A2(stringProperty,"colSpan",$Basics.toString(n));};
-   var headers = function (value) {    return A2(stringProperty,"headers",value);};
-   var rowspan = function (n) {    return A2(stringProperty,"rowSpan",$Basics.toString(n));};
-   var scope = function (value) {    return A2(stringProperty,"scope",value);};
-   var manifest = function (value) {    return A2(stringProperty,"manifest",value);};
-   var boolProperty = F2(function (name,bool) {    return A2(property,name,$Json$Encode.bool(bool));});
-   var hidden = function (bool) {    return A2(boolProperty,"hidden",bool);};
-   var contenteditable = function (bool) {    return A2(boolProperty,"contentEditable",bool);};
-   var spellcheck = function (bool) {    return A2(boolProperty,"spellcheck",bool);};
-   var async = function (bool) {    return A2(boolProperty,"async",bool);};
-   var defer = function (bool) {    return A2(boolProperty,"defer",bool);};
-   var scoped = function (bool) {    return A2(boolProperty,"scoped",bool);};
-   var autoplay = function (bool) {    return A2(boolProperty,"autoplay",bool);};
-   var controls = function (bool) {    return A2(boolProperty,"controls",bool);};
-   var loop = function (bool) {    return A2(boolProperty,"loop",bool);};
-   var $default = function (bool) {    return A2(boolProperty,"default",bool);};
-   var seamless = function (bool) {    return A2(boolProperty,"seamless",bool);};
-   var checked = function (bool) {    return A2(boolProperty,"checked",bool);};
-   var selected = function (bool) {    return A2(boolProperty,"selected",bool);};
-   var autofocus = function (bool) {    return A2(boolProperty,"autofocus",bool);};
-   var disabled = function (bool) {    return A2(boolProperty,"disabled",bool);};
-   var multiple = function (bool) {    return A2(boolProperty,"multiple",bool);};
-   var novalidate = function (bool) {    return A2(boolProperty,"noValidate",bool);};
-   var readonly = function (bool) {    return A2(boolProperty,"readOnly",bool);};
-   var required = function (bool) {    return A2(boolProperty,"required",bool);};
-   var ismap = function (value) {    return A2(boolProperty,"isMap",value);};
-   var download = function (bool) {    return A2(boolProperty,"download",bool);};
-   var reversed = function (bool) {    return A2(boolProperty,"reversed",bool);};
-   var classList = function (list) {    return $class(A2($String.join," ",A2($List.map,$Basics.fst,A2($List.filter,$Basics.snd,list))));};
-   var style = function (props) {
-      return A2(property,
-      "style",
-      $Json$Encode.object(A2($List.map,function (_p0) {    var _p1 = _p0;return {ctor: "_Tuple2",_0: _p1._0,_1: $Json$Encode.string(_p1._1)};},props)));
-   };
-   var key = function (k) {    return A2(stringProperty,"key",k);};
-   return _elm.Html.Attributes.values = {_op: _op
-                                        ,key: key
-                                        ,style: style
-                                        ,$class: $class
-                                        ,classList: classList
-                                        ,id: id
-                                        ,title: title
-                                        ,hidden: hidden
-                                        ,type$: type$
-                                        ,value: value
-                                        ,checked: checked
-                                        ,placeholder: placeholder
-                                        ,selected: selected
-                                        ,accept: accept
-                                        ,acceptCharset: acceptCharset
-                                        ,action: action
-                                        ,autocomplete: autocomplete
-                                        ,autofocus: autofocus
-                                        ,autosave: autosave
-                                        ,disabled: disabled
-                                        ,enctype: enctype
-                                        ,formaction: formaction
-                                        ,list: list
-                                        ,maxlength: maxlength
-                                        ,minlength: minlength
-                                        ,method: method
-                                        ,multiple: multiple
-                                        ,name: name
-                                        ,novalidate: novalidate
-                                        ,pattern: pattern
-                                        ,readonly: readonly
-                                        ,required: required
-                                        ,size: size
-                                        ,$for: $for
-                                        ,form: form
-                                        ,max: max
-                                        ,min: min
-                                        ,step: step
-                                        ,cols: cols
-                                        ,rows: rows
-                                        ,wrap: wrap
-                                        ,href: href
-                                        ,target: target
-                                        ,download: download
-                                        ,downloadAs: downloadAs
-                                        ,hreflang: hreflang
-                                        ,media: media
-                                        ,ping: ping
-                                        ,rel: rel
-                                        ,ismap: ismap
-                                        ,usemap: usemap
-                                        ,shape: shape
-                                        ,coords: coords
-                                        ,src: src
-                                        ,height: height
-                                        ,width: width
-                                        ,alt: alt
-                                        ,autoplay: autoplay
-                                        ,controls: controls
-                                        ,loop: loop
-                                        ,preload: preload
-                                        ,poster: poster
-                                        ,$default: $default
-                                        ,kind: kind
-                                        ,srclang: srclang
-                                        ,sandbox: sandbox
-                                        ,seamless: seamless
-                                        ,srcdoc: srcdoc
-                                        ,reversed: reversed
-                                        ,start: start
-                                        ,align: align
-                                        ,colspan: colspan
-                                        ,rowspan: rowspan
-                                        ,headers: headers
-                                        ,scope: scope
-                                        ,async: async
-                                        ,charset: charset
-                                        ,content: content
-                                        ,defer: defer
-                                        ,httpEquiv: httpEquiv
-                                        ,language: language
-                                        ,scoped: scoped
-                                        ,accesskey: accesskey
-                                        ,contenteditable: contenteditable
-                                        ,contextmenu: contextmenu
-                                        ,dir: dir
-                                        ,draggable: draggable
-                                        ,dropzone: dropzone
-                                        ,itemprop: itemprop
-                                        ,lang: lang
-                                        ,spellcheck: spellcheck
-                                        ,tabindex: tabindex
-                                        ,challenge: challenge
-                                        ,keytype: keytype
-                                        ,cite: cite
-                                        ,datetime: datetime
-                                        ,pubdate: pubdate
-                                        ,manifest: manifest
-                                        ,property: property
-                                        ,attribute: attribute};
-};
-Elm.Native.Regex = {};
-Elm.Native.Regex.make = function(localRuntime) {
-	localRuntime.Native = localRuntime.Native || {};
-	localRuntime.Native.Regex = localRuntime.Native.Regex || {};
-	if (localRuntime.Native.Regex.values)
-	{
-		return localRuntime.Native.Regex.values;
-	}
-	if ('values' in Elm.Native.Regex)
-	{
-		return localRuntime.Native.Regex.values = Elm.Native.Regex.values;
-	}
-
-	var List = Elm.Native.List.make(localRuntime);
-	var Maybe = Elm.Maybe.make(localRuntime);
-
-	function escape(str)
-	{
-		return str.replace(/[-\/\\^$*+?.()|[\]{}]/g, '\\$&');
-	}
-	function caseInsensitive(re)
-	{
-		return new RegExp(re.source, 'gi');
-	}
-	function regex(raw)
-	{
-		return new RegExp(raw, 'g');
-	}
-
-	function contains(re, string)
-	{
-		return string.match(re) !== null;
-	}
-
-	function find(n, re, str)
-	{
-		n = n.ctor === 'All' ? Infinity : n._0;
-		var out = [];
-		var number = 0;
-		var string = str;
-		var lastIndex = re.lastIndex;
-		var prevLastIndex = -1;
-		var result;
-		while (number++ < n && (result = re.exec(string)))
-		{
-			if (prevLastIndex === re.lastIndex) break;
-			var i = result.length - 1;
-			var subs = new Array(i);
-			while (i > 0)
-			{
-				var submatch = result[i];
-				subs[--i] = submatch === undefined
-					? Maybe.Nothing
-					: Maybe.Just(submatch);
-			}
-			out.push({
-				match: result[0],
-				submatches: List.fromArray(subs),
-				index: result.index,
-				number: number
-			});
-			prevLastIndex = re.lastIndex;
-		}
-		re.lastIndex = lastIndex;
-		return List.fromArray(out);
-	}
-
-	function replace(n, re, replacer, string)
-	{
-		n = n.ctor === 'All' ? Infinity : n._0;
-		var count = 0;
-		function jsReplacer(match)
-		{
-			if (count++ >= n)
-			{
-				return match;
-			}
-			var i = arguments.length - 3;
-			var submatches = new Array(i);
-			while (i > 0)
-			{
-				var submatch = arguments[i];
-				submatches[--i] = submatch === undefined
-					? Maybe.Nothing
-					: Maybe.Just(submatch);
-			}
-			return replacer({
-				match: match,
-				submatches: List.fromArray(submatches),
-				index: arguments[i - 1],
-				number: count
-			});
-		}
-		return string.replace(re, jsReplacer);
-	}
-
-	function split(n, re, str)
-	{
-		n = n.ctor === 'All' ? Infinity : n._0;
-		if (n === Infinity)
-		{
-			return List.fromArray(str.split(re));
-		}
-		var string = str;
-		var result;
-		var out = [];
-		var start = re.lastIndex;
-		while (n--)
-		{
-			if (!(result = re.exec(string))) break;
-			out.push(string.slice(start, result.index));
-			start = re.lastIndex;
-		}
-		out.push(string.slice(start));
-		return List.fromArray(out);
-	}
-
-	return Elm.Native.Regex.values = {
-		regex: regex,
-		caseInsensitive: caseInsensitive,
-		escape: escape,
-
-		contains: F2(contains),
-		find: F3(find),
-		replace: F4(replace),
-		split: F3(split)
-	};
-};
-
-Elm.Regex = Elm.Regex || {};
-Elm.Regex.make = function (_elm) {
-   "use strict";
-   _elm.Regex = _elm.Regex || {};
-   if (_elm.Regex.values) return _elm.Regex.values;
-   var _U = Elm.Native.Utils.make(_elm),$Maybe = Elm.Maybe.make(_elm),$Native$Regex = Elm.Native.Regex.make(_elm);
-   var _op = {};
-   var split = $Native$Regex.split;
-   var replace = $Native$Regex.replace;
-   var find = $Native$Regex.find;
-   var AtMost = function (a) {    return {ctor: "AtMost",_0: a};};
-   var All = {ctor: "All"};
-   var Match = F4(function (a,b,c,d) {    return {match: a,submatches: b,index: c,number: d};});
-   var contains = $Native$Regex.contains;
-   var caseInsensitive = $Native$Regex.caseInsensitive;
-   var regex = $Native$Regex.regex;
-   var escape = $Native$Regex.escape;
-   var Regex = {ctor: "Regex"};
-   return _elm.Regex.values = {_op: _op
-                              ,regex: regex
-                              ,escape: escape
-                              ,caseInsensitive: caseInsensitive
-                              ,contains: contains
-                              ,find: find
-                              ,replace: replace
-                              ,split: split
-                              ,Match: Match
-                              ,All: All
-                              ,AtMost: AtMost};
-};
-Elm.Util = Elm.Util || {};
-Elm.Util.List = Elm.Util.List || {};
-Elm.Util.List.make = function (_elm) {
-   "use strict";
-   _elm.Util = _elm.Util || {};
-   _elm.Util.List = _elm.Util.List || {};
-   if (_elm.Util.List.values) return _elm.Util.List.values;
-   var _U = Elm.Native.Utils.make(_elm),
-   $Basics = Elm.Basics.make(_elm),
-   $Debug = Elm.Debug.make(_elm),
-   $List = Elm.List.make(_elm),
-   $Maybe = Elm.Maybe.make(_elm),
-   $Result = Elm.Result.make(_elm),
-   $Signal = Elm.Signal.make(_elm);
-   var _op = {};
-   var nth = F2(function (i,l) {
-      nth: while (true) {
-         var _p0 = i;
-         if (_p0 === 0) {
-               return $List.head(l);
-            } else {
-               var _v1 = i - 1,_v2 = A2($Maybe.withDefault,_U.list([]),$List.tail(l));
-               i = _v1;
-               l = _v2;
-               continue nth;
-            }
-      }
-   });
-   var updateById = F3(function (id,f,list) {    return A2($List.map,function (e) {    return _U.eq(e.id,id) ? f(e) : e;},list);});
-   var setById = F3(function (id,elem,list) {    return A3(updateById,id,$Basics.always(elem),list);});
-   var last = function (_p1) {    return $List.head($List.reverse(_p1));};
-   var find = F2(function (f,list) {
-      find: while (true) {
-         var _p2 = list;
-         if (_p2.ctor === "[]") {
-               return $Maybe.Nothing;
-            } else {
-               var _p3 = _p2._0;
-               if (f(_p3)) return $Maybe.Just(_p3); else {
-                     var _v4 = f,_v5 = _p2._1;
-                     f = _v4;
-                     list = _v5;
-                     continue find;
-                  }
-            }
-      }
-   });
-   var findById = F2(function (id,list) {    return A2(find,function (e) {    return _U.eq(e.id,id);},list);});
-   return _elm.Util.List.values = {_op: _op,find: find,last: last,findById: findById,updateById: updateById,setById: setById,nth: nth};
-};
-Elm.Util = Elm.Util || {};
-Elm.Util.Router = Elm.Util.Router || {};
-Elm.Util.Router.make = function (_elm) {
-   "use strict";
-   _elm.Util = _elm.Util || {};
-   _elm.Util.Router = _elm.Util.Router || {};
-   if (_elm.Util.Router.values) return _elm.Util.Router.values;
-   var _U = Elm.Native.Utils.make(_elm),
-   $Basics = Elm.Basics.make(_elm),
-   $Debug = Elm.Debug.make(_elm),
-   $Html = Elm.Html.make(_elm),
-   $List = Elm.List.make(_elm),
-   $Maybe = Elm.Maybe.make(_elm),
-   $Regex = Elm.Regex.make(_elm),
-   $Result = Elm.Result.make(_elm),
-   $Signal = Elm.Signal.make(_elm),
-   $Util$List = Elm.Util.List.make(_elm);
-   var _op = {};
-   var flatten = function (a) {    var _p0 = a;if (_p0.ctor === "Just") {    return _p0._0;} else {    return $Maybe.Nothing;}};
-   var isJust = function (a) {    var _p1 = a;if (_p1.ctor === "Just") {    return true;} else {    return false;}};
-   var router = F2(function (routes,location) {
-      var r = flatten(A2($Util$List.find,isJust,A2($List.map,function (r) {    return r(location);},routes)));
-      var _p2 = r;
-      if (_p2.ctor === "Just") {
-            return _p2._0;
-         } else {
-            return $Html.text("");
-         }
-   });
-   var route = F3(function (path,content,location) {    return A2($Regex.contains,$Regex.regex(path),location) ? $Maybe.Just(content) : $Maybe.Nothing;});
-   return _elm.Util.Router.values = {_op: _op,route: route,router: router,isJust: isJust,flatten: flatten};
-};
-Elm.View = Elm.View || {};
-Elm.View.Header = Elm.View.Header || {};
-Elm.View.Header.make = function (_elm) {
-   "use strict";
-   _elm.View = _elm.View || {};
-   _elm.View.Header = _elm.View.Header || {};
-   if (_elm.View.Header.values) return _elm.View.Header.values;
-   var _U = Elm.Native.Utils.make(_elm),
-   $Basics = Elm.Basics.make(_elm),
-   $Debug = Elm.Debug.make(_elm),
-   $Html = Elm.Html.make(_elm),
-   $Html$Attributes = Elm.Html.Attributes.make(_elm),
-   $List = Elm.List.make(_elm),
-   $Maybe = Elm.Maybe.make(_elm),
-   $Result = Elm.Result.make(_elm),
-   $Signal = Elm.Signal.make(_elm);
-   var _op = {};
-   var header = A2($Html.div,
-   _U.list([$Html$Attributes.$class("row")]),
-   _U.list([A2($Html.nav,
-   _U.list([$Html$Attributes.$class("navbar")]),
-   _U.list([A2($Html.div,
-   _U.list([$Html$Attributes.$class("nav-item")]),
-   _U.list([A2($Html.a,
-   _U.list([$Html$Attributes.href("#")]),
-   _U.list([A2($Html.span,_U.list([$Html$Attributes.$class("fa fa-home fa-2x")]),_U.list([]))]))]))]))]));
-   return _elm.View.Header.values = {_op: _op,header: header};
-};
-Elm.View = Elm.View || {};
-Elm.View.GamesListPage = Elm.View.GamesListPage || {};
-Elm.View.GamesListPage.make = function (_elm) {
-   "use strict";
-   _elm.View = _elm.View || {};
-   _elm.View.GamesListPage = _elm.View.GamesListPage || {};
-   if (_elm.View.GamesListPage.values) return _elm.View.GamesListPage.values;
-   var _U = Elm.Native.Utils.make(_elm),
-   $Basics = Elm.Basics.make(_elm),
-   $Debug = Elm.Debug.make(_elm),
-   $Html = Elm.Html.make(_elm),
-   $Html$Attributes = Elm.Html.Attributes.make(_elm),
-   $List = Elm.List.make(_elm),
-   $Maybe = Elm.Maybe.make(_elm),
-   $Model$Game = Elm.Model.Game.make(_elm),
-   $Result = Elm.Result.make(_elm),
-   $Signal = Elm.Signal.make(_elm);
-   var _op = {};
-   var listItem = function (_p0) {
-      var _p1 = _p0;
-      return A2($Html.div,
-      _U.list([$Html$Attributes.$class("list-group-item")]),
-      _U.list([A2($Html.a,
-      _U.list([$Html$Attributes.href(A2($Basics._op["++"],"#games/",A2($Basics._op["++"],_p1.id,"/activities")))]),
-      _U.list([A2($Html.div,
-      _U.list([$Html$Attributes.$class("media")]),
-      _U.list([A2($Html.div,
-              _U.list([$Html$Attributes.$class("media-left")]),
-              _U.list([A2($Html.div,_U.list([$Html$Attributes.$class("fa fa-gamepad fa-3x text-primary")]),_U.list([]))]))
-              ,A2($Html.div,
-              _U.list([$Html$Attributes.$class("media-body")]),
-              _U.list([A2($Html.h3,_U.list([]),_U.list([$Html.text(_p1.title)])),A2($Html.p,_U.list([]),_U.list([$Html.text(_p1.description)]))]))]))]))]));
-   };
-   var gamesListPage = function (_p2) {
-      var _p3 = _p2;
-      return A2($Html.div,
-      _U.list([$Html$Attributes.$class("col-md-6 col-md-offset-3")]),
-      _U.list([A2($Html.div,
-              _U.list([$Html$Attributes.$class("row m-t-1 m-b-1 relative")]),
-              _U.list([A2($Html.div,
-              _U.list([$Html$Attributes.$class("container-fluid container-fluid")]),
-              _U.list([A2($Html.h1,
-                      _U.list([]),
-                      _U.list([A2($Html.a,_U.list([$Html$Attributes.href("#"),$Html$Attributes.$class("fa fa-chevron-circle-left")]),_U.list([]))
-                              ,$Html.text(" Games")]))
-                      ,A2($Html.a,
-                      _U.list([$Html$Attributes.$class("btn btn-success-outline floating-button"),$Html$Attributes.href("#games/new")]),
-                      _U.list([$Html.text("New Game")]))]))]))
-              ,A2($Html.div,
-              _U.list([$Html$Attributes.$class("row card")]),
-              _U.list([A2($Html.div,_U.list([$Html$Attributes.$class("list-group list-group-flush")]),A2($List.map,listItem,_p3.games))]))]));
-   };
-   return _elm.View.GamesListPage.values = {_op: _op,gamesListPage: gamesListPage};
-};
-Elm.Html = Elm.Html || {};
-Elm.Html.Events = Elm.Html.Events || {};
-Elm.Html.Events.make = function (_elm) {
-   "use strict";
-   _elm.Html = _elm.Html || {};
-   _elm.Html.Events = _elm.Html.Events || {};
-   if (_elm.Html.Events.values) return _elm.Html.Events.values;
-   var _U = Elm.Native.Utils.make(_elm),
-   $Basics = Elm.Basics.make(_elm),
-   $Debug = Elm.Debug.make(_elm),
-   $Html = Elm.Html.make(_elm),
-   $Json$Decode = Elm.Json.Decode.make(_elm),
-   $List = Elm.List.make(_elm),
-   $Maybe = Elm.Maybe.make(_elm),
-   $Result = Elm.Result.make(_elm),
-   $Signal = Elm.Signal.make(_elm),
-   $VirtualDom = Elm.VirtualDom.make(_elm);
-   var _op = {};
-   var keyCode = A2($Json$Decode._op[":="],"keyCode",$Json$Decode.$int);
-   var targetChecked = A2($Json$Decode.at,_U.list(["target","checked"]),$Json$Decode.bool);
-   var targetValue = A2($Json$Decode.at,_U.list(["target","value"]),$Json$Decode.string);
-   var defaultOptions = $VirtualDom.defaultOptions;
-   var Options = F2(function (a,b) {    return {stopPropagation: a,preventDefault: b};});
-   var onWithOptions = $VirtualDom.onWithOptions;
-   var on = $VirtualDom.on;
-   var messageOn = F3(function (name,addr,msg) {    return A3(on,name,$Json$Decode.value,function (_p0) {    return A2($Signal.message,addr,msg);});});
-   var onClick = messageOn("click");
-   var onDoubleClick = messageOn("dblclick");
-   var onMouseMove = messageOn("mousemove");
-   var onMouseDown = messageOn("mousedown");
-   var onMouseUp = messageOn("mouseup");
-   var onMouseEnter = messageOn("mouseenter");
-   var onMouseLeave = messageOn("mouseleave");
-   var onMouseOver = messageOn("mouseover");
-   var onMouseOut = messageOn("mouseout");
-   var onBlur = messageOn("blur");
-   var onFocus = messageOn("focus");
-   var onSubmit = messageOn("submit");
-   var onKey = F3(function (name,addr,handler) {    return A3(on,name,keyCode,function (code) {    return A2($Signal.message,addr,handler(code));});});
-   var onKeyUp = onKey("keyup");
-   var onKeyDown = onKey("keydown");
-   var onKeyPress = onKey("keypress");
-   return _elm.Html.Events.values = {_op: _op
-                                    ,onBlur: onBlur
-                                    ,onFocus: onFocus
-                                    ,onSubmit: onSubmit
-                                    ,onKeyUp: onKeyUp
-                                    ,onKeyDown: onKeyDown
-                                    ,onKeyPress: onKeyPress
-                                    ,onClick: onClick
-                                    ,onDoubleClick: onDoubleClick
-                                    ,onMouseMove: onMouseMove
-                                    ,onMouseDown: onMouseDown
-                                    ,onMouseUp: onMouseUp
-                                    ,onMouseEnter: onMouseEnter
-                                    ,onMouseLeave: onMouseLeave
-                                    ,onMouseOver: onMouseOver
-                                    ,onMouseOut: onMouseOut
-                                    ,on: on
-                                    ,onWithOptions: onWithOptions
-                                    ,defaultOptions: defaultOptions
-                                    ,targetValue: targetValue
-                                    ,targetChecked: targetChecked
-                                    ,keyCode: keyCode
-                                    ,Options: Options};
-};
-Elm.View = Elm.View || {};
-Elm.View.NotFoundPage = Elm.View.NotFoundPage || {};
-Elm.View.NotFoundPage.make = function (_elm) {
-   "use strict";
-   _elm.View = _elm.View || {};
-   _elm.View.NotFoundPage = _elm.View.NotFoundPage || {};
-   if (_elm.View.NotFoundPage.values) return _elm.View.NotFoundPage.values;
-   var _U = Elm.Native.Utils.make(_elm),
-   $Basics = Elm.Basics.make(_elm),
-   $Debug = Elm.Debug.make(_elm),
-   $Html = Elm.Html.make(_elm),
-   $Html$Attributes = Elm.Html.Attributes.make(_elm),
-   $List = Elm.List.make(_elm),
-   $Maybe = Elm.Maybe.make(_elm),
-   $Result = Elm.Result.make(_elm),
-   $Signal = Elm.Signal.make(_elm);
-   var _op = {};
-   var notFoundPage = A2($Html.div,
-   _U.list([$Html$Attributes.$class("card")]),
-   _U.list([A2($Html.div,
-   _U.list([$Html$Attributes.$class("card-block")]),
-   _U.list([A2($Html.h1,_U.list([]),_U.list([$Html.text("404 page not found")]))
-           ,A2($Html.p,_U.list([]),_U.list([$Html.text("This link does not seem to lead anywhere")]))
-           ,A2($Html.p,
-           _U.list([]),
-           _U.list([$Html.text("try going back to "),A2($Html.a,_U.list([$Html$Attributes.href("#home")]),_U.list([$Html.text("home")]))]))]))]));
-   return _elm.View.NotFoundPage.values = {_op: _op,notFoundPage: notFoundPage};
-};
-Elm.Util = Elm.Util || {};
-Elm.Util.Events = Elm.Util.Events || {};
-Elm.Util.Events.make = function (_elm) {
-   "use strict";
-   _elm.Util = _elm.Util || {};
-   _elm.Util.Events = _elm.Util.Events || {};
-   if (_elm.Util.Events.values) return _elm.Util.Events.values;
-   var _U = Elm.Native.Utils.make(_elm),
-   $Actions = Elm.Actions.make(_elm),
-   $Basics = Elm.Basics.make(_elm),
-   $Debug = Elm.Debug.make(_elm),
-   $Html = Elm.Html.make(_elm),
-   $Html$Events = Elm.Html.Events.make(_elm),
-   $List = Elm.List.make(_elm),
-   $Maybe = Elm.Maybe.make(_elm),
-   $Result = Elm.Result.make(_elm),
-   $Signal = Elm.Signal.make(_elm),
-   $String = Elm.String.make(_elm);
-   var _op = {};
-   var onSubmitOptions = {stopPropagation: true,preventDefault: true};
-   var onClick = function (action) {    return A2($Html$Events.onClick,$Actions.address,action);};
-   var onSubmit = function (msg) {
-      return A4($Html$Events.onWithOptions,
-      "submit",
-      onSubmitOptions,
-      $Html$Events.targetValue,
-      function (_p0) {
-         return A2($Signal.message,$Actions.address,msg);
-      });
-   };
-   var getInt = function (str) {    var parsed = $String.toInt(str);var _p1 = parsed;if (_p1.ctor === "Ok") {    return _p1._0;} else {    return 0;}};
-   var onNumberInput = function (actionCreator) {
-      return A3($Html$Events.on,"input",$Html$Events.targetValue,function (str) {    return A2($Signal.message,$Actions.address,actionCreator(getInt(str)));});
-   };
-   var onInput = function (actionCreator) {
-      return A3($Html$Events.on,"input",$Html$Events.targetValue,function (str) {    return A2($Signal.message,$Actions.address,actionCreator(str));});
-   };
-   return _elm.Util.Events.values = {_op: _op
-                                    ,onInput: onInput
-                                    ,onNumberInput: onNumberInput
-                                    ,getInt: getInt
-                                    ,onSubmit: onSubmit
-                                    ,onClick: onClick
-                                    ,onSubmitOptions: onSubmitOptions};
-};
-Elm.View = Elm.View || {};
-Elm.View.GamePage = Elm.View.GamePage || {};
-Elm.View.GamePage.Activities = Elm.View.GamePage.Activities || {};
-Elm.View.GamePage.Activities.make = function (_elm) {
-   "use strict";
-   _elm.View = _elm.View || {};
-   _elm.View.GamePage = _elm.View.GamePage || {};
-   _elm.View.GamePage.Activities = _elm.View.GamePage.Activities || {};
-   if (_elm.View.GamePage.Activities.values) return _elm.View.GamePage.Activities.values;
-   var _U = Elm.Native.Utils.make(_elm),
-   $Basics = Elm.Basics.make(_elm),
-   $Debug = Elm.Debug.make(_elm),
-   $Html = Elm.Html.make(_elm),
-   $Html$Attributes = Elm.Html.Attributes.make(_elm),
-   $List = Elm.List.make(_elm),
-   $Maybe = Elm.Maybe.make(_elm),
-   $Model$Activity = Elm.Model.Activity.make(_elm),
-   $Result = Elm.Result.make(_elm),
-   $Signal = Elm.Signal.make(_elm);
-   var _op = {};
-   var activity = function (activity) {
-      return A2($Html.div,
-      _U.list([$Html$Attributes.$class("list-group-item")]),
-      _U.list([A2($Html.div,
-      _U.list([$Html$Attributes.$class("media")]),
-      _U.list([A2($Html.div,
-              _U.list([$Html$Attributes.$class("media-left")]),
-              _U.list([A2($Html.div,_U.list([$Html$Attributes.$class("fa fa-3x fa-check-square-o text-primary")]),_U.list([]))]))
-              ,A2($Html.div,
-              _U.list([$Html$Attributes.$class("media-body")]),
-              _U.list([A2($Html.h5,_U.list([]),_U.list([$Html.text(activity.title)]))
-                      ,A2($Html.p,_U.list([]),_U.list([$Html.text(activity.description)]))]))]))]));
-   };
-   var renderActivities = function (activities) {
-      return A2($Html.div,
-      _U.list([]),
-      _U.list([A2($Html.div,_U.list([$Html$Attributes.$class("list-group list-group-flush")]),A2($List.map,activity,activities))]));
-   };
-   return _elm.View.GamePage.Activities.values = {_op: _op,renderActivities: renderActivities,activity: activity};
-};
-Elm.View = Elm.View || {};
-Elm.View.GamePage = Elm.View.GamePage || {};
-Elm.View.GamePage.ActivityForm = Elm.View.GamePage.ActivityForm || {};
-Elm.View.GamePage.ActivityForm.make = function (_elm) {
-   "use strict";
-   _elm.View = _elm.View || {};
-   _elm.View.GamePage = _elm.View.GamePage || {};
-   _elm.View.GamePage.ActivityForm = _elm.View.GamePage.ActivityForm || {};
-   if (_elm.View.GamePage.ActivityForm.values) return _elm.View.GamePage.ActivityForm.values;
-   var _U = Elm.Native.Utils.make(_elm),
-   $Actions = Elm.Actions.make(_elm),
-   $Basics = Elm.Basics.make(_elm),
-   $Debug = Elm.Debug.make(_elm),
-   $Html = Elm.Html.make(_elm),
-   $Html$Attributes = Elm.Html.Attributes.make(_elm),
-   $List = Elm.List.make(_elm),
-   $Maybe = Elm.Maybe.make(_elm),
-   $Model$Activity = Elm.Model.Activity.make(_elm),
-   $Result = Elm.Result.make(_elm),
-   $Signal = Elm.Signal.make(_elm),
-   $Util$Events = Elm.Util.Events.make(_elm);
-   var _op = {};
-   var renderActivityForm = function (activityForm) {
-      var _p0 = activityForm;
-      var title = _p0.title;
-      var id = _p0.id;
-      return A2($Html.div,
-      _U.list([$Html$Attributes.$class("col-md-8 col-md-offset-2")]),
-      _U.list([A2($Html.div,
-              _U.list([$Html$Attributes.$class("row m-t-1 m-b-1")]),
-              _U.list([A2($Html.div,
-              _U.list([$Html$Attributes.$class("container-fluid container-fluid")]),
-              _U.list([A2($Html.h1,
-              _U.list([]),
-              _U.list([A2($Html.a,
-                      _U.list([$Html$Attributes.href("javascript:history.back()"),$Html$Attributes.$class("fa fa-chevron-circle-left")]),
-                      _U.list([$Html.text(" ")]))
-                      ,$Html.text(A2($Basics._op["++"]," ",_U.eq(id,"") ? "New Activity" : title))]))]))]))
-              ,A2($Html.div,
-              _U.list([$Html$Attributes.$class("row")]),
-              _U.list([A2($Html.div,
-              _U.list([$Html$Attributes.$class("container-fluid card")]),
-              _U.list([A2($Html.div,
-              _U.list([$Html$Attributes.$class("card-block")]),
-              _U.list([A2($Html.form,
-              _U.list([]),
-              _U.list([A2($Html.div,
-                      _U.list([$Html$Attributes.$class("form-group")]),
-                      _U.list([A2($Html.label,_U.list([]),_U.list([$Html.text("Activity Title")]))
-                              ,A2($Html.input,_U.list([$Html$Attributes.$class("form-control"),$Util$Events.onInput($Actions.SetActivityTitle)]),_U.list([]))]))
-                      ,A2($Html.div,
-                      _U.list([$Html$Attributes.$class("form-group")]),
-                      _U.list([A2($Html.label,_U.list([]),_U.list([$Html.text("Activity Description")]))
-                              ,A2($Html.textarea,
-                              _U.list([$Html$Attributes.$class("form-control"),$Util$Events.onInput($Actions.SetActivityDescription)]),
-                              _U.list([]))]))
-                      ,A2($Html.div,
-                      _U.list([$Html$Attributes.$class("form-group")]),
-                      _U.list([A2($Html.label,_U.list([]),_U.list([$Html.text("Activity Value")]))
-                              ,A2($Html.input,
-                              _U.list([$Html$Attributes.$class("form-control")
-                                      ,$Html$Attributes.type$("number")
-                                      ,$Util$Events.onNumberInput($Actions.SetActivityValue)]),
-                              _U.list([]))]))
-                      ,A2($Html.div,
-                      _U.list([$Html$Attributes.$class("clearfix")]),
-                      _U.list([A2($Html.div,
-                      _U.list([$Html$Attributes.$class("pull-xs-right")]),
-                      _U.list([A2($Html.a,
-                              _U.list([$Html$Attributes.$class("btn btn-danger-outline"),$Html$Attributes.href("javascript:history.back()")]),
-                              _U.list([$Html.text("cancel")]))
-                              ,$Html.text(" ")
-                              ,A2($Html.button,
-                              _U.list([$Html$Attributes.$class("btn btn-success-outline"),$Util$Events.onClick($Actions.AddActivity(activityForm))]),
-                              _U.list([$Html.text("add")]))]))]))]))]))]))]))]));
-   };
-   return _elm.View.GamePage.ActivityForm.values = {_op: _op,renderActivityForm: renderActivityForm};
-};
-Elm.View = Elm.View || {};
-Elm.View.GamePage = Elm.View.GamePage || {};
-Elm.View.GamePage.Players = Elm.View.GamePage.Players || {};
-Elm.View.GamePage.Players.make = function (_elm) {
-   "use strict";
-   _elm.View = _elm.View || {};
-   _elm.View.GamePage = _elm.View.GamePage || {};
-   _elm.View.GamePage.Players = _elm.View.GamePage.Players || {};
-   if (_elm.View.GamePage.Players.values) return _elm.View.GamePage.Players.values;
-   var _U = Elm.Native.Utils.make(_elm),
-   $Basics = Elm.Basics.make(_elm),
-   $Debug = Elm.Debug.make(_elm),
-   $Html = Elm.Html.make(_elm),
-   $Html$Attributes = Elm.Html.Attributes.make(_elm),
-   $List = Elm.List.make(_elm),
-   $Maybe = Elm.Maybe.make(_elm),
-   $Model$Player = Elm.Model.Player.make(_elm),
-   $Result = Elm.Result.make(_elm),
-   $Signal = Elm.Signal.make(_elm);
-   var _op = {};
-   var player = function (_p0) {
-      var _p1 = _p0;
-      return A2($Html.div,
-      _U.list([$Html$Attributes.$class("list-group-item")]),
-      _U.list([A2($Html.div,
-      _U.list([$Html$Attributes.$class("media")]),
-      _U.list([A2($Html.div,
-              _U.list([$Html$Attributes.$class("media-left")]),
-              _U.list([A2($Html.div,_U.list([$Html$Attributes.$class("fa fa-3x fa-check-square-o text-primary")]),_U.list([]))]))
-              ,A2($Html.div,
-              _U.list([$Html$Attributes.$class("media-body")]),
-              _U.list([A2($Html.h5,_U.list([$Html$Attributes.$class("pull-xs-left")]),_U.list([$Html.text(_p1.name)]))
-                      ,A2($Html.h3,
-                      _U.list([$Html$Attributes.$class("pull-xs-right")]),
-                      _U.list([A2($Html.p,
-                      _U.list([$Html$Attributes.$class("label label-primary label-pill")]),
-                      _U.list([$Html.text($Basics.toString(_p1.score))]))]))]))]))]));
-   };
-   var players = function (players) {
-      return A2($Html.div,
-      _U.list([$Html$Attributes.$class("list-group list-group-flush")]),
-      A2($List.map,player,A2($List.sortBy,function (_) {    return _.score;},players)));
-   };
-   return _elm.View.GamePage.Players.values = {_op: _op,players: players,player: player};
-};
-Elm.View = Elm.View || {};
-Elm.View.GamePage = Elm.View.GamePage || {};
-Elm.View.GamePage.make = function (_elm) {
-   "use strict";
-   _elm.View = _elm.View || {};
-   _elm.View.GamePage = _elm.View.GamePage || {};
-   if (_elm.View.GamePage.values) return _elm.View.GamePage.values;
-   var _U = Elm.Native.Utils.make(_elm),
-   $Basics = Elm.Basics.make(_elm),
-   $Debug = Elm.Debug.make(_elm),
-   $Html = Elm.Html.make(_elm),
-   $Html$Attributes = Elm.Html.Attributes.make(_elm),
-   $List = Elm.List.make(_elm),
-   $Maybe = Elm.Maybe.make(_elm),
-   $Model$Game = Elm.Model.Game.make(_elm),
-   $Result = Elm.Result.make(_elm),
-   $Signal = Elm.Signal.make(_elm),
-   $View$NotFoundPage = Elm.View.NotFoundPage.make(_elm);
-   var _op = {};
-   var newActivityButton = function (game) {
-      return A2($Html.a,
-      _U.list([$Html$Attributes.$class("btn btn-success-outline floating-button")
-              ,$Html$Attributes.href(A2($Basics._op["++"],"#games/",A2($Basics._op["++"],game.id,"/activities/new")))]),
-      _U.list([$Html.text("New Activity")]));
-   };
-   var showGamePage = function (_p0) {
-      var _p1 = _p0;
-      var _p2 = _p1.game;
-      return A2($Html.div,
-      _U.list([$Html$Attributes.$class("col-md-6 col-md-offset-3")]),
-      _U.list([A2($Html.div,
-              _U.list([$Html$Attributes.$class("row m-t-1 m-b-1 relative")]),
-              _U.list([A2($Html.div,
-              _U.list([$Html$Attributes.$class("container-fluid container-fluid")]),
-              _U.list([A2($Html.h1,
-              _U.list([]),
-              _U.list([A2($Html.a,_U.list([$Html$Attributes.href("#games"),$Html$Attributes.$class("fa fa-chevron-circle-left")]),_U.list([]))
-                      ,$Html.text(A2($Basics._op["++"]," ",_p2.title))]))]))]))
-              ,A2($Html.div,
-              _U.list([$Html$Attributes.$class("row")]),
-              _U.list([A2($Html.nav,
-              _U.list([$Html$Attributes.$class("navbar")]),
-              _U.list([A2($Html.ul,
-              _U.list([$Html$Attributes.$class("nav navbar-nav")]),
-              _U.list([A2($Html.li,
-                      _U.list([$Html$Attributes.$class("nav-item")]),
-                      _U.list([A2($Html.a,
-                      _U.list([$Html$Attributes.$class("nav-link")
-                              ,$Html$Attributes.href(A2($Basics._op["++"],"#games/",A2($Basics._op["++"],_p2.id,"/activities")))]),
-                      _U.list([$Html.text("Activities")]))]))
-                      ,A2($Html.li,
-                      _U.list([$Html$Attributes.$class("nav-item")]),
-                      _U.list([A2($Html.a,
-                      _U.list([$Html$Attributes.$class("nav-link")
-                              ,$Html$Attributes.href(A2($Basics._op["++"],"#games/",A2($Basics._op["++"],_p2.id,"/players")))]),
-                      _U.list([$Html.text("Players")]))]))]))]))]))
-              ,A2($Html.div,_U.list([$Html$Attributes.$class("row card")]),_U.list([]))]));
-   };
-   var gamePage = function (props) {
-      var _p3 = props;
-      var game = _p3.game;
-      var _p4 = game;
-      if (_p4.ctor === "Nothing") {
-            return $View$NotFoundPage.notFoundPage;
-         } else {
-            return showGamePage({game: _p4._0});
-         }
-   };
-   return _elm.View.GamePage.values = {_op: _op,gamePage: gamePage,showGamePage: showGamePage,newActivityButton: newActivityButton};
-};
-Elm.View = Elm.View || {};
-Elm.View.HomePage = Elm.View.HomePage || {};
-Elm.View.HomePage.make = function (_elm) {
-   "use strict";
-   _elm.View = _elm.View || {};
-   _elm.View.HomePage = _elm.View.HomePage || {};
-   if (_elm.View.HomePage.values) return _elm.View.HomePage.values;
-   var _U = Elm.Native.Utils.make(_elm),
-   $Basics = Elm.Basics.make(_elm),
-   $Debug = Elm.Debug.make(_elm),
-   $Html = Elm.Html.make(_elm),
-   $Html$Attributes = Elm.Html.Attributes.make(_elm),
-   $List = Elm.List.make(_elm),
-   $Maybe = Elm.Maybe.make(_elm),
-   $Result = Elm.Result.make(_elm),
-   $Signal = Elm.Signal.make(_elm);
-   var _op = {};
-   var homePage = A2($Html.div,
-   _U.list([$Html$Attributes.$class("col-md-6 col-md-offset-3")]),
-   _U.list([A2($Html.div,
-           _U.list([$Html$Attributes.$class("row m-t-1 m-b-1")]),
-           _U.list([A2($Html.div,
-           _U.list([$Html$Attributes.$class("container-fluid container-fluid")]),
-           _U.list([A2($Html.h1,
-           _U.list([]),
-           _U.list([A2($Html.a,_U.list([$Html$Attributes.href("#"),$Html$Attributes.$class("fa fa-home")]),_U.list([])),$Html.text(" GMFY")]))]))]))
-           ,A2($Html.div,
-           _U.list([$Html$Attributes.$class("row card")]),
-           _U.list([A2($Html.div,
-           _U.list([$Html$Attributes.$class("card-block")]),
-           _U.list([A2($Html.h2,_U.list([]),_U.list([$Html.text("Welcome to GMFY")]))
-                   ,A2($Html.div,
-                   _U.list([]),
-                   _U.list([A2($Html.a,_U.list([$Html$Attributes.href("#/games")]),_U.list([$Html.text("View your current games")]))]))
-                   ,A2($Html.div,
-                   _U.list([]),
-                   _U.list([A2($Html.a,_U.list([$Html$Attributes.href("#/games/new")]),_U.list([$Html.text("Create New Game")]))]))]))]))]));
-   return _elm.View.HomePage.values = {_op: _op,homePage: homePage};
-};
-Elm.View = Elm.View || {};
-Elm.View.Router = Elm.View.Router || {};
-Elm.View.Router.make = function (_elm) {
-   "use strict";
-   _elm.View = _elm.View || {};
-   _elm.View.Router = _elm.View.Router || {};
-   if (_elm.View.Router.values) return _elm.View.Router.values;
-   var _U = Elm.Native.Utils.make(_elm),
-   $Basics = Elm.Basics.make(_elm),
-   $Debug = Elm.Debug.make(_elm),
-   $Dict = Elm.Dict.make(_elm),
-   $Html = Elm.Html.make(_elm),
-   $List = Elm.List.make(_elm),
-   $Maybe = Elm.Maybe.make(_elm),
-   $Model = Elm.Model.make(_elm),
-   $Model$Url = Elm.Model.Url.make(_elm),
-   $Result = Elm.Result.make(_elm),
-   $Signal = Elm.Signal.make(_elm),
-   $View$GamePage = Elm.View.GamePage.make(_elm),
-   $View$GamesListPage = Elm.View.GamesListPage.make(_elm),
-   $View$HomePage = Elm.View.HomePage.make(_elm),
-   $View$NotFoundPage = Elm.View.NotFoundPage.make(_elm);
-   var _op = {};
-   var appRouter = function (model) {
-      var _p0 = model.location;
-      switch (_p0.ctor)
-      {case "Home": return $View$HomePage.homePage;
-         case "GamesList": return $View$GamesListPage.gamesListPage({games: $Dict.values(model.games)});
-         case "GamePage": return $View$GamePage.gamePage({game: A2($Dict.get,_p0._0,model.games),user: model.user});
-         default: return $View$NotFoundPage.notFoundPage;}
-   };
-   return _elm.View.Router.values = {_op: _op,appRouter: appRouter};
-};
-Elm.View = Elm.View || {};
-Elm.View.make = function (_elm) {
-   "use strict";
-   _elm.View = _elm.View || {};
-   if (_elm.View.values) return _elm.View.values;
-   var _U = Elm.Native.Utils.make(_elm),
-   $Basics = Elm.Basics.make(_elm),
-   $Debug = Elm.Debug.make(_elm),
-   $Html = Elm.Html.make(_elm),
-   $Html$Attributes = Elm.Html.Attributes.make(_elm),
-   $List = Elm.List.make(_elm),
-   $Maybe = Elm.Maybe.make(_elm),
-   $Model = Elm.Model.make(_elm),
-   $Result = Elm.Result.make(_elm),
-   $Signal = Elm.Signal.make(_elm),
-   $View$Router = Elm.View.Router.make(_elm);
-   var _op = {};
-   var view = function (model) {
-      return A2($Html.div,
-      _U.list([$Html$Attributes.$class("full-screen")]),
-      _U.list([A2($Html.div,
-      _U.list([$Html$Attributes.$class("container-fluid m-t-1")]),
-      _U.list([A2($Html.div,_U.list([$Html$Attributes.$class("row")]),_U.list([$View$Router.appRouter(model)]))]))]));
-   };
-   return _elm.View.values = {_op: _op,view: view};
-};
-Elm.Update = Elm.Update || {};
-Elm.Update.Navigate = Elm.Update.Navigate || {};
-Elm.Update.Navigate.make = function (_elm) {
-   "use strict";
-   _elm.Update = _elm.Update || {};
-   _elm.Update.Navigate = _elm.Update.Navigate || {};
-   if (_elm.Update.Navigate.values) return _elm.Update.Navigate.values;
-   var _U = Elm.Native.Utils.make(_elm),
-   $Actions = Elm.Actions.make(_elm),
-   $Basics = Elm.Basics.make(_elm),
-   $Debug = Elm.Debug.make(_elm),
-   $List = Elm.List.make(_elm),
-   $Maybe = Elm.Maybe.make(_elm),
-   $Model = Elm.Model.make(_elm),
-   $Model$Url = Elm.Model.Url.make(_elm),
-   $Result = Elm.Result.make(_elm),
-   $Signal = Elm.Signal.make(_elm),
-   $String = Elm.String.make(_elm);
-   var _op = {};
-   var gotToCurrentGameActivities = function (location) {    return A2($String.join,"/",A2($List.take,3,A2($String.split,"/",location)));};
-   var navigate = F2(function (action,model) {
-      var _p0 = action;
-      switch (_p0.ctor)
-      {case "Navigate": return _U.update(model,{location: _p0._0});
-         case "CreateGame": return _U.update(model,{location: $Model$Url.parse("#games")});
-         default: return model;}
-   });
-   return _elm.Update.Navigate.values = {_op: _op,navigate: navigate,gotToCurrentGameActivities: gotToCurrentGameActivities};
-};
-Elm.Update = Elm.Update || {};
-Elm.Update.User = Elm.Update.User || {};
-Elm.Update.User.make = function (_elm) {
-   "use strict";
-   _elm.Update = _elm.Update || {};
-   _elm.Update.User = _elm.Update.User || {};
-   if (_elm.Update.User.values) return _elm.Update.User.values;
-   var _U = Elm.Native.Utils.make(_elm),
-   $Actions = Elm.Actions.make(_elm),
-   $Basics = Elm.Basics.make(_elm),
-   $Debug = Elm.Debug.make(_elm),
-   $List = Elm.List.make(_elm),
-   $Maybe = Elm.Maybe.make(_elm),
-   $Model = Elm.Model.make(_elm),
-   $Model$User = Elm.Model.User.make(_elm),
-   $Result = Elm.Result.make(_elm),
-   $Signal = Elm.Signal.make(_elm);
-   var _op = {};
-   var updateUser = F2(function (action,user) {    var _p0 = action;return user;});
-   var user = F2(function (action,model) {    return _U.update(model,{user: A2(updateUser,action,model.user)});});
-   return _elm.Update.User.values = {_op: _op,user: user,updateUser: updateUser};
-};
-Elm.Util = Elm.Util || {};
-Elm.Util.Functions = Elm.Util.Functions || {};
-Elm.Util.Functions.make = function (_elm) {
-   "use strict";
-   _elm.Util = _elm.Util || {};
-   _elm.Util.Functions = _elm.Util.Functions || {};
-   if (_elm.Util.Functions.values) return _elm.Util.Functions.values;
-   var _U = Elm.Native.Utils.make(_elm),
-   $Basics = Elm.Basics.make(_elm),
-   $Debug = Elm.Debug.make(_elm),
-   $List = Elm.List.make(_elm),
-   $Maybe = Elm.Maybe.make(_elm),
-   $Result = Elm.Result.make(_elm),
-   $Signal = Elm.Signal.make(_elm);
-   var _op = {};
-   var composeAll = function (fs) {
-      return function (_p0) {
-         return A3($List.foldl,
-         F2(function (x,y) {    return function (_p1) {    return x(y(_p1));};}),
-         function (a) {
-            return a;
-         },
-         A2($List.map,function (r) {    return r(fs);},_p0));
-      };
-   };
-   return _elm.Util.Functions.values = {_op: _op,composeAll: composeAll};
-};
-Elm.Update = Elm.Update || {};
-Elm.Update.make = function (_elm) {
-   "use strict";
-   _elm.Update = _elm.Update || {};
-   if (_elm.Update.values) return _elm.Update.values;
-   var _U = Elm.Native.Utils.make(_elm),
-   $Actions = Elm.Actions.make(_elm),
-   $Basics = Elm.Basics.make(_elm),
-   $Debug = Elm.Debug.make(_elm),
-   $List = Elm.List.make(_elm),
-   $Maybe = Elm.Maybe.make(_elm),
-   $Model = Elm.Model.make(_elm),
-   $Result = Elm.Result.make(_elm),
-   $Signal = Elm.Signal.make(_elm),
-   $Update$Navigate = Elm.Update.Navigate.make(_elm),
-   $Update$User = Elm.Update.User.make(_elm),
-   $Util$Functions = Elm.Util.Functions.make(_elm);
-   var _op = {};
-   var update = F2(function (action,model) {
-      var updateAll = A2($Util$Functions.composeAll,action,_U.list([$Update$User.user,$Update$Navigate.navigate]));
-      return updateAll(model);
-   });
-   return _elm.Update.values = {_op: _op,update: update};
-};
-Elm.Main = Elm.Main || {};
-Elm.Main.make = function (_elm) {
-   "use strict";
-   _elm.Main = _elm.Main || {};
-   if (_elm.Main.values) return _elm.Main.values;
-   var _U = Elm.Native.Utils.make(_elm),
-   $Actions = Elm.Actions.make(_elm),
-   $Basics = Elm.Basics.make(_elm),
-   $Debug = Elm.Debug.make(_elm),
-   $Html = Elm.Html.make(_elm),
-   $Json$Decode = Elm.Json.Decode.make(_elm),
-   $Json$Encode = Elm.Json.Encode.make(_elm),
-   $List = Elm.List.make(_elm),
-   $Maybe = Elm.Maybe.make(_elm),
-   $Model = Elm.Model.make(_elm),
-   $Result = Elm.Result.make(_elm),
-   $Signal = Elm.Signal.make(_elm),
-   $Update = Elm.Update.make(_elm),
-   $View = Elm.View.make(_elm);
-   var _op = {};
-   var getStorage = Elm.Native.Port.make(_elm).inbound("getStorage",
-   "Maybe.Maybe String",
-   function (v) {
-      return v === null ? Elm.Maybe.make(_elm).Nothing : Elm.Maybe.make(_elm).Just(typeof v === "string" || typeof v === "object" && v instanceof String ? v : _U.badPort("a string",
-      v));
-   });
-   var initialModel = A2($Maybe.withDefault,
-   $Model.emptyModel,
-   A2($Maybe.andThen,getStorage,function (_p0) {    return $Result.toMaybe(A2($Json$Decode.decodeString,$Model.decoder,_p0));}));
-   var model = A3($Signal.foldp,$Update.update,initialModel,$Actions.signal);
-   var setStorage = Elm.Native.Port.make(_elm).outboundSignal("setStorage",function (v) {    return v;},A2($Signal.map,$Model.encode,model));
-   var main = A2($Signal.map,$View.view,model);
-   return _elm.Main.values = {_op: _op,main: main,model: model,initialModel: initialModel};
+   var setData = Elm.Native.Task.make(_elm).perform(A2($LocalStorage.set,"stuff","DATA"));
+   var main = $Html.text(A2($Maybe.withDefault,"nope",A2($Debug.log,"ls",$LocalStorage.get("stuff"))));
+   return _elm.Test.values = {_op: _op,main: main};
 };
