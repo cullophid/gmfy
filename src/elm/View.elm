@@ -11,7 +11,7 @@ import Actions exposing (..)
 
 view : Model -> Html
 view model =
-  div [class "full-screen"] [
+  div [class "full-screen perspective-800"] [
     div [class "container-fluid"] [
       div [class "row"] [
         appRouter model

@@ -6,15 +6,21 @@ import View.Header as Header
 
 homePage : Html
 homePage =
-  div [] [
+  div [ class "anim-fade-in"] [
     Header.header "GMFY" (div [] []),
     div [class "col-md-6 col-md-offset-3"] [
       h2 [] [ text "Welcome to GMFY" ],
       div [class "form-group"] [
-        a [href "#/games", class "btn btn-block btn-white-outline"] [text "View Your games"]
+        a [
+          href "#/games",
+          class "btn btn-block btn-white-outline"
+        ] [text "View Your games"]
       ],
       div [] [
-        a [href "#/games/new", class "btn btn-block btn-white-outline"] [text "Create New Game"]
+        a [
+          href "#/games/new",
+          class "btn btn-block btn-white-outline"
+        ] [text "Create New Game"]
       ]
 
     ]

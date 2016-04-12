@@ -12,19 +12,19 @@ newGamePage {gameForm} =
   let
     {id, title} = gameForm
   in
-    div [] [
+    div [ class "anim-fade-in"] [
       Header.header "New Game" (div [] []),
       div [class "col-md-6 col-md-offset-3"] [
         form [onSubmit (CreateGame gameForm)] [
-          div [class "form-group"] [
-            label [class ""] [text "Title"],
+          div [class "form-group anim-fold-in"] [
+            label [] [text "Title"],
             input [
               class "form-control",
               value gameForm.title,
               onInput SetGameTitle
             ] []
           ],
-          div [class "form-group"] [
+          div [class "form-group anim-fold-in anim-delay-100"] [
             label [] [text "Description"],
             textarea [
               class "form-control",
@@ -33,16 +33,16 @@ newGamePage {gameForm} =
             ] []
           ],
           div [ class "row"] [
-            div [class "col-xs-6"] [
+            div [class "col-xs-6 anim-fold-in anim-delay-200"] [
               a [ type' "button",
-                  class "btn btn-danger btn-block",
+                  class "btn btn-danger btn-block ",
                   href "#/"
               ] [text "Cancel"]
             ],
-            div [class "col-xs-6"] [
+            div [class "col-xs-6 anim-fold-in anim-delay-300"] [
               button [
                 type' "button",
-                class "btn btn-success btn-block",
+                class "btn btn-success btn-block ",
                 onClick (Actions.CreateGame gameForm)
               ] [text "Create Game"]
             ]

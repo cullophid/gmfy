@@ -9,17 +9,17 @@ import Dict
 
 gameActivities {game, user} =
   div [] [
-    div [class "list-group"]
+    div [class "list-group anim-list-stagger"]
       <| List.map (activity game) <| Dict.values game.activities,
     a [
-      class "fixed-bottom-right btn btn-success",
+      class "fixed-bottom-right btn btn-success anim-from-right anim-delay-400",
       href ("#/games/" ++ game.id ++ "/activities/new")
       ] [text "New Activity"]
 
   ]
 
 activity game activity =
-  a [class "list-group-item"  , href ("#/games/" ++ game.id ++ "/activities/" ++ activity.id)] [
+  a [class "list-group-item anim-from-left", href ("#/games/" ++ game.id ++ "/activities/" ++ activity.id)] [
     div [class "media"] [
       div [class "media-left"] [
         div [class "fa fa-3x fa-check-square-o"] [  ]

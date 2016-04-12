@@ -8,13 +8,13 @@ gamePlayers {game, user} =
   let
     players = Dict.values game.players
   in
-    div [class "list-group list-group-flush"]
+    div [class "list-group list-group-flush anim-list-stagger"]
       <| List.map player <| List.sortBy .score players
 
 
 player : Player -> Html
 player {name, score} =
-    div [class "list-group-item"] [
+    div [class "list-group-item anim-fold-in"] [
       div [class "media"] [
         div [class "media-left"] [
           div [class "fa fa-3x fa-user"] []

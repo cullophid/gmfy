@@ -68,7 +68,7 @@ menu game showHeaderMenu =
       class "fa fa-2x fa-ellipsis-v",
       onClick (ToggleHeaderMenu True)
       ] [],
-    div [class "dropdown-list"] [
+    div [class "dropdown-list anim-from-right"] [
       div [
         class "dropdown-list-item",
         onClick (DeleteGame game.id)

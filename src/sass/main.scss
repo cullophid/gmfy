@@ -1,6 +1,6 @@
 @import "bootstrap/bootstrap";
 @import "fa/font-awesome";
-
+@import "animation";
 .full-screen {
   height: 100vh;
 }
@@ -19,6 +19,7 @@ a {
   right: 20px;
   z-index: 100;
 }
+
 .fixed-bottom-right-sm {
   @include media-breakpoint-down("sm") {
     position: fixed;
@@ -73,4 +74,8 @@ a {
   &.is-visible {
     display: block;
   }
+}
+
+.perspective-800 {
+  perspective: 800px;
 }

@@ -14,21 +14,21 @@ newActivityPage {activityForm, gameId} =
       Header.header "New Activity" (div [] []),
       div [class "col-md-6 col-md-offset-3"] [
         form [] [
-          div [class "form-group"] [
+          div [class "form-group anim-fold-in"] [
             label [] [text "Activity Title"],
             input [
               class "form-control",
               onInput SetActivityTitle
             ] []
           ],
-          div [class "form-group"] [
+          div [class "form-group anim-fold-in anim-delay-100"] [
             label [] [text "Activity Description"],
             textarea [
               class "form-control",
               onInput SetActivityDescription
             ] []
           ],
-          div [class "form-group"] [
+          div [class "form-group anim-fold-in anim-delay-200"] [
             label [] [text "Activity Value"],
             input [
               class "form-control",
@@ -37,14 +37,14 @@ newActivityPage {activityForm, gameId} =
             ] []
           ],
           div [class "row"] [
-            div [class "col-xs-6"] [
+            div [class "col-xs-6 anim-fold-in anim-delay-300"] [
               a [
                 class "btn btn-danger btn-block",
                 href ("#/games/" ++ gameId ++ "/activities")
               ] [text "cancel"],
               text " "
             ],
-            div [class "col-xs-6"] [
+            div [class "col-xs-6 anim-fold-in anim-delay-400"] [
               button [
                 type' "button",
                 class "btn btn-success btn-block",
