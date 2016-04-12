@@ -33,10 +33,11 @@ navigate action model =
         , url = url
         }
     CompleteActivity _ ->
-      let url = String.join "/" <| List.take 4 <| String.split "/" model.url
+      let
+        url = (String.join "/" <| List.take 3 <| String.split "/" model.url) ++ "/players"
       in
         { model
-        | page = Model.Page.fromUrl <| Debug.log "complete" url
+        | page = Model.Page.fromUrl url
         , url = url
         }
     DeleteActivity _ _ ->

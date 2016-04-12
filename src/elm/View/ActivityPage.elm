@@ -12,7 +12,7 @@ activityPage {gameId, activity, showHeaderMenu}  =
       div [] [
         Header.header activity.title (menu gameId activity showHeaderMenu),
         div [class "col-md-6 col-md-offset-3"] [
-          p [] [
+          p [ class "clearfix"] [
             span [class "font-size-h1"] [
               span [class "label label-default label-pill pull-xs-right anim-from-right anim-delay-200"] [text (toString activity.value)]
             ],
