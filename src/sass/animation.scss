@@ -1,38 +1,53 @@
 .anim-list-stagger > * {
   &:nth-child(2) {
-    animation-delay: 100ms;
+    animation-delay: 50ms;
   }
   &:nth-child(3) {
-    animation-delay: 200ms;
+    animation-delay: 100ms;
   }
   &:nth-child(4) {
-    animation-delay: 300ms;
+    animation-delay: 150ms;
   }
   &:nth-child(5) {
-    animation-delay: 400ms;
+    animation-delay: 200ms;
   }
   &:nth-child(6) {
-    animation-delay: 500ms;
+    animation-delay: 250ms;
   }
   &:nth-child(7) {
-    animation-delay: 600ms;
+    animation-delay: 300ms;
+  }
+  &:nth-child(8) {
+    animation-delay: 350ms;
+  }
+  &:nth-child(9) {
+    animation-delay: 400ms;
+  }
+  &:nth-child(10) {
+    animation-delay: 450ms;
+  }
+  &:nth-child(11) {
+    animation-delay: 500ms;
   }
 }
 
 .anim-from-left {
   transform:translateX(-150%);
+  opacity: 0;
   animation: left 500ms 1;
   animation-fill-mode: forwards;
 }
 
 .anim-from-right {
   transform:translateX(150%);
+  opacity: 0;
   animation: right 500ms 1;
   animation-fill-mode: forwards;
 }
 
 .anim-from-top {
   transform:translateY(-150%);
+  opacity: 0;
   animation: top 500ms 1;
   animation-fill-mode: forwards;
 }
@@ -89,63 +104,71 @@ animation-direction: reverse;
 
 @keyframes left {
   0% {
-    transform: translateX(-150%)
+    opacity: 0;
+    transform: translateX(-150%);
   }
   100% {
-    transform: translateX(0)
+    transform: translateX(0);
+    opacity: 1;
   }
 }
 
 @keyframes right {
   0% {
-    transform: translateX(150%)
+    opacity: 0;
+    transform: translateX(150%);
   }
   100% {
-    transform: translateX(0)
+    opacity: 1;
+    transform: translateX(0);
   }
 }
 @keyframes top {
   0% {
-    transform: translateY(-150%)
+    opacity: 0;
+    transform: translateY(-150%);
   }
   100% {
-    transform: translateY(0)
+    opacity: 1;
+    transform: translateY(0);
   }
 }
 
 @keyframes bottom {
   0% {
-    transform: translateY(150%)
+    transform: translateY(150%);
+    opacity: 0;
   }
   100% {
-    transform: translateY(0)
+    transform: translateY(0);
+    opacity: 1;
   }
 }
 
 @keyframes fade {
   0% {
-    opacity: 1
+    opacity: 1;
   }
   100% {
-    opacity: 0
+    opacity: 0;
   }
 }
 
 @keyframes scaleX {
   0% {
-    transform: scaleX(0)
+    transform: scaleX(0);
   }
   100% {
-    transform: scaleX(1)
+    transform: scaleX(1);
   }
 }
 
 @keyframes scaleY {
   0% {
-    transform: scaleY(0)
+    transform: scaleY(0);
   }
   100% {
-    transform: scaleY(1)
+    transform: scaleY(1);
   }
 }
 
