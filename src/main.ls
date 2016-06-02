@@ -18,6 +18,6 @@ updateUrl = ({location}) ->
 
 subscribe ([state, command]) ->
   updateUrl state
-  command()
+  command.fork()
   storage.set 'state', state
   dom := render (view dispatch, state), mainElement, dom

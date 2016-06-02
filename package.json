@@ -3,8 +3,8 @@
   "version": "1.1.0",
   "main": "",
   "scripts": {
-    "test": "lsc test.ls src/**/*.test.ls | tap-spec",
-    "test:watch": "lsc test.ls src/**/*.test.ls -w | tap-spec",
+    "test": "oolon-livetape src/**/*.test.ls | tap-spec",
+    "test:watch": "oolon-livetape src/**/*.test.ls -w | tap-spec",
     "build": "browserify -t browserify-livescript --extension .ls -o public/bundle.js src/main.ls",
     "watch": "watchify -d -t browserify-livescript --extension .ls -o public/bundle.js src/main.ls",
     "start": "serve public",
@@ -29,6 +29,7 @@
     "browserify-livescript": "^0.2.3",
     "glob": "^7.0.3",
     "node-sass": "^3.4.2",
+    "oolon-livetape": "^1.0.2",
     "parallelshell": "^2.0.0",
     "serve": "^1.4.0",
     "sinon": "^1.17.4",

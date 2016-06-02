@@ -1,7 +1,9 @@
 # dependencies
-elm-stuff/
 node_modules/
 
+#sandbox
+sandbox.ls
+
 #build
-public/elm.js
+public/bundle.js
 public/bundle.css
