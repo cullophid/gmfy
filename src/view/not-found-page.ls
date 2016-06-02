@@ -1,7 +1,9 @@
-{h} = require 'preact'
+{DIV, H1} = require '../lib/html'
 header = require './header'
 module.exports = (dispatch, state) -->
-  h 'div', {},
-    header dispatch, state
-    h 'div', class: 'col-md-6 col-md-offset-3',
-      h 'h1', {}, 'PAGE NOT FOUND'
+  DIV {}, [
+    header dispatch, {title: 'Page Not Found'}
+    DIV class: 'col-md-6 col-md-offset-3', [
+      H1 {}, 'PAGE NOT FOUND'
+    ]
+  ]

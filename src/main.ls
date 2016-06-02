@@ -1,14 +1,23 @@
 {render} = require 'preact'
 events = require './events'
-redux = require './redux'
+redux = require './lib/redux'
 view = require './view'
+storage = require './lib/storage'
 update = require './update'
+commands = require './commands'
+{log, curryN} = require './util'
 
-dom = void
-main-element = document.getElementById 'main'
-{dispatch, subscribe, getState} = redux update
+dom = null
+mainElement = document.getElementById 'main'
+{dispatch, subscribe, getState} = redux update commands
 
 events dispatch
 
-subscribe (state) ->
-  dom := render (view dispatch, state), main-element, dom
+updateUrl = ({location}) ->
+  history.pushState {}, "", location unless location == window.location.hash
+
+subscribe ([state, command]) ->
+  updateUrl state
+  command()
+  storage.set 'state', state
+  dom := render (view dispatch, state), mainElement, dom

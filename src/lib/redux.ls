@@ -1,9 +1,9 @@
-{filter, forEach} = require './util'
+{filter, forEach, head, last} = require '../util'
 module.exports = (update) -->
   state = update void []
   subscribers = []
   dispatch = (action) ->
-    state = update state, action
+    state := update state, action
     forEach ((f) -> f state), subscribers
     state
 
@@ -13,6 +13,6 @@ module.exports = (update) -->
     ->
       subscribers := filter (!= subscriber), subscribers
 
-  getState = -> state
+  getState = -> head state
 
   {dispatch, subscribe, getState}

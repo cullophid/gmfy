@@ -1,17 +1,21 @@
-{h} = require 'preact'
-{router, route} = require './router'
-home-page = require './home-page'
-games-list-page = require './games-list-page'
-not-found-page = require './not-found-page'
+{propEq, find} = require '../util'
+{router, route} = require '../lib/router'
+homePage = require './home-page'
+gamesListPage = require './games-list-page'
+gamePage = require './game-page'
+notFoundPage = require './not-found-page'
+newGamePage = require './new-game-page'
+
+
+
 
 module.exports = (dispatch, state) -->
-  {location} = state
+  {location, gameForm, games} = state
 
   router location, [
-    * /^#$/,
-      -> home-page dispatch, state
-    * /^#\/games$/,
-      -> games-list-page dispatch, state
-    * /./,
-      -> not-found-page dispatch, state
+    route /^#\/$/, -> homePage dispatch, state
+    route /^#\/games\/new$/, -> newGamePage dispatch, {gameForm}
+    route /^#\/games\/(.*)\/activities$/, (gameId) -> gamePage dispatch, {game: (find (propEq 'id', gameId), games)}
+    route /^#\/games$/, -> gamesListPage dispatch, {games}
+    route /.*/, -> notFoundPage dispatch, state
   ]
