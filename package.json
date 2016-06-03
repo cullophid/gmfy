@@ -5,8 +5,12 @@
   "scripts": {
     "test": "oolon-livetape src/**/*.test.ls | tap-spec",
     "test:watch": "oolon-livetape src/**/*.test.ls -w | tap-spec",
-    "build": "browserify -t browserify-livescript --extension .ls -o public/bundle.js src/main.ls",
-    "watch": "watchify -d -t browserify-livescript --extension .ls -o public/bundle.js src/main.ls",
+    "build:ls": "browserify -t browserify-livescript --extension .ls -o public/bundle.js src/main.ls",
+    "build:sass": "node-sass sass/main.scss public/bundle.css",
+    "watch:ls": "watchify -d -t browserify-livescript --extension .ls -o public/bundle.js src/main.ls",
+    "watch:sass": "npm run build:sass -- -w src/sass",
+    "build": "npm run build:ls && npm run build:sass",
+    "watch": "parallelshell 'npm run watch:ls' 'npm run watch:sass'",
     "start": "serve public",
     "dev": "parallelshell 'npm run watch' 'npm start' 'livereload public'"
   },

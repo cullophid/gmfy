@@ -1,4 +1,6 @@
-noop = -> void
+{Task} = require '../lib/monads'
+noop = Task.of void
+
 api = require './api'
 
 module.exports = {

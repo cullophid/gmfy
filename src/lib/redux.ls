@@ -3,7 +3,7 @@ module.exports = (update) -->
   state = update void []
   subscribers = []
   dispatch = (action) ->
-    state := update state, action
+    state := update (head state), action
     forEach ((f) -> f state), subscribers
     state
 

@@ -17,7 +17,8 @@ updateUrl = ({location}) ->
   history.pushState {}, "", location unless location == window.location.hash
 
 subscribe ([state, command]) ->
+  console.log 'STATE', state
   updateUrl state
-  command.fork()
+  command.fork(-> void, -> void)
   storage.set 'state', state
   dom := render (view dispatch, state), mainElement, dom
