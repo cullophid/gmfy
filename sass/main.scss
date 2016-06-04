@@ -2,8 +2,13 @@
 @import "fa/font-awesome";
 @import "animation";
 .full-screen {
-  height: 100vh;
+  height: 100%;
+  width: 100%;
+  top:0;
+  left:0;
 }
+
+.fixed {position:fixed;}
 
 html {
   overflow-x: hidden;

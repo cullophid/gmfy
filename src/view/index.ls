@@ -14,8 +14,6 @@ module.exports = (dispatch, state) -->
 
   router location, [
     route /^#\/$/, -> homePage dispatch, state
-    route /^#\/games\/new$/, -> newGamePage dispatch, {gameForm}
-    route /^#\/games\/(.*)\/activities$/, (gameId) -> gamePage dispatch, {game: (find (propEq 'id', gameId), games)}
-    route /^#\/games$/, -> gamesListPage dispatch, {games}
+    route /^#\/games\/?(.*)$/, (path)-> gamesListPage dispatch, {games, path}
     route /.*/, -> notFoundPage dispatch, state
   ]
