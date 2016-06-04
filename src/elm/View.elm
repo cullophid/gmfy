@@ -1,25 +1,8 @@
-module View where
+module View exposing (view)
+import Html exposing (Html, div, text)
+import Model exposing (..)
+import View.GamesList as GamesList
 
-import Dict
-import Html exposing (Html, div)
-import Html.Attributes exposing (..)
-import View.Router exposing (appRouter)
-import View.Header exposing (header)
-import Model exposing (Model)
-import Util.Events exposing (onClick)
-import Actions exposing (..)
-
-view : Model -> Html
+view : Model -> Html Msg
 view model =
-  div [class "full-screen perspective-800"] [
-    div [class "container-fluid"] [
-      div [class "row"] [
-        appRouter model
-      ]
-    ],
-    div [
-      class ("page-overlay" ++ if model.showHeaderMenu then " is-visible" else ""),
-      onClick (ToggleHeaderMenu False)
-      ] []
-
-  ]
+  GamesList.render model
