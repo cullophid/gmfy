@@ -13,6 +13,6 @@ module.exports = (dispatch, state) -->
   {location, gameForm, games} = state
 
   router location, [
-    route /^#\/games\/?(.*)$/, (path)-> gamesListPage dispatch, {games, path}
+    route /^#\/games\/?(.*)$/, (path)-> gamesListPage dispatch, {games, location, gameForm}
     route /.*/, -> notFoundPage dispatch, state
   ]
