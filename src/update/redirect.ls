@@ -1,5 +1,5 @@
 module.exports = (url) ->
   switch url
-    when '' then '#/'
-    when '#' then '#/'
+    when '' then '#/games'
+    when '#' then '#/games'
     when _ then url

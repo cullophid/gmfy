@@ -1,0 +1,14 @@
+.page {
+  position: fixed;
+  width: 100%;
+  height: 100%;
+  bottom: 0;
+  right: 0;
+  transition: all 150ms;
+}
+
+.page-button {
+  width: 100px;
+  height: 50px;
+  padding: 10px;
+}

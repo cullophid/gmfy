@@ -1,0 +1,16 @@
+var _user$project$Model$init = {
+	ctor: '_Tuple2',
+	_0: {
+		games: _elm_lang$core$Native_List.fromArray(
+			[])
+	},
+	_1: _elm_lang$core$Platform_Cmd$none
+};
+var _user$project$Model$Game = F3(
+	function (a, b, c) {
+		return {name: a, description: b, id: c};
+	});
+var _user$project$Model$Model = function (a) {
+	return {games: a};
+};
+var _user$project$Model$NoOp = {ctor: 'NoOp'};

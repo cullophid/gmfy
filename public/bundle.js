@@ -1,1 +1,1 @@
-console.error("Error: Cannot find module './new-game' from '/Users/andreasmoller/repos/gmfy/src/view'");
+console.error("Error: Cannot find module './game' from '/Users/andreasmoller/repos/gmfy/src/view'");

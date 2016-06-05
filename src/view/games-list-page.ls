@@ -2,7 +2,6 @@
 {DIV, H3, A, P} = require '../lib/html'
 header = require './header'
 game = require './game'
-newGame = require './new-game'
 
 module.exports = (dispatch, {games, path}) -->
   console.log 'PATH', path
@@ -15,6 +14,6 @@ module.exports = (dispatch, {games, path}) -->
       DIV class: 'row',[
         DIV id: 'games-list', class: 'list-group anim-list-stagger', map (game dispatch, gameId), games
       ],
-      newGame url,
+      a class: 'fixed-bottom-right'
     ]
   ]
