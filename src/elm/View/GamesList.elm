@@ -1,13 +1,34 @@
 module View.GamesList exposing (render)
-import Html exposing (div, text, a)
-import Html.Attributes exposing (class, href)
-import View.Game as Game
 
-render {games} =
-  div [class "col-md-6 col-md-offset-3"]
-    [ div [class "row"]
-        [ div [class "list-group anim-stagger"]
-            <| List.map Game.render games
-        , a [class "fixed-bottom-right btn btn-success anim-from-right anim-delay-200", href "#/games/new"] [text "New Game"]
+import Model exposing (..)
+import Html exposing (..)
+import Html.Attributes exposing (href, class)
+import View.NewGame as NewGame
+
+render {games, location, gameForm} =
+  div [] [
+    div [class "col-md-6 col-md-offset-3"] [
+      div [class "row"] [
+        div [class "list-group anim-list-stagger"]
+          <| List.map listItem <| Debug.log "GAMES" games
+      ]
+    ],
+    NewGame.render {location = location, gameForm = gameForm}
+ ]
+
+
+listItem : Game -> Html Msg
+listItem {name, description, id} =
+  div [class "list-group-item anim-from-left"] [
+    a [href ("#/games/" ++ id ++ "/activities")] [
+      div [class "media"] [
+        div [class "media-left"] [
+          div [class "fa fa-circle-o fa-3x"] []
+        ],
+        div [class "media-body"] [
+          h3 [] [text name],
+          p [] [text description]
         ]
+      ]
     ]
+  ]

@@ -10,9 +10,13 @@ type alias Game =
   }
 
 type alias Model =
-  { games : List Game 
+  { games : List Game
+  , location: String
   }
 
 init : (Model, Cmd Msg)
 init =
-  ({games = []}, Cmd.none)
+  ( { games = []
+    , location = ""
+    }
+  , Cmd.none)
