@@ -52,6 +52,13 @@
   animation-fill-mode: forwards;
 }
 
+.anim-from-bottom {
+  transform:translateY(-150%);
+  opacity: 0;
+  animation: bottom 200ms 1;
+  animation-fill-mode: forwards;
+}
+
 .anim-scale-x {
 transform:scaleX(0);
 animation: scaleX 500ms 1;

@@ -3,6 +3,9 @@ module Model exposing (..)
 type Msg
   = NoOp
   | Location String
+  | CreateGame GameForm
+  | GameFormTitle String
+  | GameFormDescription String
 
 type alias Game =
   { name : String
