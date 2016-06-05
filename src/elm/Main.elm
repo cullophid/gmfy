@@ -1,11 +1,10 @@
-import Html exposing (Html, input, p, text, div)
-import Html.Attributes exposing (class, value)
 import Html.App as App
-import Html.Events exposing (onInput)
-import Model exposing (Model, Msg, init)
+import Ports exposing (locationUpdate)
+import Model exposing (Model, Msg(..), init)
 import Update exposing (update)
 import View exposing (view)
 
+main : Program Never
 main =
   App.program
     { init = init
@@ -14,5 +13,6 @@ main =
     , subscriptions = subscriptions
     }
 
+subscriptions : Model -> Sub Msg
 subscriptions model =
-  Sub.none
+  locationUpdate Location

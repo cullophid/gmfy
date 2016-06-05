@@ -3,17 +3,26 @@ import Model exposing (..)
 import Html exposing (..)
 import Html.Attributes exposing (class, value, type', href)
 
+render : {location: String, gameForm : GameForm} -> Html Msg
 render {location, gameForm} =
-  if location == "#/games/new"
-  then newGameForm gameForm
-  else newGameButton
+  let
+    isNewGamePage = location == "#/games/new"
+    containerClass = if isNewGamePage
+      then "bg-success page"
+      else "fixed-bottom-right btn btn-success anim-from-right"
+  in
+    div [class containerClass] [
+      if isNewGamePage
+      then newGameForm gameForm
+      else newGameButton
+    ]
 
+newGameButton : Html Msg
 newGameButton =
   a [
-    class "fixed-bottom-right btn btn-success anim-from-right anim-delay-500",
     href "#/games/new"
   ] [text "New Game"]
 
-
-newGameForm {id, name, description} =
-  div [] [text "New Game Form"]
+newGameForm : GameForm -> Html Msg
+newGameForm {name, description} =
+  text "New Game Form"

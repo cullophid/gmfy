@@ -5,6 +5,7 @@ import Html exposing (..)
 import Html.Attributes exposing (href, class)
 import View.NewGame as NewGame
 
+render : Model -> Html Msg
 render {games, location, gameForm} =
   div [] [
     div [class "col-md-6 col-md-offset-3"] [

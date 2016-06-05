@@ -18,7 +18,13 @@
   <body>
     <script src="/elm.js" charset="utf-8"></script>
     <script>
-      Elm.Main.fullscreen()
+      var app = Elm.Main.fullscreen()
+      app.ports.location = window.location.hash
+      window.addEventListener('hashchange', function (e) {
+        var hash = e.newURL.match(/(#.*)$/)[1]
+        app.ports.locationUpdate.send(hash)
+      })
+      app.ports.locationUpdate.send(window.location.hash)
     </script>
   </body>
 </html>
