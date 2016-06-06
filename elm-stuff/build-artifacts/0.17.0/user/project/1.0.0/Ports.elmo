@@ -1,1 +1,0 @@
-var _user$project$Ports$locationUpdate = _elm_lang$core$Native_Platform.incomingPort('locationUpdate', _elm_lang$core$Json_Decode$string);

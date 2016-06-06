@@ -2,15 +2,19 @@ test = require 'tape'
 gamesListPage = require './games-list-page'
 {findNode} = require '../util'
 
-test 'should render a list of games', (t) ->
-  t.plan  2
-  vdom = gamesListPage void, {games: [{name: 'game', description: 'description'}]}
-  title = findNode ((node) -> node.nodeName == 'h3'), vdom
-  description = findNode ((node) -> node.nodeName == 'p'), vdom
-  t.deepEqual title.children, ['game']
-  t.deepEqual description.children, ['description']
+test 'games-list-page should render a list of games', (t) ->
+  t.plan  1
+  vdom = gamesListPage void, {games: [{id: 'game', name: 'game', description: 'description'}]}
+  game = findNode ((node) -> node.attributes?['data-test'] == 'game'), vdom
+  t.ok game
 
-test 'should render an empty list if no games are provided', (t) ->
+test 'games-list-page should render a New Game button', (t) ->
+  t.plan  1
+  vdom = gamesListPage void, {games: [{id: 'game', name: 'game', description: 'description'}]}
+  newGame = findNode ((node) -> node.attributes?.id == 'new-game-button'), vdom
+  t.equals newGame.attributes.href, '#/games/new'
+
+test 'games-list-page should render an empty list if no games are provided', (t) ->
   t.plan  1
   vdom = gamesListPage void, {games: []}
   list = findNode ((node) -> node.attributes?.id == 'games-list'), vdom

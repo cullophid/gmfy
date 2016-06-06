@@ -1,3 +1,0 @@
-var _user$project$View$view = function (model) {
-	return _user$project$View_GamesList$render(model);
-};

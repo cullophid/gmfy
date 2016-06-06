@@ -10,7 +10,7 @@ update = (require './') commands
 
 init =
   games: []
-  location: '#/'
+  location: '#/games'
   gameForm:
     name: ''
     description: ''

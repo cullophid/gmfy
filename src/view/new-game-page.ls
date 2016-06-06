@@ -1,5 +1,6 @@
 {DIV, FORM, INPUT, LABEL, A, TEXTAREA, BUTTON} = require '../lib/html'
 {log} = require '../util'
+{formOnInput} = require '../lib/form-utils'
 header = require './header'
 {createGame, setFormField} = require '../actions'
 
@@ -7,11 +8,16 @@ onSubmit = (dispatch, form, e) -->
   e.preventDefault()
   dispatch create-game form
 
-module.exports = (dispatch, props) -->
-  {gameForm} = props
-  setField = (field, e) --> dispatch setFormField 'gameForm', field, e.target.value
+newGameButton =
+  A {
+    class: 'btn btn-success fixed-bottom-right'
+    href: '#/games/new'
+    id: 'new-game-button'
+    }, ['New Game']
+
+newGamePage = (dispatch, gameForm) -->
+  setField = formOnInput dispatch, 'gameForm'
   DIV {}, [
-    header dispatch, {title: 'New Game'}
     DIV class: 'col-md-6 col-md-offset-3', [
       FORM id: 'new-game-form', onSubmit: (onSubmit dispatch, gameForm), [
         DIV class: 'form-group anim-fold-in', [
@@ -44,3 +50,9 @@ module.exports = (dispatch, props) -->
       ]
     ]
   ]
+
+module.exports = (dispatch, {location, gameForm}) -->
+  if location == '#/games/new'
+    newGamePage dispatch, gameForm
+  else
+    newGameButton
