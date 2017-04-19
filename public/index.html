@@ -3,28 +3,25 @@
   <head>
     <title>Gmfy</title>
     <link rel="manifest" href="manifest.json">
-      <meta name="apple-mobile-web-app-capable" content="yes">
-      <meta name="mobile-web-app-capable" content="yes">
-      <meta name="theme-color" content="#3F51B5">
-      <meta name="viewport" content="width=device-width, initial-scale=1, user-scalable=no">
-      <link rel="icon" sizes="192x192" href="images/gmfy-icon-192.png">
-      <link rel="icon" sizes="128x128" href="images/gmfy-icon-128.png">
-      <link rel="apple-touch-icon" href="images/gmfy-icon-152.png">
-      <link rel="apple-touch-icon" sizes="76x76" href="images/gmfy-icon-76.png">
-      <link rel="apple-touch-icon" sizes="120x120" href="images/gmfy-icon-120.png">
-      <link rel="apple-touch-icon" sizes="152x152" href="images/gmfy-icon-152.png">
-    <link rel="stylesheet" href="bundle.css">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="mobile-web-app-capable" content="yes">
+    <meta name="theme-color" content="#3F51B5">
+    <meta name="viewport" content="width=device-width, initial-scale=1, user-scalable=no">
+    <link rel="icon" sizes="192x192" href="images/gmfy-icon-192.png">
+    <link rel="icon" sizes="128x128" href="images/gmfy-icon-128.png">
+    <link rel="apple-touch-icon" href="images/gmfy-icon-152.png">
+    <link rel="apple-touch-icon" sizes="76x76" href="images/gmfy-icon-76.png">
+    <link rel="apple-touch-icon" sizes="120x120" href="images/gmfy-icon-120.png">
+    <link rel="apple-touch-icon" sizes="152x152" href="images/gmfy-icon-152.png">
+    <link rel="stylesheet" href="/bundle.css">
+    <style>
+      .invisible { opacity: 0; }
+    </style>
   </head>
   <body>
     <script src="/elm.js" charset="utf-8"></script>
     <script>
-      var app = Elm.Main.fullscreen()
-      app.ports.location = window.location.hash
-      window.addEventListener('hashchange', function (e) {
-        var hash = e.newURL.match(/(#.*)$/)[1]
-        app.ports.locationUpdate.send(hash)
-      })
-      app.ports.locationUpdate.send(window.location.hash)
+      Elm.Main.fullscreen()
     </script>
   </body>
 </html>

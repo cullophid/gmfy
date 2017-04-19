@@ -4,15 +4,16 @@
   "main": "index.js",
   "scripts": {
     "install:elm": "elm package install -y",
-    "build:elm": "elm make src/elm/Main.elm --output public/elm.js",
-    "build:sass": "node-sass src/sass/main.scss public/bundle.css",
+    "build:elm": "elm make elm/Main.elm --output public/elm.js",
+    "build:elm:debug": "elm make elm/Main.elm --output public/elm.js --debug",
+    "build:sass": "node-sass sass/main.scss public/bundle.css",
     "build": "npm run build:sass && npm run build:elm",
-    "watch:elm": "watch 'npm run build:elm' src/elm",
-    "watch:sass": "npm run build:sass -- -w src/sass",
+    "watch:elm": "watch 'npm run build:elm:debug' elm",
+    "watch:sass": "npm run build:sass -- -w sass",
     "watch": "parallelshell 'npm run watch:elm' 'npm run watch:sass'",
     "livereload": "parallelshell 'livereload public/' 'npm run watch'",
-    "dev": "parallelshell 'npm start' 'npm run livereload'",
-    "start": "serve public"
+    "start": "node server",
+    "dev": "parallelshell 'npm start' 'npm run livereload'"
   },
   "repository": {
     "type": "git",
@@ -21,13 +22,16 @@
   "author": "",
   "license": "ISC",
   "bugs": {},
-  "dependencies": {
-    "elm": "^0.16.0",
-    "node-sass": "^3.4.2"
-  },
   "devDependencies": {
+    "elm": "^0.18.0",
+    "livereload": "^0.6.2",
+    "node-sass": "^4.5.2",
     "parallelshell": "^2.0.0",
     "serve": "^1.4.0",
-    "watch": "^0.17.1"
+    "watch": "^0.18.0"
+  },
+  "dependencies": {
+    "express": "^4.15.2",
+    "express-http-proxy": "^0.11.0"
   }
 }

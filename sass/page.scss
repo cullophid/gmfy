@@ -1,0 +1,44 @@
+.page-overlay {
+  visibility: hidden;
+  position:fixed;
+  z-index: 10;
+  height: 100%;
+  width: 100%;
+  top:0;
+  left:0;
+}
+
+.page-overlay-show {
+  visibility: visible;
+  animation: show-overlay-page 150ms 1;
+  animation-fill-mode: forwards;
+}
+
+.page-overlay-hide {
+  visibility: visible;
+  animation: hide-overlay-page 150ms 1;
+  animation-fill-mode: forwards;
+}
+
+@keyframes show-overlay-page {
+  0% {
+    opacity: 0;
+    transform: translateY(90%) translateX(90%) scale(0.1);
+  }
+  100% {
+    opacity: 1;
+    transform: translateY(0) translateX(0) scale(1);
+  }
+}
+
+@keyframes hide-overlay-page {
+  0% {
+    opacity: 1;
+    transform: translateY(0) translateX(0) scale(1);
+  }
+  100% {
+    opacity: 0;
+    transform: translateY(90%) translateX(90%) scale(0.1);
+    display: none;
+  }
+}

@@ -1,0 +1,91 @@
+@import "bootstrap/bootstrap";
+@import "fa/font-awesome";
+@import "animation";
+@import "page";
+@import "screen";
+@import "loader";
+@import "tabs";
+
+.full-screen {
+  height: 100vh;
+}
+.full-height {
+  height: 100%;
+}
+
+.min-100 {
+  min-height: 100%;
+}
+
+html {
+  overflow-x: hidden;
+}
+
+a {
+  cursor: pointer;
+}
+
+.large-gutter-top {
+  padding-top: $grid-gutter-width * 2;
+}
+.gutter-top {
+  padding-top: $grid-gutter-width / 2;
+}
+.gutter-bottom {
+  padding-bottom: $grid-gutter-width / 2;
+}
+
+.fixed-bottom-right {
+  position: fixed;
+  bottom: 20px;
+  right: 20px;
+  z-index: 1;
+}
+.fixed-bottom-left {
+  position: fixed;
+  bottom: 20px;
+  left: 20px;
+  z-index: 1;
+}
+
+.relative {
+  position: relative;
+}
+
+.space-between {
+  display: flex;
+  justify-content: space-between;
+}
+
+.flex {
+  display: flex
+}
+.flex-row {
+  display: flex;
+  flex-direction: row;
+}
+
+.flex-column {
+  display: flex;
+  flex-direction: column;
+}
+
+.flex-grow-1 {
+  flex-grow: 1;
+}
+
+.flex-grow-0 {
+  flex-grow: 0;
+}
+.floating-back-button {
+  padding: 0;
+  position: fixed;
+  bottom: 20px;
+  top: auto;
+  left: 20px;
+  z-index: 1;
+  @include media-breakpoint-up('sm') {
+    top: 20px;
+    bottom: auto;
+  }
+}

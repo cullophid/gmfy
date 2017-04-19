@@ -12,16 +12,14 @@
   </head>
   <body>
     <script>
-    var setUrl = function (state) {
-      return Object.assign({}, state, {url: window.location.hash})
-    }
-    var cached = localStorage.getItem('gmfy-state');
-    var state = cached ? setUrl(JSON.parse(cached)) : null;
-    console.log('starting state', state)
-    var gmfy = Elm.fullscreenDebug('Main', 'src/elm/Main.elm', {getStorage: state});
-    gmfy.ports.setStorage.subscribe(function(state) {
-      localStorage.setItem('gmfy-state', JSON.stringify(state));
-    });
+      console.log(Elm.Main)
+      var app = Elm.Main.fullscreenDebug()
+      app.ports.location = window.location.hash
+      window.addEventListener('hashchange', function (e) {
+        var hash = e.newURL.match(/(#.*)$/)[1]
+        app.ports.locationUpdate.send(hash)
+      })
+      app.ports.locationUpdate.send(window.location.hash)
     </script>
   </body>
 </html>
