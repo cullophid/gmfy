@@ -1,7 +1,8 @@
 module View.ActivityPage exposing (activityPage)
 
-import App exposing (Msg(..))
-import Activity exposing (Activity, ActivityMsg(..))
+import App.Data exposing (Msg(..))
+import Activity.Data exposing (Activity, ActivityMsg(..))
+import Event.Data exposing (EventMsg(..))
 import Html exposing (Html, text)
 import Bulma exposing (div)
 import Bulma.Elements exposing (button)
@@ -29,6 +30,6 @@ content_ activity =
   hero "" [
     button
       "is-primary"
-      (ActivityMsg <| CompleteActivity activity.id)
+      (EventMsg <| CompleteActivity activity.id)
       [text "Complete Activity"]
   ]

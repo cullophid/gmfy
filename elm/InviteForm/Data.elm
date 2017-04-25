@@ -1,4 +1,4 @@
-module InviteForm.Types exposing (..)
+module InviteForm.Data exposing (..)
 
 import GraphQL.Client.Http as Http
 

@@ -1,13 +1,13 @@
 module Game.Update exposing (update)
 
-import Game exposing (GameMsg(..), emptyGameForm, Game)
-import Event exposing (EventListItem)
-import App exposing (Model, Msg)
+import Game.Data exposing (GameMsg(..), emptyGameForm, Game)
+import Event.Data exposing (EventListItem)
+import App.Data exposing (Model, Msg)
 import Focus exposing (Focus, set, (=>))
 import Util exposing (title_, description_, indexWith)
 import Navigation
 import RemoteData exposing (RemoteData(..))
-import Api
+import Game.Api as Api
 
 gameForm_ : Focus {a | gameForm: b} b
 gameForm_ = Focus.create .gameForm (\f x -> {x | gameForm = f x.gameForm})
@@ -37,12 +37,3 @@ update msg model =
       ({model | game = Failure err }, Cmd.none)
     FetchGameSuccess game ->
       ({model | game = Success game }, Cmd.none)
-    CompleteActivityFail err ->
-      ({model | error = Just err}, Cmd.none)
-    CompleteActivitySuccess event ->
-      ({model | game = RemoteData.map (addEvent event) model.game}, Navigation.newUrl ("/games/" ++ event.game))
-
-
-addEvent : EventListItem -> Game -> Game
-addEvent event game =
-  {game | log = event :: game.log}

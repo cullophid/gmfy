@@ -1,6 +1,6 @@
 module Auth.Data exposing (..)
 
-import User exposing (User)
+import User.Data exposing (User)
 import Http
 
 type alias LoginForm = { email:String }

@@ -1,6 +1,6 @@
 module View.ErrorModal exposing (errorModal)
 
-import App exposing (Msg(..))
+import App.Data exposing (Msg(..))
 import Html exposing (Html, text)
 import GraphQL.Client.Http as GQL exposing (Error(..))
 import Http exposing (Error(..))

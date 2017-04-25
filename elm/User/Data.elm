@@ -1,4 +1,4 @@
-module User exposing (..)
+module User.Data exposing (..)
 
 import GraphQL.Request.Builder exposing (..)
 import Json.Decode as Decode exposing (Decoder)

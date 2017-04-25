@@ -1,5 +1,5 @@
 import View exposing (view)
-import App exposing (Model, Msg(..), emptyModel)
+import App.Data exposing (Model, Msg(..), emptyModel)
 import App.Update exposing (update)
 import Navigation exposing (Location)
 import Route.Update as Route

@@ -1,5 +1,5 @@
 module View.NotFoundPage exposing (notFoundPage)
-import App  exposing (Msg)
+import App.Data  exposing (Msg)
 import Html exposing (Html)
 import View.Header exposing (header, homeButton)
 

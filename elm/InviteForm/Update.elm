@@ -1,8 +1,8 @@
 module InviteForm.Update exposing (..)
 
-import App exposing (Model, Msg(..))
-import InviteForm.Types exposing (InviteFormMsg(..))
-import Api
+import App.Data exposing (Model, Msg(..))
+import InviteForm.Data exposing (InviteFormMsg(..))
+import InviteForm.Api as Api
 
 update : InviteFormMsg -> Model -> (Model, Cmd Msg)
 update msg model =

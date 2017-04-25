@@ -1,11 +1,11 @@
 module Activity.Update exposing (update)
-import App exposing (Model, Msg(..))
-import Activity exposing (Activity, ActivityMsg(..))
+import App.Data exposing (Model, Msg(..))
+import Activity.Data exposing (Activity, ActivityMsg(..))
 import Focus exposing (Focus, set, (=>))
 import Util exposing (title_, description_, points_)
 import RemoteData exposing (RemoteData(..))
 import Navigation
-import Api
+import Activity.Api as Api
 
 activityForm_ : Focus {a | activityForm: b} b
 activityForm_ = Focus.create .activityForm (\f x -> {x | activityForm = f x.activityForm})
@@ -21,8 +21,6 @@ update msg model =
       (set (activityForm_ => points_) points model, Cmd.none)
     SubmitActivity activityForm ->
       (model , Api.createActivity activityForm)
-    CompleteActivity activityId ->
-      (model, Api.completeActivity activityId)
     CreateActivityFail err ->
       ({model | activity = Failure err}, Cmd.none)
     CreateActivitySuccess activity ->

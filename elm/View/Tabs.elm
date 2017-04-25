@@ -2,7 +2,7 @@ module View.Tabs exposing (tabs, Tab(..))
 
 import Html exposing (Html, div, text)
 import Html.Attributes exposing (class)
-import App exposing (Msg)
+import App.Data exposing (Msg)
 import View.Link exposing (link)
 import Util exposing (indexWith)
 import Dict

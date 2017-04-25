@@ -1,7 +1,7 @@
 module User.Api exposing (..)
 
 import GraphQL.Request.Builder exposing (..)
-import User exposing (User)
+import User.Data exposing (User)
 
 user : ValueSpec NonNull ObjectType User vars
 user = object User

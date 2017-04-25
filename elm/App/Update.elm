@@ -1,11 +1,12 @@
 module App.Update exposing (update)
 
-import App exposing (Msg(..), Model)
+import App.Data exposing (Msg(..), Model)
 import Navigation
 import Route.Update as Route
 import Game.Update as Game
 import InviteForm.Update as InviteForm
 import Auth.Update as Auth
+import Event.Update as Event
 import Activity.Update as Activity
 
 update : Msg -> Model -> (Model, Cmd Msg)
@@ -34,3 +35,5 @@ update msg model =
         InviteForm.update msg model
       AuthMsg msg ->
         Auth.update msg model
+      EventMsg msg ->
+        Event.update msg model

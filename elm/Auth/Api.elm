@@ -1,9 +1,9 @@
 module Auth.Api exposing (sendAuthEmail, validateToken)
-import App exposing (Msg(..))
+import App.Data exposing (Msg(..))
 import Auth.Data exposing (AuthMsg(..))
 import Http
 import Util exposing (foldResult)
-import User exposing (userDecoder)
+import User.Data exposing (userDecoder)
 import Json.Decode exposing (string)
 import Json.Encode as Encode
 

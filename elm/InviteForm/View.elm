@@ -1,6 +1,6 @@
 module InviteForm.View exposing (invitePlayerScreen)
-import App exposing (Msg(..))
-import InviteForm.Types exposing (InviteForm, InviteFormMsg(..))
+import App.Data exposing (Msg(..))
+import InviteForm.Data exposing (InviteForm, InviteFormMsg(..))
 import Html exposing (Html, text)
 import Bulma exposing (div)
 import Bulma.Elements exposing (form, field, textInput, submit)

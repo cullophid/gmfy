@@ -2,7 +2,7 @@ module Auth.Update exposing (update)
 
 import Auth.Data exposing (AuthMsg(..))
 import Auth.Api as Api
-import App exposing (Model, Msg)
+import App.Data exposing (Model, Msg)
 import GraphQL.Client.Http exposing (Error(..))
 import RemoteData exposing (RemoteData(..))
 import Navigation

@@ -1,6 +1,6 @@
 module View.Header exposing (..)
 import Html exposing (Html,text)
-import App exposing (Msg)
+import App.Data exposing (Msg)
 import Bulma exposing (link, back, div)
 import Bulma.Elements exposing (title, icon)
 import Bulma.Grid exposing (column)

@@ -1,9 +1,7 @@
-module Activity exposing (..)
-
+module Activity.Data exposing (..)
 import GraphQL.Client.Http as Http
 import GraphQL.Request.Builder exposing (..)
 import GraphQL.Request.Builder.Variable as Var exposing (Variable)
-
 
 type alias ActivityListItem = {
   id: String,
@@ -30,7 +28,6 @@ type ActivityMsg =
     ActivityTitle String
   | ActivityDescription String
   | ActivityPoints Int
-  | CompleteActivity String
   | SubmitActivity ActivityForm
   | CreateActivityFail Http.Error
   | CreateActivitySuccess Activity

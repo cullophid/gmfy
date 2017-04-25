@@ -3,7 +3,7 @@ module Bulma exposing (..)
 import Html exposing (a, Attribute, Html)
 import Html.Events exposing (Options, onWithOptions, onClick)
 import Html.Attributes exposing (class, type_)
-import App exposing (Msg(..))
+import App.Data exposing (Msg(..))
 import Json.Decode as Decode
 
 options : Options

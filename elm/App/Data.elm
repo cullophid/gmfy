@@ -1,13 +1,14 @@
-module App exposing (Model, Msg(..), emptyModel)
+module App.Data exposing (Model, Msg(..), emptyModel)
 
-import Game exposing (Game, GameList, GameForm, GameMsg, emptyGameForm)
-import Activity exposing (ActivityListItem, Activity, ActivityForm, ActivityMsg, emptyActivityForm)
-import InviteForm.Types exposing (InviteFormMsg, InviteForm, emptyInviteForm)
-import User exposing (User, andreas)
+import Game.Data exposing (Game, GameList, GameForm, GameMsg, emptyGameForm)
+import Activity.Data exposing (ActivityListItem, Activity, ActivityForm, ActivityMsg, emptyActivityForm)
+import InviteForm.Data exposing (InviteFormMsg, InviteForm, emptyInviteForm)
+import User.Data exposing (User, andreas)
 import Auth.Data exposing (AuthMsg, LoginForm, emptyLoginForm)
+import Event.Data exposing (EventMsg)
 import RemoteData exposing (RemoteData(..))
 import Navigation exposing (Location)
-import Route exposing (Route(..))
+import Route.Data exposing (Route(..))
 import GraphQL.Client.Http as Http
 
 type alias Model = {
@@ -33,6 +34,7 @@ type Msg =
   | ActivityMsg ActivityMsg
   | InviteFormMsg InviteFormMsg
   | AuthMsg AuthMsg
+  | EventMsg EventMsg
 
 emptyModel : Model
 emptyModel = {

@@ -1,13 +1,16 @@
 module Route.Update exposing (update)
 
-import Route exposing (Route(..), parseRoute)
+import Route.Data exposing (Route(..), parseRoute)
 import Navigation exposing (Location)
-import App exposing (Model, Msg)
-import Activity exposing (emptyActivityForm)
-import Game exposing (emptyGameForm)
+import App.Data exposing (Model, Msg)
+import Activity.Data exposing (emptyActivityForm)
+import Game.Data exposing (emptyGameForm)
 import RemoteData exposing (RemoteData(..))
-import Api
-import Auth.Api as AuthApi
+import Game.Api
+import Auth.Api
+import Event.Api
+import Activity.Api
+import InviteForm.Api
 import Navigation
 
 update : Location -> Model -> (Model, Cmd Msg)
@@ -36,18 +39,18 @@ authenticatedRoutes route model =
     LoginPendingRoute ->
       (model, Cmd.none)
     LoginTokenRoute token->
-      ({model| user = Loading}, AuthApi.validateToken token)
+      ({model| user = Loading}, Auth.Api.validateToken token)
     HomeRoute ->
       (model, Navigation.modifyUrl "/games")
     GameListRoute ->
-      ({model | gameList = Loading}, Api.getGameList)
+      ({model | gameList = Loading}, Game.Api.getGameList)
     NewActivityRoute gameId ->
       ({model | activityForm = emptyActivityForm gameId}, Cmd.none)
     NewGameRoute ->
       ({model | gameForm = emptyGameForm, game = NotAsked }, Cmd.none)
     GameRoute gameId ->
-      ({model | game = Loading }, Api.getGame gameId)
+      ({model | game = Loading }, Game.Api.getGame gameId)
     InvitePlayerRoute gameId ->
       (model, Cmd.none)
     ActivityRoute activityId ->
-      ({model | activity = Loading}, Api.getActivity activityId)
+      ({model | activity = Loading}, Activity.Api.getActivity activityId)

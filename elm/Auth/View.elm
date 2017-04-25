@@ -2,7 +2,7 @@ module Auth.View exposing (loginPage, loginPendingPage)
 
 import Html exposing (Html, text)
 import Auth.Data exposing (LoginForm, AuthMsg(..))
-import App exposing (Msg(..))
+import App.Data exposing (Msg(..))
 
 import Bulma exposing (div, p)
 import Bulma.Elements exposing (form, field, textInput, submit)

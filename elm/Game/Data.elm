@@ -1,4 +1,4 @@
-module Game exposing (..)
+module Game.Data exposing (..)
 
 import GraphQL.Request.Builder exposing (..)
 import GraphQL.Request.Builder.Variable as Var exposing (Variable)
@@ -6,9 +6,9 @@ import GraphQL.Request.Builder.Variable as Var exposing (Variable)
 
 import RemoteData exposing (RemoteData)
 import GraphQL.Client.Http exposing (Error)
-import User exposing (User)
-import Activity exposing (ActivityListItem)
-import Event exposing (EventListItem)
+import User.Data as User exposing (User)
+import Activity.Data as Activity exposing (ActivityListItem)
+import Event.Data as Event exposing (EventListItem)
 
 type GameMsg =
     GameTitle String
@@ -20,8 +20,6 @@ type GameMsg =
   | FetchGameListSuccess (List GameListItem)
   | FetchGameFail Error
   | FetchGameSuccess Game
-  | CompleteActivityFail Error
-  | CompleteActivitySuccess EventListItem
 
 type alias GameList = RemoteData Error (List GameListItem)
 
