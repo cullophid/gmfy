@@ -1,9 +1,34 @@
 module View.ActivityPage exposing (activityPage)
 
-import App exposing (Msg)
-import Route exposing (Route(..))
-import Activity exposing (Activities)
-import Html exposing (Html, div)
+import App exposing (Msg(..))
+import Activity exposing (Activity, ActivityMsg(..))
+import Html exposing (Html, text)
+import Bulma exposing (div)
+import Bulma.Elements exposing (button)
+import Bulma.Layout exposing (hero)
+import RemoteData exposing (RemoteData(..))
+import GraphQL.Client.Http as Http
+import View.Loader exposing (loadingScreen)
+import View.Header exposing (header, backButton)
+import View.NotFoundPage exposing(notFoundPage)
 
-activityPage : Route -> Activities -> Html Msg
-activityPage route activities = div [] []
+activityPage : RemoteData Http.Error Activity -> Html Msg
+activityPage activity =
+  case activity of
+    NotAsked -> div "" []
+    Loading -> loadingScreen "Fetching Activity"
+    Failure err -> notFoundPage
+    Success activity ->
+      div "" [
+      header "is-primary" activity.title backButton,
+      content_ activity
+    ]
+
+content_ : Activity -> Html Msg
+content_ activity =
+  hero "" [
+    button
+      "is-primary"
+      (ActivityMsg <| CompleteActivity activity.id)
+      [text "Complete Activity"]
+  ]

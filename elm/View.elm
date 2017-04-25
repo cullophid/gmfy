@@ -1,29 +1,57 @@
 module View exposing (view)
 import App exposing (Model, Msg)
-import Html exposing (div, Html)
+import User exposing (User)
+import Html exposing (Html, text)
+import Bulma exposing (div)
+import Route exposing (Route(..))
 import View.GamesListPage exposing (gamesListPage)
 import View.GamePage exposing (gamePage)
-import View.GameFormPage exposing (gameFormPage)
-import View.ActivityFormPage exposing (activityFormPage)
+import View.NewGamePage exposing (newGamePage)
+import View.NewActivityPage exposing (newActivityPage)
 import View.ActivityPage exposing (activityPage)
+import View.NotFoundPage exposing (notFoundPage)
+import View.ErrorModal  exposing (errorModal)
+import RemoteData exposing (RemoteData(..))
+import View.Loader exposing (loadingScreen)
+import InviteForm.View exposing (invitePlayerScreen)
+import Auth.View exposing (loginPage, loginPendingPage)
 
 view : Model -> Html Msg
 view model =
   let
-    { games,
-      activities,
+    { gameList,
+      loginForm,
+      game,
+      user,
+      error,
+      activity,
       route,
       history,
+      inviteForm,
       gameForm,
-      activityForm,
-      events
+      activityForm
     } = model
-    hash = Maybe.withDefault "#Activities" <| Maybe.map .hash <| List.head history
   in
-    div [] [
-      gamesListPage route games,
-      gamePage route hash games activities events,
-      gameFormPage route gameForm,
-      activityFormPage route activityForm,
-      activityPage route activities
+    div "main" [
+      errorModal error,
+      case route of
+        LoginRoute ->
+          loginPage loginForm
+        LoginPendingRoute ->
+          loginPendingPage
+        GameListRoute ->
+          gamesListPage gameList
+        GameRoute _ ->
+          gamePage {user = user, game = game}
+        NewGameRoute ->
+          newGamePage game gameForm
+        NewActivityRoute _->
+          newActivityPage activityForm
+        ActivityRoute _ ->
+          activityPage activity
+        InvitePlayerRoute gameId ->
+          invitePlayerScreen {gameId = gameId, inviteForm = inviteForm}
+        NotFound ->
+          notFoundPage
+        _ -> div "" []
     ]

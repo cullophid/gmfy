@@ -1,25 +1,28 @@
 module Activity exposing (..)
 
-import Json.Encode as Encode
-import Json.Decode exposing (Decoder, field, string, int, map5)
+import GraphQL.Client.Http as Http
+import GraphQL.Request.Builder exposing (..)
+import GraphQL.Request.Builder.Variable as Var exposing (Variable)
 
-import RemoteData exposing (WebData)
-import Dict exposing (Dict)
-import Http
 
-type alias Activities = WebData (Dict String Activity)
-
+type alias ActivityListItem = {
+  id: String,
+  title: String,
+  description: String,
+  points: Int
+}
 type alias Activity = {
   id: String,
   title: String,
   description: String,
-  game: String,
+  game: { id: String },
   points: Int
 }
 
 type alias ActivityForm = {
   title : String,
   description: String,
+  game: String,
   points: Int
   }
 
@@ -28,33 +31,40 @@ type ActivityMsg =
   | ActivityDescription String
   | ActivityPoints Int
   | CompleteActivity String
-  | SubmitActivity String ActivityForm
+  | SubmitActivity ActivityForm
   | CreateActivityFail Http.Error
   | CreateActivitySuccess Activity
-  | FetchActivitiesFail Http.Error
-  | FetchActivitiesSuccess (List Activity)
+  | GetActivityFail Http.Error
+  | GetActivitySuccess Activity
 
-activityDecoder : Decoder Activity
-activityDecoder = map5 Activity
-  (field "id" string)
-  (field "title" string)
-  (field "description" string)
-  (field "game" string)
-  (field "points" int)
-
-
-
-emptyActivityForm : ActivityForm
-emptyActivityForm = {
+emptyActivityForm : String -> ActivityForm
+emptyActivityForm game = {
   title = "",
   description = "",
+  game = game,
   points = 10
   }
 
-encodeActivityForm : ActivityForm -> Encode.Value
-encodeActivityForm activityForm =
-  Encode.object [
-    ("title", Encode.string activityForm.title),
-    ("description", Encode.string activityForm.description),
-    ("points", Encode.int activityForm.points)
+activitySpec : ValueSpec NonNull ObjectType Activity vars
+activitySpec = object Activity
+  |> with (field "id" [] string)
+  |> with (field "title" [] string)
+  |> with (field "description" [] string)
+  |> with (field "game" [] (object (\id -> {id = id}) |> with (field "id" [] string)))
+  |> with (field "points" [] int)
+
+activityListItemSpec : ValueSpec NonNull ObjectType ActivityListItem vars
+activityListItemSpec = object ActivityListItem
+  |> with (field "id" [] string)
+  |> with (field "title" [] string)
+  |> with (field "description" [] string)
+  |> with (field "points" [] int)
+
+activityFormVar: Variable {b| activityForm: ActivityForm}
+activityFormVar = Var.required "activityForm" .activityForm
+  <| Var.object "ActivityForm" [
+    Var.field "title" .title Var.string,
+    Var.field "description" .description Var.string,
+    Var.field "game" .game Var.string,
+    Var.field "points" .points Var.int
   ]

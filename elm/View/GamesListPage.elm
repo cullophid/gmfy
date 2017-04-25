@@ -1,34 +1,42 @@
 module View.GamesListPage exposing (gamesListPage)
-import Html exposing (Html, div, h1, h3, p, text)
+import Html exposing (Html, h1, h3, p, text, i, span)
 import Html.Attributes exposing (class, href)
 import App exposing (Msg)
-import Route exposing (Route(..))
 import RemoteData exposing (RemoteData(..))
-import Game exposing (Game, Games)
-import View.Link exposing (link)
-import Dict exposing (Dict)
+import Game exposing (GameListItem, GameList)
+import Bulma exposing (link, div)
+import Bulma.Components exposing (card, cardContent)
+import Bulma.Layout exposing (container)
+import Bulma.Grid exposing (column)
 import View.Loader exposing (loadingScreen)
+import View.Header exposing (header, homeButton)
 
-gamesListPage : Route -> Games -> Html Msg
-gamesListPage location games =
-  div [class "col-md-6 col-md-offset-3 large-gutter-top"] [
-    h1 [] [text "Games"],
+
+gamesListPage : GameList -> Html Msg
+gamesListPage games =
+  div "" [
+    header "is-primary" "Games" homeButton,
     case games of
       Loading -> loadingScreen "Loading Games"
       Success games ->
-        div [class "anim-list-stagger"]
-          <| List.map listGame <| Dict.values games
-      _ -> div [] [],
-      link "/games/new"
-         [ class "fixed-bottom-right btn btn-success" ]
-         [ text "New Game"]
+        container "" [
+          column "" <| List.map listGame games
+        ]
+      _ -> div "" [],
+      link  "button is-primary fixed-bottom-right" "/games/new" [
+        text "New Game"
+      ]
   ]
 
-listGame : Game -> Html Msg
+listGame : GameListItem -> Html Msg
 listGame {id, title, description} =
-  div [class "anim-fold-in card card-block bg-white"] [
-    link ("/games/" ++ id ) [] [
-      h3 [] [text title],
-      p [] [text description]
+  column "anim-fold-in" [
+    link  "" ("/games/" ++ id) [
+      card "" [
+        cardContent "" [
+          h3 [class "title is-4"] [text title],
+          p [] [text description]
+        ]
+      ]
     ]
   ]

@@ -1,111 +1,92 @@
 module View.GamePage exposing (gamePage)
-import Html exposing (Html, div, h1, text, p, span, h3)
-import Html.Attributes exposing (class, href)
-import Html.Events exposing (onClick)
+import Html exposing (Html, text)
+import GraphQL.Client.Http as Http
 import RemoteData exposing (RemoteData(..))
-import Game exposing (Game, Games)
+import Game exposing (Game, GameMsg(..))
+import User exposing (User)
+import Event exposing (EventListItem)
 import App exposing (Msg(..))
-import Route exposing (Route(..))
-import Activity exposing (Activity, Activities, ActivityMsg(..))
-import Event exposing (Event, Events, EventMsg(..), EventType(..))
-import View.Link exposing (link, back)
+import Activity exposing (ActivityListItem, ActivityMsg(..))
+import Bulma exposing (link, back, div, p, span)
+import Bulma.Elements exposing (title, tag, table, thead, tbody, th, tr, td, button, form)
+import Bulma.Components exposing (card, cardContent, modal)
+import Bulma.Layout exposing (container, hero, section, heading)
+import Bulma.Grid exposing (column)
 import View.Loader exposing (loader)
-import View.Tabs exposing (tabs, Tab(..))
-import Dict exposing (Dict)
+import View.Header exposing (header, backButton)
+import View.NotFoundPage exposing(notFoundPage)
 
-gamePage : Route -> String -> Games -> Activities -> Events -> Html Msg
-gamePage route hash games activities events =
-  let
-    selectedTab = String.dropLeft 1 hash
-  in
-    case route of
-      GameRoute gameId ->
-        let
-          game = RemoteData.toMaybe games |> Maybe.andThen (Dict.get gameId)
-        in
-          gamePageContent game selectedTab activities events
-      _ -> div [class "screen screen-hide"] []
+type alias Props = {
+  game: RemoteData Http.Error Game,
+  user: RemoteData Http.Error User
+}
 
-gamePageContent : Maybe Game -> String -> Activities -> Events -> Html Msg
-gamePageContent game selectedTab activities events =
-  case game of
-    Nothing -> div [] []
-    Just {title, description, id} ->
-      div [class "screen bg-gray-lighter"] [
-        div [class "col-md-6 col-md-offset-3 large-gutter-top gutter-bottom"] [
-          h1 [] [text title],
-          p [] [text description],
-          userScore events activities "4f496a48-8ad1-414c-b56d-f70b11fb472b"
-        ],
-        tabs selectedTab [
-          Tab "Activities" <| div [class "col-md-6 col-md-offset-3 gutter-top gutter-bottom"] [
-            activitiesList activities
-          ],
-          Tab "Events" <| div [class "col-md-6 col-md-offset-3 gutter-top gutter-bottom"] [
-            eventList events
-          ]
-        ],
-        back [class "btn btn-white-outline floating-back-button"] [
-          span [class "fa fa-arrow-left"] []
-        ],
-        link ("/games/" ++ id ++ "/activities/new") [
-            class "fixed-bottom-right btn btn-success"
-          ]
-          [ text "New Activity"]
-      ]
-
-eventList : Events -> Html Msg
-eventList events =
-  let
-    event {eventType, user, activity, time} =
-      div [class "anim-fold-in card card-block bg-white"] [
-        h3 [] [text (toString eventType), text " : ", text activity],
-        p [] [text user],
-        p [] [text (toString time)]
-      ]
-  in
-    case events of
+gamePage : Props -> Html Msg
+gamePage props =
+    case RemoteData.map2 (,) props.game props.user of
       Loading -> loader
-      Success events ->
-        div [class "anim-list-stagger"]
-          <| List.map event <| Dict.values events
-      _ -> div [] []
+      Failure err -> notFoundPage
+      Success (game, user) ->
+        content_ {props | game = game, user = user}
+      _ -> div "" []
 
-activitiesList : Activities -> Html Msg
-activitiesList activities =
-  case activities of
-    Loading -> loader
-    Success activities ->
-      div [class "anim-list-stagger"]
-        <| List.map activity <| Dict.values activities
-    _ -> div [] []
-
-
-activity : Activity -> Html Msg
-activity {title, description, id} =
-  div [
-      class "anim-fold-in card card-block bg-white",
-      onClick (ActivityMsg <| CompleteActivity id)
-
-    ] [
-    h3 [] [text title],
-    p [] [text description]
+content_ : {game: Game, user:User} -> Html Msg
+content_ {user, game} =
+  div "" [
+    header "is-primary" game.title backButton,
+    section "" [
+      container "" [
+        heading "" [
+          title "is-4" [text "Players"]
+        ],
+        table "" [
+          thead "" [
+            tr "" [
+              th "" [text "Name"],
+              th "" [text "Score"]
+            ]
+          ],
+          tbody "" <| List.map (playerScoreRow game.log) game.players
+        ],
+        link "button is-primary" ("/games/" ++ game.id ++ "/invite") [
+          text "Invite Player"
+        ]
+      ]
+    ],
+    section "" [
+      container "" [
+        heading "" [
+          title "is-4" [text "Activities"]
+        ],
+        column "" <| List.map activity game.activities,
+        link
+          "button is-primary"
+          ("/games/" ++ game.id ++ "/activities/new")
+        [ text "New Activity"]
+      ]
+    ]
   ]
 
-userScore : Events -> Activities -> String -> Html Msg
-userScore events activities userId =
-  case RemoteData.map2 (,) events activities of
-    Loading -> loader
-    Success (events, activities) ->
-      p [] [text "User Score: ", text <| toString <| calculateScore events activities userId]
-    _ -> div [] []
+activity : ActivityListItem -> Html Msg
+activity activity =
+  link
+    "column"
+    ("/activities/" ++ activity.id)
+  [
+    card "anim-fold-in" [
+      cardContent "" [
+        title "" [text activity.title],
+        p "" [text activity.description]
+      ]
+    ]
+  ]
 
-calculateScore : Dict String Event -> Dict String Activity -> String -> Int
-calculateScore events activities userId =
+playerScoreRow : List EventListItem -> User -> Html Msg
+playerScoreRow log user =
   let
-      getEventScore = Maybe.withDefault 0 << (\{activity} -> Maybe.map .points <| Dict.get activity activities)
+    score = List.foldl (+) 0 <| List.map .score <| List.filter (\{player} -> player == user.id) log
   in
-
-    List.filter (\{user, eventType} -> user == userId && eventType == ActivityCompleted) (Dict.values events)
-      |> List.map getEventScore
-      |> List.foldl (+) 0
+    tr "" [
+      td "" [ text <| user.firstName ++ " " ++ user.lastName ],
+      td "" [text <| toString score]
+    ]

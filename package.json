@@ -24,6 +24,7 @@
   "bugs": {},
   "devDependencies": {
     "elm": "^0.18.0",
+    "elm-test": "^0.18.2",
     "livereload": "^0.6.2",
     "node-sass": "^4.5.2",
     "parallelshell": "^2.0.0",
@@ -31,6 +32,8 @@
     "watch": "^0.18.0"
   },
   "dependencies": {
+    "body-parser": "^1.17.1",
+    "bulma": "^0.4.0",
     "express": "^4.15.2",
     "express-http-proxy": "^0.11.0"
   }

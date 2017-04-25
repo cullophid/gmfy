@@ -1,91 +1,41 @@
-@import "bootstrap/bootstrap";
 @import "fa/font-awesome";
-@import "animation";
-@import "page";
-@import "screen";
+@import "bulma/utilities/all";
+@import "bulma/base/all";
+@import "bulma/components/all";
+@import "bulma/elements/all";
+@import "bulma/grid/all";
+@import "bulma/layout/all";
+
 @import "loader";
-@import "tabs";
+@import "animation";
+@import "screen";
 
-.full-screen {
-  height: 100vh;
+.main {
+  perspective: 800px;
+  min-height: 100vh;
 }
-.full-height {
-  height: 100%;
-}
-
-.min-100 {
-  min-height: 100%;
-}
-
-html {
-  overflow-x: hidden;
-}
-
-a {
-  cursor: pointer;
-}
-
-.large-gutter-top {
-  padding-top: $grid-gutter-width * 2;
-}
-.gutter-top {
-  padding-top: $grid-gutter-width / 2;
-}
-.gutter-bottom {
-  padding-bottom: $grid-gutter-width / 2;
+.fit-page {
+  min-height: 100vh;
 }
 
 .fixed-bottom-right {
+  bottom: 50px;
   position: fixed;
-  bottom: 20px;
-  right: 20px;
-  z-index: 1;
-}
-.fixed-bottom-left {
-  position: fixed;
-  bottom: 20px;
-  left: 20px;
-  z-index: 1;
+  right: 50px;
 }
 
-.relative {
-  position: relative;
-}
+.bg-grey-darkest { background-color: $grey-darkest; }
+.bg-grey-darker { background-color: $grey-darker; }
+.bg-grey-dark { background-color: $grey-dark; }
+.bg-grey { background-color: $grey; }
+.bg-grey-light { background-color: $grey-light; }
+.bg-grey-lighter { background-color: $grey-lighter; }
+.bg-grey-lightest { background-color: $grey-lightest; }
 
-.space-between {
-  display: flex;
-  justify-content: space-between;
-}
-
-.flex {
-  display: flex
-}
-.flex-row {
-  display: flex;
-  flex-direction: row;
-}
-
-.flex-column {
-  display: flex;
-  flex-direction: column;
-}
-
-.flex-grow-1 {
-  flex-grow: 1;
-}
-
-.flex-grow-0 {
-  flex-grow: 0;
-}
-.floating-back-button {
-  padding: 0;
-  position: fixed;
-  bottom: 20px;
-  top: auto;
-  left: 20px;
-  z-index: 1;
-  @include media-breakpoint-up('sm') {
-    top: 20px;
-    bottom: auto;
-  }
-}
+.text-grey-darkest { color: $grey-darkest; }
+.text-grey-darker { color: $grey-darker; }
+.text-grey-dark { color: $grey-dark; }
+.text-grey { color: $grey; }
+.text-grey-light { color: $grey-light; }
+.text-grey-lighter { color: $grey-lighter; }
+.text-grey-lightest { color: $grey-lightest; }

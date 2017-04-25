@@ -1,8 +1,8 @@
 import View exposing (view)
 import App exposing (Model, Msg(..), emptyModel)
-import Update.App exposing (update)
+import App.Update exposing (update)
 import Navigation exposing (Location)
-import Update.Route as Route
+import Route.Update as Route
 
 main : Program Never Model Msg
 main =

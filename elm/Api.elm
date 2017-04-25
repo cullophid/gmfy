@@ -1,49 +1,81 @@
 module Api exposing (..)
-import Http
-import Json.Decode exposing (Decoder, list)
-import Game exposing (Game, GameForm, GameMsg(..), encodeGameForm, gameDecoder)
-import Activity exposing (ActivityForm, ActivityMsg(..), encodeActivityForm, activityDecoder)
-import Event exposing (Event, EventMsg(..), eventDecoder, encodeEvent)
+
+import GraphQL.Request.Builder exposing (..)
+import GraphQL.Request.Builder.Arg exposing (Value, variable)
+import GraphQL.Request.Builder.Variable as Var exposing (Variable)
+import GQL
+import Game exposing (GameForm, GameListItem, Game, GameMsg(..), gameSpec, gameListItemSpec, gameFormVar)
+import InviteForm.Types exposing (InviteForm, InviteFormMsg(..))
+import Event exposing (Event, eventListItemSpec)
+import Activity exposing (ActivityMsg(..), Activity, ActivityForm, activitySpec, activityFormVar)
 import App exposing (Msg(..))
 import Util exposing (foldResult)
 
 
-send : (a -> Msg) -> (Http.Error -> a) -> (res -> a) -> Http.Request res -> Cmd Msg
-send msg fail success req =
-  Http.send (foldResult (msg << fail) (msg << success)) req
+idVar : Value {a| id : String}
+idVar = variable <| Var.required "id" .id Var.id
 
+emailVar : Value {a| email : String}
+emailVar = variable <| Var.required "email" .email Var.string
 
-createGame : GameForm -> Cmd Msg
-createGame game =
+getGame : String -> Cmd Msg
+getGame gameId =
   let
-      body = Http.jsonBody <| encodeGameForm game
+    gameRequest=
+      extract (field "game" [("id", idVar)] gameSpec)
   in
-    send GameMsg CreateGameFail CreateGameSuccess <| Http.post "/api/games" body gameDecoder
+    GQL.sendQuery gameRequest {id = gameId}
+      |> Cmd.map (GameMsg << foldResult FetchGameFail FetchGameSuccess)
 
 getGameList : Cmd Msg
 getGameList =
-  send GameMsg FetchGamesFail FetchGamesSuccess <| Http.get "/api/games" (list gameDecoder)
-
-
-createActivity : String -> ActivityForm -> Cmd Msg
-createActivity gameId activity =
   let
-      body = Http.jsonBody <| encodeActivityForm activity
+    gameListRequest =
+      extract (field "games" [] (list gameListItemSpec))
   in
-    send ActivityMsg CreateActivityFail CreateActivitySuccess
-      <| Http.post ("/api/games/" ++ gameId ++ "/activities") body activityDecoder
+    GQL.sendQuery gameListRequest {}
+      |> Cmd.map (GameMsg << foldResult FetchGameListFail FetchGameListSuccess)
 
-getGameActivities : String -> Cmd Msg
-getGameActivities gameId =
-  send ActivityMsg FetchActivitiesFail FetchActivitiesSuccess
-    <| Http.get ("/api/games/" ++ gameId ++ "/activities") <| list activityDecoder
+createGame : GameForm -> Cmd Msg
+createGame gameForm =
+  let
+    createGameRequest =
+      extract (field "createGame" [ ("gameForm", variable gameFormVar)] gameSpec)
+  in
+    GQL.sendMutation createGameRequest {gameForm = gameForm}
+      |> Cmd.map (GameMsg << foldResult CreateGameFail CreateGameSuccess)
 
-getGameEvents : String -> Cmd Msg
-getGameEvents gameId =
-  send EventMsg FetchEventsFail FetchEventsSuccess
-    <| Http.get ("/api/games/" ++ gameId ++ "/events") <| list eventDecoder
+createActivity : ActivityForm -> Cmd Msg
+createActivity activityForm =
+  extract (field "createActivity" [ ("activityForm", variable activityFormVar)] activitySpec)
+    |> flip GQL.sendMutation {activityForm = activityForm}
+    |> Cmd.map (ActivityMsg << foldResult CreateActivityFail CreateActivitySuccess)
+
+
+getActivity : String -> Cmd Msg
+getActivity activityId =
+  let
+    getActivityRequest =
+      extract (field "activity" [("id", idVar)] activitySpec)
+  in
+    GQL.sendQuery getActivityRequest {id = activityId}
+      |> Cmd.map (ActivityMsg << foldResult GetActivityFail GetActivitySuccess)
+
 
 completeActivity : String -> Cmd Msg
 completeActivity activityId =
-  send EventMsg CreateEventFail CreateEventSuccess
-    <| Http.post ("/api/activities/" ++ activityId ++ "/complete") Http.emptyBody eventDecoder
+  let
+    completeActivityRequest =
+      extract (field "completeActivity" [("id", idVar)] eventListItemSpec)
+  in
+    GQL.sendMutation completeActivityRequest {id = activityId}
+      |> Cmd.map (GameMsg << foldResult CompleteActivityFail CompleteActivitySuccess)
+
+invitePlayer : String -> String -> Cmd Msg
+invitePlayer gameId email =
+  let
+    mutation =
+      extract (field "invitePlayer" [("gameId", idVar), ("email", emailVar)] string)
+  in
+    GQL.sendMutation mutation {email = email, id = gameId}
+      |> Cmd.map (InviteFormMsg << foldResult InvitePlayerFail InvitePlayerSuccess)

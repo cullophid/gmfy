@@ -1,34 +1,43 @@
 .anim-list-stagger > * {
-  &:nth-child(2) {
+  &:nth-child(1) {
     animation-delay: 50ms;
   }
-  &:nth-child(3) {
+  &:nth-child(2) {
     animation-delay: 100ms;
   }
-  &:nth-child(4) {
+  &:nth-child(3) {
     animation-delay: 150ms;
   }
-  &:nth-child(5) {
+  &:nth-child(4) {
     animation-delay: 200ms;
   }
-  &:nth-child(6) {
+  &:nth-child(5) {
     animation-delay: 250ms;
   }
-  &:nth-child(7) {
+  &:nth-child(6) {
     animation-delay: 300ms;
   }
-  &:nth-child(8) {
+  &:nth-child(7) {
     animation-delay: 350ms;
   }
-  &:nth-child(9) {
+  &:nth-child(8) {
     animation-delay: 400ms;
   }
-  &:nth-child(10) {
+  &:nth-child(9) {
     animation-delay: 450ms;
   }
-  &:nth-child(11) {
+  &:nth-child(10) {
     animation-delay: 500ms;
   }
+  &:nth-child(11) {
+    animation-delay: 550ms;
+  }
+}
+
+.anim-zoom-bottom-right {
+  opacity: 0;
+  animation: zoom-bottom-right 300ms 1;
+  animation-fill-mode: forwards;
 }
 
 .anim-from-left {
@@ -158,6 +167,17 @@ animation-direction: reverse;
   }
   100% {
     opacity: 0;
+  }
+}
+
+@keyframes zoom-bottom-right {
+  0% {
+    opacity: 0;
+    transform: scale(0.1) translate(100%, 100%);
+  }
+  100% {
+    opacity: 1;
+    transform: scale(1) translate(0, 0);
   }
 }
 

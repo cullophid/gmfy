@@ -1,49 +1,71 @@
-module Game exposing (Game, GameForm, Games, GameMsg(..), emptyGame, emptyGameForm, gameDecoder, encodeGameForm)
+module Game exposing (..)
 
-import Json.Decode as Decode exposing (Decoder, field, string, list, map2, map4)
-import Json.Encode as Encode
-import RemoteData exposing (WebData)
-import Dict exposing (Dict)
-import Http
+import GraphQL.Request.Builder exposing (..)
+import GraphQL.Request.Builder.Variable as Var exposing (Variable)
+
+
+import RemoteData exposing (RemoteData)
+import GraphQL.Client.Http exposing (Error)
+import User exposing (User)
+import Activity exposing (ActivityListItem)
+import Event exposing (EventListItem)
 
 type GameMsg =
     GameTitle String
   | GameDescription String
   | SubmitGame GameForm
   | CreateGameSuccess Game
-  | CreateGameFail Http.Error
-  | FetchGamesFail Http.Error
-  | FetchGamesSuccess (List Game)
+  | CreateGameFail Error
+  | FetchGameListFail Error
+  | FetchGameListSuccess (List GameListItem)
+  | FetchGameFail Error
+  | FetchGameSuccess Game
+  | CompleteActivityFail Error
+  | CompleteActivitySuccess EventListItem
 
-type alias Games = WebData (Dict String Game)
+type alias GameList = RemoteData Error (List GameListItem)
 
 type alias Game = {
   id: String,
   title: String,
   description: String,
-  users: List String
+  players: List User,
+  activities: List ActivityListItem,
+  log: List EventListItem
   }
+
+type alias GameListItem = {
+  id: String,
+  title: String,
+  description: String
+}
 
 type alias GameForm = {
   title: String,
   description: String
   }
 
+gameSpec : ValueSpec NonNull ObjectType Game vars
+gameSpec = object Game
+  |> with (field "id" [] string)
+  |> with (field "title" [] string)
+  |> with (field "description" [] string)
+  |> with (field "players" [] (list User.userSpec))
+  |> with (field "activities" [] (list Activity.activityListItemSpec))
+  |> with (field "log" [] (list Event.eventListItemSpec))
 
-emptyGame : Game
-emptyGame = {
-  id = "",
-  title = "",
-  description = "",
-  users = []
-  }
+gameListItemSpec : ValueSpec NonNull ObjectType GameListItem vars
+gameListItemSpec = object GameListItem
+  |> with (field "id" [] string)
+  |> with (field "title" [] string)
+  |> with (field "description" [] string)
 
-gameDecoder : Decoder Game
-gameDecoder = map4 Game
-  (field "id" string)
-  (field "title" string)
-  (field "description" string)
-  (field "users" (list string))
+gameFormVar: Variable {b| gameForm: GameForm}
+gameFormVar = Var.required "game" .gameForm
+  <| Var.object "GameForm" [
+    Var.field "title" .title Var.string,
+    Var.field "description" .description Var.string
+  ]
 
 
 emptyGameForm : GameForm
@@ -51,10 +73,3 @@ emptyGameForm = {
   title = "",
   description = ""
   }
-
-encodeGameForm : GameForm -> Encode.Value
-encodeGameForm gameForm =
-  Encode.object [
-    ("title", Encode.string gameForm.title),
-    ("description", Encode.string gameForm.description)
-  ]

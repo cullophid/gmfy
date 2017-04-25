@@ -1,35 +1,38 @@
 module App exposing (Model, Msg(..), emptyModel)
 
-import Game exposing (Game, Games, GameForm, GameMsg, emptyGameForm)
-import Activity exposing (Activity, Activities, ActivityForm, ActivityMsg, emptyActivityForm)
-import Event exposing (EventMsg, Event, Events)
+import Game exposing (Game, GameList, GameForm, GameMsg, emptyGameForm)
+import Activity exposing (ActivityListItem, Activity, ActivityForm, ActivityMsg, emptyActivityForm)
+import InviteForm.Types exposing (InviteFormMsg, InviteForm, emptyInviteForm)
 import User exposing (User, andreas)
-import RemoteData exposing (WebData)
+import Auth.Data exposing (AuthMsg, LoginForm, emptyLoginForm)
+import RemoteData exposing (RemoteData(..))
 import Navigation exposing (Location)
 import Route exposing (Route(..))
-import Http
-
+import GraphQL.Client.Http as Http
 
 type alias Model = {
-  user: WebData User,
+  user: RemoteData Http.Error User,
   route: Route,
   error: Maybe Http.Error,
   gameForm : GameForm,
+  loginForm: LoginForm,
   activityForm : ActivityForm,
-  games : Games,
-  events: Events,
-  activities: Activities,
-  history : List Location
+  gameList : GameList,
+  game: RemoteData Http.Error Game,
+  activity: RemoteData Http.Error Activity,
+  history : List Location,
+  inviteForm: InviteForm
   }
-
 
 type Msg =
     UrlChange Navigation.Location
+  | ClearError
   | Navigate String
   | Back
   | GameMsg GameMsg
   | ActivityMsg ActivityMsg
-  | EventMsg EventMsg
+  | InviteFormMsg InviteFormMsg
+  | AuthMsg AuthMsg
 
 emptyModel : Model
 emptyModel = {
@@ -37,9 +40,11 @@ emptyModel = {
   route = GameListRoute,
   error = Nothing,
   gameForm = emptyGameForm,
-  events = RemoteData.NotAsked,
-  activityForm = emptyActivityForm,
-  games = RemoteData.NotAsked,
-  activities = RemoteData.NotAsked,
-  history = []
+  loginForm = emptyLoginForm,
+  activityForm = emptyActivityForm "",
+  gameList = RemoteData.NotAsked,
+  game = RemoteData.NotAsked,
+  activity = RemoteData.NotAsked,
+  history = [],
+  inviteForm = emptyInviteForm
   }
