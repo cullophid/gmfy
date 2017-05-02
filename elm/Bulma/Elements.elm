@@ -2,9 +2,36 @@ module Bulma.Elements exposing (..)
 
 import Bulma.Util exposing (BasicComponent, basicDiv)
 import Html exposing (Html, text)
-import Html.Events exposing (onClick, onSubmit, onInput)
-import Html.Attributes exposing (class, type_, value)
+import Html.Events exposing (Options, onWithOptions, onClick, onSubmit, onInput)
+import Html.Attributes exposing (class, type_, value, src)
 import String exposing (toInt)
+import Json.Decode as Decode
+import Msg exposing (Msg(..))
+
+options : Options
+options = { stopPropagation = True , preventDefault = True }
+
+link : String -> String -> List (Html Msg) -> Html Msg
+link classes href children =
+  let
+    clickHandler = onWithOptions "click" options (Decode.succeed <| NewUrl href)
+  in
+    Html.a [class classes, clickHandler] children
+
+back : String -> List (Html Msg) -> Html Msg
+back classes children =
+  let
+    options = { stopPropagation = True , preventDefault = True }
+    click = onWithOptions "click" options (Decode.succeed <| Back)
+  in
+    Html.a [class classes, click] children
+
+sublink : String -> String -> List (Html Msg) -> Html Msg
+sublink classes href children =
+  let
+    clickHandler = onWithOptions "click" options (Decode.succeed <| ModifyUrl href)
+  in
+    Html.a [class classes, clickHandler] children
 
 notification : String -> msg -> List (Html msg) -> Html msg
 notification classes onClose children =
@@ -20,8 +47,11 @@ icon classes iconClasses=
   ]
 
 button: String -> msg -> List (Html msg) -> Html msg
-button classes handler children =
-  Html.button [class ("button " ++ classes), onClick handler] children
+button classes msg children =
+  let
+      clickHandler = onWithOptions "click" options (Decode.succeed <| msg)
+  in
+    Html.button [class ("button " ++ classes), clickHandler] children
 
 form: String -> msg -> List (Html msg) -> Html msg
 form classes msg children =
@@ -34,6 +64,10 @@ submit classes children =
 title: BasicComponent msg
 title classes children =
   Html.h1 [class ("title " ++ classes)] children
+
+subtitle: BasicComponent msg
+subtitle classes children =
+  Html.p [class ("subtitle " ++ classes)] children
 
 tag: BasicComponent msg
 tag classes children =
@@ -95,3 +129,12 @@ numberInput classes val msg =
 textArea : String -> String -> (String -> msg) -> Html msg
 textArea classes val msg =
   Html.textarea [value val, onInput msg, class ("textarea" ++ classes)] []
+
+image : String -> String -> Html msg
+image classes src_ =
+  Html.figure [class ("image " ++ classes)] [
+    Html.img [src src_] []
+  ]
+
+scrollpane classes children =
+  Html.div [class ("scrollpane " ++ classes)] children

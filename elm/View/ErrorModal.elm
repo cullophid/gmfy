@@ -1,6 +1,6 @@
 module View.ErrorModal exposing (errorModal)
 
-import App.Data exposing (Msg(..))
+import Msg exposing (Msg(..))
 import Html exposing (Html, text)
 import GraphQL.Client.Http as GQL exposing (Error(..))
 import Http exposing (Error(..))
@@ -28,7 +28,7 @@ errorMessage err =
 errorModal : Maybe GQL.Error -> Html Msg
 errorModal err =
   case err of
-    Nothing -> div "" []
+    Nothing -> text ""
     Just err ->
       modal "" [
         notification "is-danger" ClearError [

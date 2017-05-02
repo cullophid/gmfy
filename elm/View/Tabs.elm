@@ -1,28 +1,29 @@
-module View.Tabs exposing (tabs, Tab(..))
+module View.Tabs exposing (tabs, Tab)
 
-import Html exposing (Html, div, text)
-import Html.Attributes exposing (class)
-import App.Data exposing (Msg)
-import View.Link exposing (link)
-import Util exposing (indexWith)
-import Dict
+import Msg exposing (Msg(..))
+import Html exposing (Html, text)
+import Html.Attributes exposing (class, href)
+import Bulma.Elements exposing (sublink)
 
-type Tab = Tab String (Html Msg)
+type alias Tab msg = {
+  key: String,
+  header: Html msg,
+  body: Html msg
+  }
 
-tabs : String -> List Tab -> Html Msg
-tabs selected tablist =
+tabs : String -> String -> List (Tab Msg) -> Html Msg
+tabs classes selected tabs =
   let
-      dict = indexWith (\(Tab name _) -> name) tablist
-      a = Debug.log "selected" selected
+    renderHeader selected {key, header} =
+      Html.li [ class (if selected == key then "is-active" else "")] [
+        sublink "" key [header]
+        ]
+    renderBody selected {key, body} =
+      if key == selected then body else text ""
   in
-    div [class "tabs"] [
-      div [class "tabs-headers"] <| List.map (tabHeader selected) tablist,
-      Maybe.withDefault (div [][ text "Nope"]) <| Maybe.map (\(Tab _ html) -> html) <| Dict.get selected dict
+    Html.div [] [
+      Html.div [class ("tabs " ++ classes)] [
+        Html.ul [] <| List.map (renderHeader selected) tabs
+      ],
+      Html.div [] <| List.map (renderBody selected) tabs
     ]
-
-tabHeader : String -> Tab -> Html Msg
-tabHeader selected (Tab name _) =
-  let
-      className = class <| "tabs-header btn btn-default" ++ if selected == name then " tabs-selected" else ""
-  in
-    link ("#" ++ name) [className] [text name]

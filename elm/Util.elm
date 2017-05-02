@@ -18,14 +18,7 @@ indexWith : (a -> comparable) -> List a -> Dict comparable a
 indexWith f list =
   Dict.fromList <| List.map (\x -> (f x, x)) list
 
-title_ : Focus {a | title: b} b
-title_ = Focus.create .title (\f x -> {x | title = f x.title})
 
-description_ : Focus {a | description: b} b
-description_ = Focus.create .description (\f x -> {x | description = f x.description})
-
-points_ : Focus {a | points: b} b
-points_ = Focus.create .points (\f x -> {x | points = f x.points})
 
 dateDecoder : Decoder Date
 dateDecoder =

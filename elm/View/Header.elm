@@ -1,39 +1,44 @@
 module View.Header exposing (..)
 import Html exposing (Html,text)
-import App.Data exposing (Msg)
-import Bulma exposing (link, back, div)
-import Bulma.Elements exposing (title, icon)
+import Msg exposing (Msg(..))
+import Bulma exposing (div)
+import Bulma.Elements exposing (title, icon, button, link, back)
+import Bulma.Components exposing (nav)
 import Bulma.Grid exposing (column)
 import Bulma.Layout exposing (hero, container)
-
-header : String -> String -> Html msg -> Html msg
-header classes headerTitle iconButton =
-  div "" [
-    column classes [
-      iconButton
-    ],
-    hero "" [
-      container "" [
-        title "" [text headerTitle]
-      ]
-    ]
-  ]
+import Html
+import Html.Attributes exposing (class)
+import Html.Events exposing (onClick)
 
 backButton : Html Msg
 backButton =
-  back "" [
-    icon "is-medium" "fa-angle-left"
+  div "nav-left" [
+    back "nav-item" [
+      icon "is-medium" "fa-angle-left"
+    ]
   ]
 
 closeButton : Html Msg
 closeButton =
-  back "" [
-    icon "is-medium" "fa-close"
-  ]
+  div "nav-left" [
+    back "nav-item  is-primary" [
+      icon "is-medium" "fa-close"
+    ]
+    ]
 
 
 homeButton : Html Msg
 homeButton =
-  link "" "/" [
-    icon "is-medium" "fa-home"
+  div "nav-left" [
+    link "nav-item" "/" [
+      icon "is-medium" "fa-home"
+    ]
+  ]
+
+signoutButton : Html Msg
+signoutButton =
+  div "nav-left" [
+    Html.a [class "nav-item is-inverted is-primary", onClick Logout] [
+      icon "is-medium" "fa-power-off"
+    ]
   ]

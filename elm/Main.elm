@@ -1,8 +1,11 @@
 import View exposing (view)
-import App.Data exposing (Model, Msg(..), emptyModel)
-import App.Update exposing (update)
+import App exposing (Model, emptyModel)
+import Msg exposing(Msg(..))
+import Update exposing (update)
 import Navigation exposing (Location)
-import Route.Update as Route
+import RemoteData exposing (RemoteData(..))
+import Api
+import Router
 
 main : Program Never Model Msg
 main =
@@ -10,13 +13,13 @@ main =
     {
     init = init,
     view = view,
-    update = update,
+    update = update << Debug.log "Msg",
     subscriptions = subscriptions
     }
 
 init: Location -> (Model, Cmd Msg)
 init location =
-  Route.update location emptyModel
+  Router.update location emptyModel
 
 subscriptions : Model -> Sub Msg
 subscriptions model =

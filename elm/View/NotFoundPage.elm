@@ -1,8 +1,17 @@
 module View.NotFoundPage exposing (notFoundPage)
-import App.Data  exposing (Msg)
-import Html exposing (Html)
-import View.Header exposing (header, homeButton)
+import Msg  exposing (Msg(..))
+import Html exposing (Html, text)
+import View.Header exposing (homeButton)
+import Bulma exposing (div)
+import Bulma.Elements exposing (title)
+import Bulma.Components exposing (nav)
+import Bulma.Layout exposing (hero)
 
 notFoundPage : Html Msg
 notFoundPage =
-  header "is-danger" "Page Not Found" homeButton
+  div "" [
+    nav "has-shadow" [homeButton],
+    hero "" [
+      title "" [text "Page Not Found"]
+    ]
+  ]

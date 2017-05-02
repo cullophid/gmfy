@@ -1,9 +1,10 @@
 module View exposing (view)
-import App.Data exposing (Model, Msg)
-import User.Data exposing (User)
+import App exposing (Model)
+import Msg exposing (Msg(..))
+import User exposing (User)
 import Html exposing (Html, text)
 import Bulma exposing (div)
-import Route.Data exposing (Route(..))
+import Router exposing (Route(..))
 import View.GamesListPage exposing (gamesListPage)
 import View.GamePage exposing (gamePage)
 import View.NewGamePage exposing (newGamePage)
@@ -13,8 +14,9 @@ import View.NotFoundPage exposing (notFoundPage)
 import View.ErrorModal  exposing (errorModal)
 import RemoteData exposing (RemoteData(..))
 import View.Loader exposing (loadingScreen)
-import InviteForm.View exposing (invitePlayerScreen)
-import Auth.View exposing (loginPage, loginPendingPage)
+import View.InviteScreen exposing (invitePlayerScreen)
+import View.LoginPage exposing (loginPage, loginPendingPage)
+import Modal
 
 view : Model -> Html Msg
 view model =
@@ -23,6 +25,7 @@ view model =
       loginForm,
       game,
       user,
+      modal,
       error,
       activity,
       route,
@@ -34,6 +37,7 @@ view model =
   in
     div "main" [
       errorModal error,
+      Modal.render modal,
       case route of
         LoginRoute ->
           loginPage loginForm
@@ -41,8 +45,8 @@ view model =
           loginPendingPage
         GameListRoute ->
           gamesListPage gameList
-        GameRoute _ ->
-          gamePage {user = user, game = game}
+        GameRoute _ hash->
+          gamePage {user = user, game = game, hash = hash}
         NewGameRoute ->
           newGamePage game gameForm
         NewActivityRoute _->

@@ -57,3 +57,15 @@ modalWithClose isActive classes children =
     Html.div [class ("modal-content " ++ classes)] children,
     Html.div [class "modal-close"] []
   ]
+
+media : BasicComponent msg
+media = basicDiv "media"
+
+mediaLeft : BasicComponent msg
+mediaLeft = basicDiv "media-left"
+
+mediaContent : BasicComponent msg
+mediaContent = basicDiv "media-content"
+
+mediaRight : BasicComponent msg
+mediaRight = basicDiv "media-right"

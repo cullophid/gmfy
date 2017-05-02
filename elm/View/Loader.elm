@@ -1,5 +1,5 @@
 module View.Loader exposing (..)
-import App.Data exposing (Msg)
+import Msg exposing (Msg(..))
 import Html exposing (Html, div, text)
 import Html.Attributes exposing (class)
 
